@@ -5,7 +5,7 @@
 # Plan = pronóstico × percentil p del cociente real / pronóstico de las 12 semanas previas
 # (se juntan las 7 categorías del segmento). Se prueban p = 40…95 y se elige el de menor
 # costo simulado (sobrante $200, faltante $150 por vianda, `config.yaml`); 80/90/95 de referencia.
-# Backtest: 12 orígenes, semanas 08/06–29/08/2026 (se pronostican además las 12 semanas
+# Backtest: 12 orígenes, semanas 24/08–14/11/2026, los dos segmentos (se pronostican además las 12 semanas
 # anteriores para tener errores previos). Referencia: naive estacional con el mismo colchón.
 # Unidades × K: % de sobrante/faltante, coberturas y costo por vianda no dependen de K.
 #
@@ -25,7 +25,7 @@ pd.set_option("display.width", 200)
 T, FIG = ruta("tablas"), ruta("figuras")
 
 # %% [markdown]
-# ## 1. Costo simulado según el colchón (backtest 08/06–29/08/2026)
+# ## 1. Costo simulado según el colchón (backtest 24/08–14/11/2026)
 
 # %%
 pd.read_csv(T / "plan_curva_costo.csv").round(3)
@@ -46,7 +46,7 @@ pd.read_csv(T / "plan_simulacion.csv").round(3)
 pd.read_csv(T / "plan_sensibilidad_costo.csv").round(3)
 
 # %% [markdown]
-# ## 4. Plan para la semana 31/08–05/09/2026 (porciones × K, una compra semanal)
+# ## 4. Plan para la semana 16/11–21/11/2026 (porciones × K, una compra semanal)
 
 # %%
 pd.read_csv(T / "plan_semana_siguiente.csv")

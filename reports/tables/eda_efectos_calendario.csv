@@ -1,16 +1,16 @@
 serie,variable,dias,efecto_pct,ic95_inf_pct,ic95_sup_pct,p_valor
-Total,tendencia (por semana),407,0.992,0.8407,1.1436,0.0
-Total,feriado_laborable,11,-29.8893,-37.3423,-21.5498,0.0
-Total,vispera_cierre,7,-21.9247,-50.3681,22.8192,0.2843
-Total,post_cierre,7,-16.5375,-38.3658,13.0214,0.2425
-Total,verano,26,-25.2151,-29.3357,-20.8541,0.0
+Total,tendencia (por semana),472,0.9731,0.8585,1.0878,0.0
+Total,feriado_laborable,13,-29.1063,-35.8556,-21.6469,0.0
+Total,vispera_cierre,7,-21.6379,-50.3715,23.7317,0.2954
+Total,post_cierre,7,-16.2952,-37.9054,12.8359,0.2431
+Total,verano,26,-25.041,-29.1948,-20.6435,0.0
 Particulares,tendencia (por semana),472,0.9187,0.7904,1.0472,0.0
 Particulares,feriado_laborable,13,-18.4623,-27.3364,-8.5046,0.0005
 Particulares,vispera_cierre,7,-25.6782,-57.046,28.5966,0.2887
 Particulares,post_cierre,7,-18.4717,-41.9847,14.5709,0.2394
 Particulares,verano,26,-25.1448,-30.2131,-19.7083,0.0
-Empresas,tendencia (por semana),403,0.9329,0.6985,1.1679,0.0
-Empresas,feriado_laborable,11,-45.9308,-55.0292,-34.9917,0.0
-Empresas,vispera_cierre,7,-12.9696,-43.3101,33.6093,0.5253
-Empresas,post_cierre,7,-8.5576,-34.6169,27.8879,0.6012
-Empresas,verano,26,-24.0575,-30.003,-17.6071,0.0
+Empresas,tendencia (por semana),468,0.9636,0.7797,1.1479,0.0
+Empresas,feriado_laborable,13,-45.4337,-53.4497,-36.0374,0.0
+Empresas,vispera_cierre,7,-13.4956,-43.7571,33.0482,0.5092
+Empresas,post_cierre,7,-8.5421,-34.1809,27.084,0.5947
+Empresas,verano,26,-24.2337,-30.239,-17.7114,0.0

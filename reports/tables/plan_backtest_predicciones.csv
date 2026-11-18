@@ -1,81 +1,4 @@
 origen,segmento,categoria,lgbm,naive_estacional,y,fase
-2026-03-14,empresas,carne vacuna,488.919171585589,481.0,490.0,previa
-2026-03-14,empresas,cerdo,78.3291193053247,90.0,45.0,previa
-2026-03-14,empresas,pastas,324.31799204025,312.0,321.0,previa
-2026-03-14,empresas,pescado,120.71065984331375,97.0,141.0,previa
-2026-03-14,empresas,pollo,381.5471249587749,398.0,412.0,previa
-2026-03-14,empresas,tartas y huevo,202.54077470140334,189.0,190.0,previa
-2026-03-14,empresas,vegetales y legumbres,114.70613067414963,107.0,116.0,previa
-2026-03-21,empresas,carne vacuna,487.95208712016944,490.0,480.0,previa
-2026-03-21,empresas,cerdo,68.20526581425702,45.0,52.0,previa
-2026-03-21,empresas,pastas,319.5458548016661,321.0,331.0,previa
-2026-03-21,empresas,pescado,122.38296579785047,141.0,101.0,previa
-2026-03-21,empresas,pollo,380.71725734687385,412.0,370.0,previa
-2026-03-21,empresas,tartas y huevo,195.34799324784868,190.0,221.0,previa
-2026-03-21,empresas,vegetales y legumbres,113.40233081942901,116.0,118.0,previa
-2026-03-28,empresas,carne vacuna,354.2053186428947,480.0,319.0,previa
-2026-03-28,empresas,cerdo,43.850650233958554,52.0,37.0,previa
-2026-03-28,empresas,pastas,237.88448291128174,331.0,246.0,previa
-2026-03-28,empresas,pescado,84.2162109202795,101.0,92.0,previa
-2026-03-28,empresas,pollo,288.74098718438836,370.0,256.0,previa
-2026-03-28,empresas,tartas y huevo,147.6823662574858,221.0,123.0,previa
-2026-03-28,empresas,vegetales y legumbres,84.83130055161196,118.0,58.0,previa
-2026-04-04,empresas,carne vacuna,368.61657821801765,319.0,617.0,previa
-2026-04-04,empresas,cerdo,47.06827233634877,37.0,92.0,previa
-2026-04-04,empresas,pastas,261.0886725890812,246.0,326.0,previa
-2026-04-04,empresas,pescado,89.4467135254357,92.0,109.0,previa
-2026-04-04,empresas,pollo,302.6664094272638,256.0,408.0,previa
-2026-04-04,empresas,tartas y huevo,154.61896516666602,123.0,199.0,previa
-2026-04-04,empresas,vegetales y legumbres,84.49316050005676,58.0,114.0,previa
-2026-04-11,empresas,carne vacuna,587.8137864743435,617.0,597.0,previa
-2026-04-11,empresas,cerdo,71.43107533758258,92.0,57.0,previa
-2026-04-11,empresas,pastas,387.65722823139055,326.0,332.0,previa
-2026-04-11,empresas,pescado,136.1758831246665,109.0,105.0,previa
-2026-04-11,empresas,pollo,443.2549808187513,408.0,398.0,previa
-2026-04-11,empresas,tartas y huevo,228.7170800027087,199.0,200.0,previa
-2026-04-11,empresas,vegetales y legumbres,125.64790626634316,114.0,152.0,previa
-2026-04-18,empresas,carne vacuna,570.7603504254402,597.0,609.0,previa
-2026-04-18,empresas,cerdo,68.38529534315157,57.0,95.0,previa
-2026-04-18,empresas,pastas,358.733258096407,332.0,317.0,previa
-2026-04-18,empresas,pescado,117.44494138032411,105.0,99.0,previa
-2026-04-18,empresas,pollo,405.3917089735602,398.0,416.0,previa
-2026-04-18,empresas,tartas y huevo,213.7185910633089,200.0,192.0,previa
-2026-04-18,empresas,vegetales y legumbres,123.69702637491571,152.0,124.0,previa
-2026-04-25,empresas,carne vacuna,457.61953241239445,511.0,562.0,previa
-2026-04-25,empresas,cerdo,69.37968969384009,84.0,48.0,previa
-2026-04-25,empresas,pastas,261.84971109693544,249.0,303.0,previa
-2026-04-25,empresas,pescado,96.89951360174567,91.0,98.0,previa
-2026-04-25,empresas,pollo,327.30781519811734,352.0,286.0,previa
-2026-04-25,empresas,tartas y huevo,155.1184635873845,155.0,156.0,previa
-2026-04-25,empresas,vegetales y legumbres,92.95001115539915,96.0,108.0,previa
-2026-05-02,empresas,carne vacuna,622.5474611410089,660.0,701.0,previa
-2026-05-02,empresas,cerdo,75.06761913770661,59.0,99.0,previa
-2026-05-02,empresas,pastas,335.9671112551014,371.0,315.0,previa
-2026-05-02,empresas,pescado,107.4721893656218,106.0,112.0,previa
-2026-05-02,empresas,pollo,390.6470642157905,350.0,384.0,previa
-2026-05-02,empresas,tartas y huevo,196.30169072165086,193.0,201.0,previa
-2026-05-02,empresas,vegetales y legumbres,130.2988879840005,136.0,127.0,previa
-2026-05-09,empresas,carne vacuna,673.0403903066403,701.0,644.0,previa
-2026-05-09,empresas,cerdo,80.87557581175747,99.0,73.0,previa
-2026-05-09,empresas,pastas,350.1995454110794,315.0,317.0,previa
-2026-05-09,empresas,pescado,112.10778686741045,112.0,117.0,previa
-2026-05-09,empresas,pollo,402.5299493521307,384.0,316.0,previa
-2026-05-09,empresas,tartas y huevo,206.30409564992996,201.0,214.0,previa
-2026-05-09,empresas,vegetales y legumbres,141.18875003569536,127.0,120.0,previa
-2026-05-16,empresas,carne vacuna,628.4499417493221,644.0,642.0,previa
-2026-05-16,empresas,cerdo,80.16603338295408,73.0,74.0,previa
-2026-05-16,empresas,pastas,321.5081162205423,317.0,277.0,previa
-2026-05-16,empresas,pescado,108.17841668656311,117.0,87.0,previa
-2026-05-16,empresas,pollo,352.46441356459036,316.0,309.0,previa
-2026-05-16,empresas,tartas y huevo,193.33556479328786,214.0,173.0,previa
-2026-05-16,empresas,vegetales y legumbres,123.54068554283624,120.0,85.0,previa
-2026-05-23,empresas,carne vacuna,625.2426730206994,642.0,668.0,previa
-2026-05-23,empresas,cerdo,71.37072774947038,74.0,74.0,previa
-2026-05-23,empresas,pastas,295.48592802594453,277.0,385.0,previa
-2026-05-23,empresas,pescado,101.06835739182921,87.0,141.0,previa
-2026-05-23,empresas,pollo,313.9224068616525,309.0,355.0,previa
-2026-05-23,empresas,tartas y huevo,182.8427217562078,173.0,212.0,previa
-2026-05-23,empresas,vegetales y legumbres,108.89594676030573,85.0,157.0,previa
 2026-05-30,empresas,carne vacuna,751.0106773705262,668.0,744.0,previa
 2026-05-30,empresas,cerdo,88.89517084880934,74.0,102.0,previa
 2026-05-30,empresas,pastas,361.74553934170166,385.0,322.0,previa
@@ -90,13 +13,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-05-30,particulares,pollo,744.3327442478751,715.0,795.0,previa
 2026-05-30,particulares,tartas y huevo,354.1322245023863,318.0,363.0,previa
 2026-05-30,particulares,vegetales y legumbres,307.71189547785514,333.0,339.0,previa
-2026-06-06,empresas,carne vacuna,720.1093323575462,744.0,757.0,test
-2026-06-06,empresas,cerdo,86.23331938185045,102.0,56.0,test
-2026-06-06,empresas,pastas,344.692762552044,322.0,306.0,test
-2026-06-06,empresas,pescado,116.11370779922285,95.0,126.0,test
-2026-06-06,empresas,pollo,360.87657439732897,382.0,358.0,test
-2026-06-06,empresas,tartas y huevo,224.9425392816091,243.0,238.0,test
-2026-06-06,empresas,vegetales y legumbres,122.12650247329759,102.0,127.0,test
+2026-06-06,empresas,carne vacuna,720.1093323575462,744.0,757.0,previa
+2026-06-06,empresas,cerdo,86.23331938185045,102.0,56.0,previa
+2026-06-06,empresas,pastas,344.692762552044,322.0,306.0,previa
+2026-06-06,empresas,pescado,116.11370779922285,95.0,126.0,previa
+2026-06-06,empresas,pollo,360.87657439732897,382.0,358.0,previa
+2026-06-06,empresas,tartas y huevo,224.9425392816091,243.0,238.0,previa
+2026-06-06,empresas,vegetales y legumbres,122.12650247329759,102.0,127.0,previa
 2026-06-06,particulares,carne vacuna,1079.8356058304691,1037.0,1130.0,previa
 2026-06-06,particulares,cerdo,138.71436364749815,144.0,184.0,previa
 2026-06-06,particulares,pastas,632.3683012844111,585.0,697.0,previa
@@ -104,13 +27,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-06-06,particulares,pollo,770.3488009024841,795.0,849.0,previa
 2026-06-06,particulares,tartas y huevo,359.4662558487568,363.0,394.0,previa
 2026-06-06,particulares,vegetales y legumbres,328.37329678681994,339.0,327.0,previa
-2026-06-13,empresas,carne vacuna,684.9833650825782,757.0,719.0,test
-2026-06-13,empresas,cerdo,75.63200955917331,56.0,114.0,test
-2026-06-13,empresas,pastas,310.8264121227058,306.0,341.0,test
-2026-06-13,empresas,pescado,110.52646593169268,126.0,99.0,test
-2026-06-13,empresas,pollo,345.89707701672523,358.0,366.0,test
-2026-06-13,empresas,tartas y huevo,211.36126578850562,238.0,225.0,test
-2026-06-13,empresas,vegetales y legumbres,115.98519319981506,127.0,127.0,test
+2026-06-13,empresas,carne vacuna,684.9833650825782,757.0,719.0,previa
+2026-06-13,empresas,cerdo,75.63200955917331,56.0,114.0,previa
+2026-06-13,empresas,pastas,310.8264121227058,306.0,341.0,previa
+2026-06-13,empresas,pescado,110.52646593169268,126.0,99.0,previa
+2026-06-13,empresas,pollo,345.89707701672523,358.0,366.0,previa
+2026-06-13,empresas,tartas y huevo,211.36126578850562,238.0,225.0,previa
+2026-06-13,empresas,vegetales y legumbres,115.98519319981506,127.0,127.0,previa
 2026-06-13,particulares,carne vacuna,1094.4870325423456,1130.0,990.0,previa
 2026-06-13,particulares,cerdo,151.0791278669003,184.0,123.0,previa
 2026-06-13,particulares,pastas,642.1739911207602,697.0,598.0,previa
@@ -118,13 +41,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-06-13,particulares,pollo,792.8741334468584,849.0,747.0,previa
 2026-06-13,particulares,tartas y huevo,367.19343717769203,394.0,349.0,previa
 2026-06-13,particulares,vegetales y legumbres,331.7570123867082,327.0,335.0,previa
-2026-06-20,empresas,carne vacuna,706.9128506253896,719.0,818.0,test
-2026-06-20,empresas,cerdo,81.99178330925494,114.0,83.0,test
-2026-06-20,empresas,pastas,333.9564065094197,341.0,364.0,test
-2026-06-20,empresas,pescado,112.07018244010641,99.0,141.0,test
-2026-06-20,empresas,pollo,353.37070693419673,366.0,435.0,test
-2026-06-20,empresas,tartas y huevo,228.15523766058016,225.0,210.0,test
-2026-06-20,empresas,vegetales y legumbres,125.44252997626414,127.0,168.0,test
+2026-06-20,empresas,carne vacuna,706.9128506253896,719.0,818.0,previa
+2026-06-20,empresas,cerdo,81.99178330925494,114.0,83.0,previa
+2026-06-20,empresas,pastas,333.9564065094197,341.0,364.0,previa
+2026-06-20,empresas,pescado,112.07018244010641,99.0,141.0,previa
+2026-06-20,empresas,pollo,353.37070693419673,366.0,435.0,previa
+2026-06-20,empresas,tartas y huevo,228.15523766058016,225.0,210.0,previa
+2026-06-20,empresas,vegetales y legumbres,125.44252997626414,127.0,168.0,previa
 2026-06-20,particulares,carne vacuna,1053.0977673374928,990.0,988.0,previa
 2026-06-20,particulares,cerdo,149.98330269814704,123.0,131.0,previa
 2026-06-20,particulares,pastas,616.5676251744769,598.0,597.0,previa
@@ -132,13 +55,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-06-20,particulares,pollo,777.7898904765049,747.0,747.0,previa
 2026-06-20,particulares,tartas y huevo,355.0894934458412,349.0,303.0,previa
 2026-06-20,particulares,vegetales y legumbres,331.86996754489485,335.0,280.0,previa
-2026-06-27,empresas,carne vacuna,825.5410132869067,818.0,793.0,test
-2026-06-27,empresas,cerdo,95.11632012959133,83.0,57.0,test
-2026-06-27,empresas,pastas,361.1744968457413,364.0,305.0,test
-2026-06-27,empresas,pescado,124.8654557917645,141.0,120.0,test
-2026-06-27,empresas,pollo,414.75371939333365,435.0,386.0,test
-2026-06-27,empresas,tartas y huevo,251.04876188827524,210.0,227.0,test
-2026-06-27,empresas,vegetales y legumbres,142.36262162247328,168.0,126.0,test
+2026-06-27,empresas,carne vacuna,825.5410132869067,818.0,793.0,previa
+2026-06-27,empresas,cerdo,95.11632012959133,83.0,57.0,previa
+2026-06-27,empresas,pastas,361.1744968457413,364.0,305.0,previa
+2026-06-27,empresas,pescado,124.8654557917645,141.0,120.0,previa
+2026-06-27,empresas,pollo,414.75371939333365,435.0,386.0,previa
+2026-06-27,empresas,tartas y huevo,251.04876188827524,210.0,227.0,previa
+2026-06-27,empresas,vegetales y legumbres,142.36262162247328,168.0,126.0,previa
 2026-06-27,particulares,carne vacuna,1021.5599775415097,988.0,964.0,previa
 2026-06-27,particulares,cerdo,143.3606557851165,131.0,133.0,previa
 2026-06-27,particulares,pastas,609.9801962799527,597.0,544.0,previa
@@ -146,13 +69,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-06-27,particulares,pollo,775.9407577509021,747.0,673.0,previa
 2026-06-27,particulares,tartas y huevo,346.88107527479247,303.0,308.0,previa
 2026-06-27,particulares,vegetales y legumbres,316.79590592919595,280.0,309.0,previa
-2026-07-04,empresas,carne vacuna,807.5973325909704,793.0,861.0,test
-2026-07-04,empresas,cerdo,80.52673132933168,57.0,87.0,test
-2026-07-04,empresas,pastas,341.7134708288076,305.0,389.0,test
-2026-07-04,empresas,pescado,125.90849539533448,120.0,91.0,test
-2026-07-04,empresas,pollo,400.9664576471417,386.0,403.0,test
-2026-07-04,empresas,tartas y huevo,236.79914901012648,227.0,226.0,test
-2026-07-04,empresas,vegetales y legumbres,143.57065412695144,126.0,161.0,test
+2026-07-04,empresas,carne vacuna,807.5973325909704,793.0,861.0,previa
+2026-07-04,empresas,cerdo,80.52673132933168,57.0,87.0,previa
+2026-07-04,empresas,pastas,341.7134708288076,305.0,389.0,previa
+2026-07-04,empresas,pescado,125.90849539533448,120.0,91.0,previa
+2026-07-04,empresas,pollo,400.9664576471417,386.0,403.0,previa
+2026-07-04,empresas,tartas y huevo,236.79914901012648,227.0,226.0,previa
+2026-07-04,empresas,vegetales y legumbres,143.57065412695144,126.0,161.0,previa
 2026-07-04,particulares,carne vacuna,963.1634962238873,964.0,981.0,previa
 2026-07-04,particulares,cerdo,135.0543525814875,133.0,117.0,previa
 2026-07-04,particulares,pastas,574.8035150899607,544.0,625.0,previa
@@ -160,13 +83,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-07-04,particulares,pollo,713.0929179616935,673.0,806.0,previa
 2026-07-04,particulares,tartas y huevo,319.32365195381726,308.0,379.0,previa
 2026-07-04,particulares,vegetales y legumbres,294.71800145823835,309.0,368.0,previa
-2026-07-11,empresas,carne vacuna,807.2514060181056,843.0,879.0,test
-2026-07-11,empresas,cerdo,83.51879795114965,85.0,68.0,test
-2026-07-11,empresas,pastas,349.80443157946377,382.0,367.0,test
-2026-07-11,empresas,pescado,114.06594921647338,90.0,113.0,test
-2026-07-11,empresas,pollo,397.8714735988226,395.0,430.0,test
-2026-07-11,empresas,tartas y huevo,220.87839686323133,215.0,228.0,test
-2026-07-11,empresas,vegetales y legumbres,150.09269470576015,161.0,135.0,test
+2026-07-11,empresas,carne vacuna,807.2514060181056,843.0,879.0,previa
+2026-07-11,empresas,cerdo,83.51879795114965,85.0,68.0,previa
+2026-07-11,empresas,pastas,349.80443157946377,382.0,367.0,previa
+2026-07-11,empresas,pescado,114.06594921647338,90.0,113.0,previa
+2026-07-11,empresas,pollo,397.8714735988226,395.0,430.0,previa
+2026-07-11,empresas,tartas y huevo,220.87839686323133,215.0,228.0,previa
+2026-07-11,empresas,vegetales y legumbres,150.09269470576015,161.0,135.0,previa
 2026-07-11,particulares,carne vacuna,843.2050114603968,833.0,1048.0,previa
 2026-07-11,particulares,cerdo,117.2413100608104,108.0,114.0,previa
 2026-07-11,particulares,pastas,515.5815126067271,544.0,586.0,previa
@@ -174,13 +97,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-07-11,particulares,pollo,638.5790535274862,681.0,707.0,previa
 2026-07-11,particulares,tartas y huevo,280.09130870626666,310.0,322.0,previa
 2026-07-11,particulares,vegetales y legumbres,281.65472769836305,311.0,306.0,previa
-2026-07-18,empresas,carne vacuna,839.418050743192,897.0,711.0,test
-2026-07-18,empresas,cerdo,74.39145207077289,70.0,93.0,test
-2026-07-18,empresas,pastas,356.2493105535224,374.0,272.0,test
-2026-07-18,empresas,pescado,115.12463671973636,114.0,101.0,test
-2026-07-18,empresas,pollo,412.5809153003815,438.0,424.0,test
-2026-07-18,empresas,tartas y huevo,225.36313943364078,239.0,281.0,test
-2026-07-18,empresas,vegetales y legumbres,147.16274356392975,135.0,135.0,test
+2026-07-18,empresas,carne vacuna,839.418050743192,897.0,711.0,previa
+2026-07-18,empresas,cerdo,74.39145207077289,70.0,93.0,previa
+2026-07-18,empresas,pastas,356.2493105535224,374.0,272.0,previa
+2026-07-18,empresas,pescado,115.12463671973636,114.0,101.0,previa
+2026-07-18,empresas,pollo,412.5809153003815,438.0,424.0,previa
+2026-07-18,empresas,tartas y huevo,225.36313943364078,239.0,281.0,previa
+2026-07-18,empresas,vegetales y legumbres,147.16274356392975,135.0,135.0,previa
 2026-07-18,particulares,carne vacuna,1051.2580226494833,1196.0,1088.0,previa
 2026-07-18,particulares,cerdo,129.21797826156055,123.0,115.0,previa
 2026-07-18,particulares,pastas,619.083962787718,667.0,624.0,previa
@@ -188,13 +111,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-07-18,particulares,pollo,775.9517649512134,832.0,762.0,previa
 2026-07-18,particulares,tartas y huevo,349.1960194963316,391.0,352.0,previa
 2026-07-18,particulares,vegetales y legumbres,330.47969341215446,363.0,279.0,previa
-2026-07-25,empresas,carne vacuna,862.1156187427267,711.0,959.0,test
-2026-07-25,empresas,cerdo,81.0518489094033,93.0,89.0,test
-2026-07-25,empresas,pastas,352.0301297561179,272.0,383.0,test
-2026-07-25,empresas,pescado,110.41391116601585,101.0,97.0,test
-2026-07-25,empresas,pollo,432.15712503773557,424.0,433.0,test
-2026-07-25,empresas,tartas y huevo,257.1169695003452,281.0,229.0,test
-2026-07-25,empresas,vegetales y legumbres,146.4266009204191,135.0,119.0,test
+2026-07-25,empresas,carne vacuna,862.1156187427267,711.0,959.0,previa
+2026-07-25,empresas,cerdo,81.0518489094033,93.0,89.0,previa
+2026-07-25,empresas,pastas,352.0301297561179,272.0,383.0,previa
+2026-07-25,empresas,pescado,110.41391116601585,101.0,97.0,previa
+2026-07-25,empresas,pollo,432.15712503773557,424.0,433.0,previa
+2026-07-25,empresas,tartas y huevo,257.1169695003452,281.0,229.0,previa
+2026-07-25,empresas,vegetales y legumbres,146.4266009204191,135.0,119.0,previa
 2026-07-25,particulares,carne vacuna,1091.5614427209407,1088.0,999.0,previa
 2026-07-25,particulares,cerdo,126.19153051014115,115.0,109.0,previa
 2026-07-25,particulares,pastas,633.4980710190944,624.0,640.0,previa
@@ -202,13 +125,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-07-25,particulares,pollo,791.2662235095198,762.0,706.0,previa
 2026-07-25,particulares,tartas y huevo,365.50093550001077,352.0,350.0,previa
 2026-07-25,particulares,vegetales y legumbres,335.32455933086885,279.0,237.0,previa
-2026-08-01,empresas,carne vacuna,893.6286436912432,959.0,900.0,test
-2026-08-01,empresas,cerdo,88.17295279609698,89.0,94.0,test
-2026-08-01,empresas,pastas,368.84170056728806,383.0,338.0,test
-2026-08-01,empresas,pescado,102.95513283548279,97.0,150.0,test
-2026-08-01,empresas,pollo,439.98399168655646,433.0,444.0,test
-2026-08-01,empresas,tartas y huevo,257.75798575335,229.0,233.0,test
-2026-08-01,empresas,vegetales y legumbres,142.89749761594152,119.0,170.0,test
+2026-08-01,empresas,carne vacuna,893.6286436912432,959.0,900.0,previa
+2026-08-01,empresas,cerdo,88.17295279609698,89.0,94.0,previa
+2026-08-01,empresas,pastas,368.84170056728806,383.0,338.0,previa
+2026-08-01,empresas,pescado,102.95513283548279,97.0,150.0,previa
+2026-08-01,empresas,pollo,439.98399168655646,433.0,444.0,previa
+2026-08-01,empresas,tartas y huevo,257.75798575335,229.0,233.0,previa
+2026-08-01,empresas,vegetales y legumbres,142.89749761594152,119.0,170.0,previa
 2026-08-01,particulares,carne vacuna,1071.4209745187081,999.0,1259.0,previa
 2026-08-01,particulares,cerdo,118.24938655844727,109.0,166.0,previa
 2026-08-01,particulares,pastas,639.5232907417454,640.0,710.0,previa
@@ -216,13 +139,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-08-01,particulares,pollo,778.9404416517709,706.0,923.0,previa
 2026-08-01,particulares,tartas y huevo,366.9831647336998,350.0,398.0,previa
 2026-08-01,particulares,vegetales y legumbres,308.27813027541356,237.0,346.0,previa
-2026-08-08,empresas,carne vacuna,874.9135539224446,900.0,923.0,test
-2026-08-08,empresas,cerdo,87.23253028896434,94.0,53.0,test
-2026-08-08,empresas,pastas,347.67333619173235,338.0,323.0,test
-2026-08-08,empresas,pescado,115.2758177806622,150.0,104.0,test
-2026-08-08,empresas,pollo,438.55134845515647,444.0,457.0,test
-2026-08-08,empresas,tartas y huevo,248.29491511621362,233.0,205.0,test
-2026-08-08,empresas,vegetales y legumbres,142.2645012151349,170.0,128.0,test
+2026-08-08,empresas,carne vacuna,874.9135539224446,900.0,923.0,previa
+2026-08-08,empresas,cerdo,87.23253028896434,94.0,53.0,previa
+2026-08-08,empresas,pastas,347.67333619173235,338.0,323.0,previa
+2026-08-08,empresas,pescado,115.2758177806622,150.0,104.0,previa
+2026-08-08,empresas,pollo,438.55134845515647,444.0,457.0,previa
+2026-08-08,empresas,tartas y huevo,248.29491511621362,233.0,205.0,previa
+2026-08-08,empresas,vegetales y legumbres,142.2645012151349,170.0,128.0,previa
 2026-08-08,particulares,carne vacuna,1206.4383109141768,1259.0,1123.0,previa
 2026-08-08,particulares,cerdo,137.96768977006332,166.0,113.0,previa
 2026-08-08,particulares,pastas,700.9232361300465,710.0,651.0,previa
@@ -230,13 +153,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-08-08,particulares,pollo,850.2057970272085,923.0,846.0,previa
 2026-08-08,particulares,tartas y huevo,389.45168300269927,398.0,369.0,previa
 2026-08-08,particulares,vegetales y legumbres,322.729255176112,346.0,375.0,previa
-2026-08-15,empresas,carne vacuna,894.382778936992,923.0,780.0,test
-2026-08-15,empresas,cerdo,84.46079054120412,53.0,118.0,test
-2026-08-15,empresas,pastas,339.6575193988843,323.0,391.0,test
-2026-08-15,empresas,pescado,114.57400674089033,104.0,103.0,test
-2026-08-15,empresas,pollo,450.426501012862,457.0,494.0,test
-2026-08-15,empresas,tartas y huevo,244.65319153238877,205.0,164.0,test
-2026-08-15,empresas,vegetales y legumbres,141.97932561303543,128.0,265.0,test
+2026-08-15,empresas,carne vacuna,894.382778936992,923.0,780.0,previa
+2026-08-15,empresas,cerdo,84.46079054120412,53.0,118.0,previa
+2026-08-15,empresas,pastas,339.6575193988843,323.0,391.0,previa
+2026-08-15,empresas,pescado,114.57400674089033,104.0,103.0,previa
+2026-08-15,empresas,pollo,450.426501012862,457.0,494.0,previa
+2026-08-15,empresas,tartas y huevo,244.65319153238877,205.0,164.0,previa
+2026-08-15,empresas,vegetales y legumbres,141.97932561303543,128.0,265.0,previa
 2026-08-15,particulares,carne vacuna,1174.0490142315564,1123.0,832.0,previa
 2026-08-15,particulares,cerdo,132.1884278442868,113.0,98.0,previa
 2026-08-15,particulares,pastas,688.6168762685224,651.0,475.0,previa
@@ -258,6 +181,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-08-22,particulares,pollo,551.1302375849564,437.0,655.0,test
 2026-08-22,particulares,tartas y huevo,245.33989127822392,183.0,300.0,test
 2026-08-22,particulares,vegetales y legumbres,237.33795810182815,206.0,291.0,test
+2026-08-29,empresas,carne vacuna,837.0216302614148,815.0,805.0,test
+2026-08-29,empresas,cerdo,85.41822826380461,101.0,88.0,test
+2026-08-29,empresas,pastas,323.24746538979196,292.0,328.0,test
+2026-08-29,empresas,pescado,107.70919251135285,92.0,132.0,test
+2026-08-29,empresas,pollo,438.1079381834673,432.0,505.0,test
+2026-08-29,empresas,tartas y huevo,184.96990838200477,162.0,177.0,test
+2026-08-29,empresas,vegetales y legumbres,177.7723797097899,202.0,206.0,test
 2026-08-29,particulares,carne vacuna,1205.2382789064347,1167.0,1121.0,test
 2026-08-29,particulares,cerdo,140.69083113828165,139.0,141.0,test
 2026-08-29,particulares,pastas,695.7416550603186,695.0,648.0,test
@@ -265,6 +195,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-08-29,particulares,pollo,874.269376696838,821.0,882.0,test
 2026-08-29,particulares,tartas y huevo,385.08737841322613,374.0,359.0,test
 2026-08-29,particulares,vegetales y legumbres,368.04290041570005,355.0,352.0,test
+2026-09-05,empresas,carne vacuna,857.4414852544796,805.0,924.0,test
+2026-09-05,empresas,cerdo,88.47776682650809,88.0,73.0,test
+2026-09-05,empresas,pastas,344.19180872867383,328.0,368.0,test
+2026-09-05,empresas,pescado,109.8203911924679,132.0,98.0,test
+2026-09-05,empresas,pollo,482.216083819832,505.0,470.0,test
+2026-09-05,empresas,tartas y huevo,185.55809703376676,177.0,196.0,test
+2026-09-05,empresas,vegetales y legumbres,199.9553024964787,206.0,190.0,test
 2026-09-05,particulares,carne vacuna,1053.6561697297043,1121.0,1245.0,test
 2026-09-05,particulares,cerdo,121.16119840532241,141.0,159.0,test
 2026-09-05,particulares,pastas,613.8057973778558,648.0,679.0,test
@@ -272,6 +209,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-09-05,particulares,pollo,776.7252780767631,882.0,957.0,test
 2026-09-05,particulares,tartas y huevo,335.42420448494596,359.0,328.0,test
 2026-09-05,particulares,vegetales y legumbres,332.2990007128492,352.0,326.0,test
+2026-09-12,empresas,carne vacuna,810.342989425414,924.0,826.0,test
+2026-09-12,empresas,cerdo,89.83874474270962,73.0,67.0,test
+2026-09-12,empresas,pastas,332.86318309962485,368.0,322.0,test
+2026-09-12,empresas,pescado,102.66298958667267,98.0,113.0,test
+2026-09-12,empresas,pollo,459.3225714988222,470.0,484.0,test
+2026-09-12,empresas,tartas y huevo,171.29819097689727,196.0,181.0,test
+2026-09-12,empresas,vegetales y legumbres,203.36728544486064,190.0,205.0,test
 2026-09-12,particulares,carne vacuna,1266.2940202264544,1245.0,1229.0,test
 2026-09-12,particulares,cerdo,154.65077055176678,159.0,130.0,test
 2026-09-12,particulares,pastas,718.7991867769582,679.0,691.0,test
@@ -279,6 +223,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-09-12,particulares,pollo,939.296376114424,957.0,907.0,test
 2026-09-12,particulares,tartas y huevo,374.8255746445933,328.0,356.0,test
 2026-09-12,particulares,vegetales y legumbres,373.10013115031865,326.0,361.0,test
+2026-09-19,empresas,carne vacuna,895.5334506660172,826.0,866.0,test
+2026-09-19,empresas,cerdo,81.73067848727453,67.0,70.0,test
+2026-09-19,empresas,pastas,341.8592114803354,322.0,376.0,test
+2026-09-19,empresas,pescado,113.44512476220467,113.0,98.0,test
+2026-09-19,empresas,pollo,495.7392488173815,484.0,535.0,test
+2026-09-19,empresas,tartas y huevo,191.71911454900373,181.0,168.0,test
+2026-09-19,empresas,vegetales y legumbres,202.7787703912357,205.0,143.0,test
 2026-09-19,particulares,carne vacuna,1183.776906641371,1229.0,1034.0,test
 2026-09-19,particulares,cerdo,139.24979474226524,130.0,100.0,test
 2026-09-19,particulares,pastas,667.8939261063294,691.0,570.0,test
@@ -286,6 +237,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-09-19,particulares,pollo,882.4665640949631,907.0,826.0,test
 2026-09-19,particulares,tartas y huevo,343.9389935332857,356.0,350.0,test
 2026-09-19,particulares,vegetales y legumbres,344.00130612549316,361.0,280.0,test
+2026-09-26,empresas,carne vacuna,823.1419201297917,866.0,798.0,test
+2026-09-26,empresas,cerdo,71.6652497315914,70.0,99.0,test
+2026-09-26,empresas,pastas,337.15716181459953,376.0,397.0,test
+2026-09-26,empresas,pescado,106.79161472280344,98.0,138.0,test
+2026-09-26,empresas,pollo,481.7318675869154,535.0,556.0,test
+2026-09-26,empresas,tartas y huevo,176.46617589970464,168.0,210.0,test
+2026-09-26,empresas,vegetales y legumbres,178.9359463288204,143.0,181.0,test
 2026-09-26,particulares,carne vacuna,1159.8562923942486,1034.0,1099.0,test
 2026-09-26,particulares,cerdo,131.8081274223814,100.0,118.0,test
 2026-09-26,particulares,pastas,646.5012452607685,570.0,618.0,test
@@ -293,6 +251,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-09-26,particulares,pollo,895.4256308718694,826.0,843.0,test
 2026-09-26,particulares,tartas y huevo,349.5022258346693,350.0,357.0,test
 2026-09-26,particulares,vegetales y legumbres,329.09586478940156,280.0,278.0,test
+2026-10-03,empresas,carne vacuna,835.2589128282867,798.0,933.0,test
+2026-10-03,empresas,cerdo,75.27593271408165,99.0,52.0,test
+2026-10-03,empresas,pastas,358.1977904923738,397.0,342.0,test
+2026-10-03,empresas,pescado,108.79902264631369,138.0,134.0,test
+2026-10-03,empresas,pollo,499.59341587282864,556.0,547.0,test
+2026-10-03,empresas,tartas y huevo,185.48921297491464,210.0,205.0,test
+2026-10-03,empresas,vegetales y legumbres,174.92633230226238,181.0,158.0,test
 2026-10-03,particulares,carne vacuna,1133.0602212742926,1099.0,1148.0,test
 2026-10-03,particulares,cerdo,124.37142739550897,118.0,125.0,test
 2026-10-03,particulares,pastas,627.5676594792958,618.0,652.0,test
@@ -300,6 +265,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-10-03,particulares,pollo,871.1140931468302,843.0,949.0,test
 2026-10-03,particulares,tartas y huevo,342.4509030529863,357.0,384.0,test
 2026-10-03,particulares,vegetales y legumbres,305.6089859896116,278.0,334.0,test
+2026-10-10,empresas,carne vacuna,803.8139320138474,933.0,670.0,test
+2026-10-10,empresas,cerdo,67.20498476343371,52.0,78.0,test
+2026-10-10,empresas,pastas,343.68592685439955,342.0,289.0,test
+2026-10-10,empresas,pescado,114.00921578950796,134.0,154.0,test
+2026-10-10,empresas,pollo,500.988297796853,547.0,442.0,test
+2026-10-10,empresas,tartas y huevo,179.4970795567296,205.0,199.0,test
+2026-10-10,empresas,vegetales y legumbres,158.82035669186772,158.0,150.0,test
 2026-10-10,particulares,carne vacuna,1057.5639305753857,1148.0,1103.0,test
 2026-10-10,particulares,cerdo,110.75977646967989,125.0,134.0,test
 2026-10-10,particulares,pastas,592.0625561727081,652.0,620.0,test
@@ -307,6 +279,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-10-10,particulares,pollo,824.9388343302091,949.0,867.0,test
 2026-10-10,particulares,tartas y huevo,339.9962168576406,384.0,349.0,test
 2026-10-10,particulares,vegetales y legumbres,293.50417536087684,334.0,326.0,test
+2026-10-17,empresas,carne vacuna,765.777861474413,670.0,825.0,test
+2026-10-17,empresas,cerdo,69.18805412604203,78.0,81.0,test
+2026-10-17,empresas,pastas,330.2332923944539,289.0,313.0,test
+2026-10-17,empresas,pescado,120.96701823609845,154.0,181.0,test
+2026-10-17,empresas,pollo,483.61140231198925,442.0,465.0,test
+2026-10-17,empresas,tartas y huevo,181.94086795907617,199.0,204.0,test
+2026-10-17,empresas,vegetales y legumbres,147.48155646129618,150.0,154.0,test
 2026-10-17,particulares,carne vacuna,1109.4267728816626,1103.0,1124.0,test
 2026-10-17,particulares,cerdo,120.67521781339748,134.0,133.0,test
 2026-10-17,particulares,pastas,621.9225167788427,620.0,681.0,test
@@ -314,6 +293,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-10-17,particulares,pollo,881.3475321372509,867.0,956.0,test
 2026-10-17,particulares,tartas y huevo,363.88567275946167,349.0,359.0,test
 2026-10-17,particulares,vegetales y legumbres,308.02898918131945,326.0,310.0,test
+2026-10-24,empresas,carne vacuna,800.5973734105548,825.0,818.0,test
+2026-10-24,empresas,cerdo,76.8605736553114,81.0,70.0,test
+2026-10-24,empresas,pastas,334.91905358448486,313.0,363.0,test
+2026-10-24,empresas,pescado,148.2501188366275,181.0,140.0,test
+2026-10-24,empresas,pollo,496.1669616793138,465.0,494.0,test
+2026-10-24,empresas,tartas y huevo,202.27961259847154,204.0,224.0,test
+2026-10-24,empresas,vegetales y legumbres,158.2095329299558,154.0,150.0,test
 2026-10-24,particulares,carne vacuna,1123.7873593316447,1124.0,1086.0,test
 2026-10-24,particulares,cerdo,127.56765513162459,133.0,123.0,test
 2026-10-24,particulares,pastas,646.4921130721167,681.0,666.0,test
@@ -321,6 +307,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-10-24,particulares,pollo,906.3532086401716,956.0,835.0,test
 2026-10-24,particulares,tartas y huevo,363.06352408334453,359.0,354.0,test
 2026-10-24,particulares,vegetales y legumbres,313.67524185978095,310.0,324.0,test
+2026-10-31,empresas,carne vacuna,759.7836868631106,818.0,915.0,test
+2026-10-31,empresas,cerdo,65.02595631769687,70.0,87.0,test
+2026-10-31,empresas,pastas,307.37119615384114,363.0,330.0,test
+2026-10-31,empresas,pescado,142.5490016056055,140.0,161.0,test
+2026-10-31,empresas,pollo,454.2319463586533,494.0,505.0,test
+2026-10-31,empresas,tartas y huevo,192.94681111882036,224.0,231.0,test
+2026-10-31,empresas,vegetales y legumbres,144.29144233592353,150.0,161.0,test
 2026-10-31,particulares,carne vacuna,1043.9827535971126,1086.0,1061.0,test
 2026-10-31,particulares,cerdo,120.64376303713053,123.0,138.0,test
 2026-10-31,particulares,pastas,612.0458068346646,666.0,685.0,test
@@ -328,6 +321,13 @@ origen,segmento,categoria,lgbm,naive_estacional,y,fase
 2026-10-31,particulares,pollo,842.4648362425298,835.0,966.0,test
 2026-10-31,particulares,tartas y huevo,338.5964519946035,354.0,388.0,test
 2026-10-31,particulares,vegetales y legumbres,302.7182517859642,324.0,268.0,test
+2026-11-07,empresas,carne vacuna,864.0687769144741,915.0,972.0,test
+2026-11-07,empresas,cerdo,84.58582635649583,87.0,92.0,test
+2026-11-07,empresas,pastas,345.75574406253895,330.0,394.0,test
+2026-11-07,empresas,pescado,166.4288945026278,161.0,180.0,test
+2026-11-07,empresas,pollo,506.64827507793535,505.0,602.0,test
+2026-11-07,empresas,tartas y huevo,229.19954728045172,231.0,282.0,test
+2026-11-07,empresas,vegetales y legumbres,164.7197568719245,161.0,221.0,test
 2026-11-07,particulares,carne vacuna,1115.0707265771039,1061.0,897.0,test
 2026-11-07,particulares,cerdo,135.27393084762647,138.0,104.0,test
 2026-11-07,particulares,pastas,678.2341420335932,685.0,584.0,test

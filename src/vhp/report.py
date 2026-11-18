@@ -65,8 +65,6 @@ class Num:
         self.gr = _t("ads_granger")
         self.lb = _t("backtest_total_ljung_box")
         self.muni = _t("mix_metricas_unidades")
-        self.met_p = _t("backtest_particulares_metricas").set_index("modelo")
-        self.dm_part = _t("backtest_particulares_dm")
         self.p_info = _t("plan_p_elegido").iloc[0]
         self.sim_seg = _t("plan_simulacion_segmento")
         self.xl = _t("plan_prop_xl")
@@ -170,21 +168,6 @@ def tabla_decisiones(dec: list[dict]) -> pd.DataFrame:
                           "Quién": "negocio" if d["quien"] == "Lucía" else "técnica"} for d in dec])
 
 
-def texto_particulares(N: Num) -> str:
-    """Párrafo del backtest de particulares (datos hasta noviembre 2026)."""
-    met, dm = N.met_p, N.dm_part
-    g = list(met.index)[0]
-    t = f"{NOMBRES[g]} es el de menor MASE ({n(met.loc[g, 'MASE'], 3)})"
-    if g != "lgbm_directo":
-        p = N.dm_p(g, "lgbm_directo", dm)
-        t += (f"; LightGBM directo queda en {n(met.loc['lgbm_directo', 'MASE'], 3)} y Diebold-Mariano "
-              f"{'no los separa' if p >= 0.05 else 'sí los separa'} (p = {n(p, 2)})")
-    t += (f". MLP: {n(met.loc['mlp', 'MASE'], 3)}; naive estacional: {n(met.loc['naive_estacional', 'MASE'], 3)}. "
-          "Se mantiene LightGBM directo como modelo de los segmentos (decisión de la fase 5): en particulares "
-          "no hay diferencia significativa con el primero.")
-    return t
-
-
 def texto_modelos(N: Num) -> str:
     """Párrafo del backtest del total, armado con los números de las tablas."""
     orden = list(N.met.index)
@@ -278,7 +261,7 @@ def seccion_plan(N: Num) -> list[str]:
     return [f"## 6. Plan de compras (compra semanal por segmento × categoría; backtest {pi.periodo_test})", "",
             "Plan = pronóstico + colchón: pronóstico semanal × percentil p del cociente real / pronóstico de las "
             "12 semanas previas (las 7 categorías del segmento juntas). Cada segmento usa sus últimas 12 semanas con "
-            "datos (empresas termina en agosto). Se elige el p de menor costo simulado. Desde noviembre 2026 el "
+            "datos. Se elige el p de menor costo simulado. Desde noviembre 2026 el "
             "sobrante y el faltante se ponderan por la proporción de XL del segmento en las 12 semanas previas a cada "
             f"origen (empresas {pct(100 * xl['empresas'])}, particulares {pct(100 * xl['particulares'])} en promedio): "
             "sobrante = $200 (normal) / $260 (XL), faltante = $150 / $155 (precio $350 / $415 menos costo).", "",
@@ -292,9 +275,8 @@ def seccion_plan(N: Num) -> list[str]:
             "", md(tabla_sensibilidad(N)), "",
             "El p se elige en el mismo backtest en que se evalúa, así que el costo del elegido es algo optimista.", "",
             "![Plan de compras](figures/12_plan_compras.png)", "",
-            "Plan para la semana 16/11–21/11/2026, una compra semanal (porciones × K). Empresas: pronóstico con su "
-            "último dato (origen 29/08/2026) puesto en esta semana [SUPUESTO: nivel y mix de agosto; no hay datos de "
-            "empresas desde septiembre].", "",
+            "Plan para la semana 16/11–21/11/2026, una compra semanal (porciones × K), con datos de los dos "
+            "segmentos hasta el 14/11/2026.", "",
             md(N.semana.rename(columns={"segmento": "Segmento", "categoria": "Categoría", "pronostico": "Pronóstico",
                                         "origen_datos": "Datos hasta"})
                .assign(Pronóstico=lambda t: t["Pronóstico"].round(0).astype(int))), ""]
@@ -333,16 +315,13 @@ def resultados_md() -> str:
     N = Num()
     ancho = eda.cargar_datos()["ancho"]
     dias = ancho["Total"].dropna()
-    dias_p = ancho["Total/particulares"].dropna()
     pb = eda.periodo(_t("backtest_total_predicciones", parse_dates=["fecha"])["fecha"])
-    pbp = eda.periodo(_t("backtest_particulares_predicciones", parse_dates=["fecha"])["fecha"])
     decisiones = yaml.safe_load(open(RAIZ / "reports" / "decisiones.yaml", encoding="utf-8"))["decisiones"]
     L = ["# Resultados — Del pedido al plato", "",
          "Pronóstico de la demanda de Viandas Hotel del Prado, efecto de eventos y de la pauta en Meta, y plan de compras.", "",
-         f"Datos: Total y empresas {eda.periodo(dias.index)} ({len(dias)} días hábiles); particulares "
-         f"{eda.periodo(dias_p.index)} ({len(dias_p)} días hábiles). Empresas no está disponible desde septiembre "
-         "2026 (solo llegaron los exports de individuales de septiembre a noviembre; noviembre cortado en la última "
-         f"semana completa). Backtest walk-forward del Total: semanas {pb}; de particulares: semanas {pbp} "
+         f"Datos: Total, particulares y empresas {eda.periodo(dias.index)} ({len(dias)} días hábiles; noviembre "
+         "cortado en la última semana completa). Empresas de septiembre a noviembre sale del export de Excel (la "
+         f"pantalla de Resumen comercial las muestra en 0). Backtest walk-forward del Total: semanas {pb} "
          "(12 orígenes, uno por sábado). " + NOTA_ESCALA, "",
          "Todo se regenera con `python main.py all`. Las tablas están en `reports/tables/`, las figuras en "
          "`reports/figures/`, y el porqué de cada decisión en `reports/decisiones.yaml`.", ""]
@@ -362,12 +341,7 @@ def resultados_md() -> str:
 
     L += [f"## 2. Pronóstico del total (backtest {pb})", "", md(tabla_modelos(N)), "", texto_modelos(N), "",
           f"Diebold-Mariano (error absoluto, h = 1 a 6, backtest {pb}):", "", md(tabla_dm(N)), "",
-          "![Backtest del total](figures/07_backtest_total.png)", "",
-          f"### Particulares con datos hasta noviembre (backtest {pbp})", "",
-          "El Total no se puede calcular desde septiembre (falta empresas), así que el mismo backtest se corre sobre "
-          "particulares con las 12 semanas que terminan en la última semana completa:", "",
-          md(tabla_modelos(N, N.met_p)), "", texto_particulares(N), "",
-          "![Backtest de particulares](figures/07b_backtest_particulares.png)", ""]
+          "![Backtest del total](figures/07_backtest_total.png)", ""]
 
     c_e, c_p = N.efecto("empresas", "carne vacuna"), N.efecto("particulares", "carne vacuna")
     L += ["## 3. Clima → mix de categorías", "",
@@ -387,7 +361,7 @@ def resultados_md() -> str:
           "chica, exógenas de calendario, sin constante), se pronostica el período posterior como contrafactual y se "
           "compara con lo observado (IC 95 % por simulación). Los placebos repiten el método en fechas falsas "
           "anteriores al evento. Efecto medio en el período de cada evento (particulares, datos "
-          f"{eda.periodo(dias_p.index)}). Clientes nuevos y pedidos de clientes que ya compraron van en nivel (hay días "
+          f"{eda.periodo(dias.index)}). Clientes nuevos y pedidos de clientes que ya compraron van en nivel (hay días "
           "con 0) y el efecto se da en %. Efecto mínimo detectable = 2,8 × desvío de los efectos placebo (test al 5 %, "
           "potencia 80 %):", "", md(tabla_eventos(N)), "", texto_eventos(N), "",
           "![Eventos](figures/10_eventos.png)", ""]

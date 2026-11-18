@@ -22,7 +22,7 @@ Pasos sueltos: `python main.py <paso>`.
 | `calendar` | Feriados de Uruguay, días hábiles, variables de calendario | `data/processed/calendario.csv` |
 | `clima` | Clima diario de Montevideo (Open-Meteo) | `data/external/` |
 | `eda` | STL, ACF/PACF, ADF, perfiles, efectos de calendario, mix vs. temperatura | figuras 01–04 y 06 |
-| `backtest` | 7 modelos (naive, naive estacional, media móvil, ETS, SARIMA, LightGBM directo, MLP), walk-forward de 12 semanas, sobre el Total (hasta 29/08/2026) y sobre particulares (hasta 14/11/2026) | `backtest_total_*`, `backtest_particulares_*`, figuras 07 y 07b |
+| `backtest` | 7 modelos (naive, naive estacional, media móvil, ETS, SARIMA, LightGBM directo, MLP), walk-forward de 12 semanas, sobre el Total (semanas 24/08–14/11/2026) | `backtest_total_*`, figura 07 |
 | `mix` | Clima → mix de categorías: efecto de la temperatura, participación media de 4 semanas vs. multinomial | `mix_*`, figuras 08–09 |
 | `eventos` | Contrafactuales SARIMA, placebos y efecto mínimo detectable (incluye el cambio de reparto de Meta del 05/09 y la baja de pauta de noviembre 2026) | `eventos_*`, figura 10 |
 | `ads` | Meta Ads: variación del gasto y de los clics, regresiones log-log (gasto total, gasto de campaña, clics) y Granger con 1 rezago | `ads_*`, figura 11 |
@@ -68,11 +68,11 @@ Las métricas absolutas (MAE) quedan multiplicadas por `K`. Por eso en el inform
 
 ## Limitaciones de los datos
 
-- **Empresas termina el 31/08/2026:** de septiembre a noviembre 2026 solo llegaron los exports de individuales (noviembre cortado en la última semana completa, 14/11/2026). El Total y los análisis de empresas terminan en agosto; el plan de empresas para noviembre usa su último dato (nivel y mix de agosto).
+- **Noviembre cortado en la última semana completa (14/11/2026).** Empresas de septiembre a noviembre sale del export de Excel: la pantalla de Resumen comercial las muestra en 0.
 - **Recetario:** 26 platos vendidos (≈10 % de las viandas de las últimas 12 semanas) no tienen receta en el Costo del recetario y quedan fuera de la lista de compras. Las XL sin receta propia se estiman como la normal × 1,30.
 
 - Faltan los pedidos por WhatsApp, teléfono o carga manual.
-- **Lunes 17/08/2026, particulares:** la cantidad de pedidos coincide con el Tablero del negocio, pero casi no tienen líneas de producto (mediana de 1 vianda por pedido, contra ~7 un lunes normal). Parece un export incompleto. Se dejó como está; en el backtest es el día con mayor error en todos los modelos, y sacarlo de la evaluación no cambia el ranking.
+- **Lunes 17/08/2026, particulares:** la cantidad de pedidos coincide con el Tablero del negocio, pero casi no tienen líneas de producto (mediana de 1 vianda por pedido, contra ~7 un lunes normal). Parece un export incompleto. Se dejó como está. Desde que empresas llega a noviembre queda fuera de las semanas pronosticadas (24/08–14/11/2026), pero sigue en el entrenamiento.
 - **Serie corta:** hay un solo enero, así que el verano y la entrada de la agencia de Meta (02/02/2026) se confunden.
 - **Clima observado:** en el backtest se usa el clima observado; en producción habría que usar el pronóstico del tiempo.
 - **Meta Ads:** desde febrero el gasto casi no varía, así que su efecto no está identificado. Los clics sí varían, pero dependen de qué anuncios elige la agencia (correlación, no causa). La baja de pauta de noviembre 2026 tiene solo 2 semanas posteriores. No hay origen del pedido (UTM): la atribución por anuncio queda fuera.

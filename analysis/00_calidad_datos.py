@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Fase 1 — Calidad de los datos de pedidos
-# Resultados de `src/vhp/load.py`. Período: entregas de mayo 2025 a agosto 2026.
+# Resultados de `src/vhp/load.py`. Período: entregas de mayo 2025 a noviembre 2026 (cortado el 14/11/2026).
 # 
 # Antes de correr: `python main.py prepare` (genera `data/interim/lineas.parquet`).
 
@@ -77,7 +77,7 @@ plt.tight_layout(); plt.show()
 calidad.pivot(index="mes", columns="segmento", values="telefono_vacio")
 
 # %% [markdown]
-# ## 7. Control contra el Tablero (particulares, semanas lunes–domingo, 05/01–24/08/2026)
+# ## 7. Control contra el Tablero (particulares, semanas lunes–domingo, 05/01–02/11/2026)
 # Diferencia = pipeline − Tablero. Se reporta, no se fuerza.
 
 # %%

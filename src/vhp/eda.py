@@ -260,8 +260,8 @@ def correr() -> dict:
     dow = perfil_dia_semana(ancho)
     efectos = efectos_calendario(ancho, cal)
     tot_sem = semanal(tot)
-    # Mix de los dos segmentos juntos: solo hasta el último día con ambos (si no, desde
-    # septiembre 2026 el mix sería solo de particulares y cambiaría por composición)
+    # Mix de los dos segmentos juntos: solo hasta el último día con ambos (si un segmento
+    # terminara antes, el mix cambiaría por composición; hoy los dos llegan al 14/11/2026)
     fin_comun = tot.dropna().index.max()
     part = participaciones_semanales(d["diarias"][d["diarias"]["fecha"] <= fin_comun])
     temp = temperatura_semanal(d["clima"], ancho.index)

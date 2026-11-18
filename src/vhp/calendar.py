@@ -33,8 +33,8 @@ def dias_sin_entregas(lineas: pd.DataFrame, indice: pd.DatetimeIndex,
                       cierres_segmento: dict | None = None) -> pd.DataFrame:
     """Días hábiles sin ninguna entrega, en total y por segmento.
 
-    Cada segmento se mira desde su primera hasta su última entrega (empresas no tiene
-    datos desde septiembre 2026: esos días no son días sin entregas). Es para que Lucía confirme
+    Cada segmento se mira desde su primera hasta su última entrega (si un segmento deja
+    de tener datos, esos días no son días sin entregas). Es para que Lucía confirme
     si fueron cierres o días con cero ventas reales. La columna `cierre_confirmado`
     marca los que ya están en config.yaml (serie.cierres_segmento).
     """

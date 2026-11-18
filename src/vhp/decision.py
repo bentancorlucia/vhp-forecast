@@ -15,19 +15,17 @@ en las 12 semanas anteriores al origen (sin mirar la semana que se planifica):
 Se prueban p = 40, 45, …, 95 y se elige el de menor costo simulado en el backtest
 (sobrante $200 y faltante $150 por vianda, `config.yaml`). Se reportan también
 p = 80, 90 y 95 como referencia ("alcanza 8, 9 o 9,5 de cada 10 semanas").
-Ojo: p se elige mirando el costo del backtest (08/06–29/08/2026), así que ese
+Ojo: p se elige mirando el costo del backtest (24/08–14/11/2026), así que ese
 costo es algo optimista para el futuro; el colchón de cada semana sí usa solo
 semanas previas.
 
 Desde el 18/11/2026 (datos nuevos):
-- Cada segmento tiene su propia ventana de backtest: particulares termina en la última
-  semana completa con datos (09/11–14/11/2026); empresas, el 29/08/2026 (no hay datos de
-  empresas desde septiembre). p se elige con las dos ventanas juntas.
+- Cada segmento puede tener su propia ventana de backtest (`fin_test_<segmento>`); desde el
+  18/11/2026 los dos terminan en la última semana completa (09/11–14/11/2026).
 - Sobrante y faltante ponderados por la proporción de XL del segmento en las 12 semanas
   previas a cada origen (x): sobrante = 200·(1 − x) + 260·x; faltante = 150·(1 − x) + 155·x
   (margen $350 − $200 y $415 − $260). Con `ponderar_xl: false` vuelve a los costos fijos.
-- Plan real de la semana 16–21/11/2026: particulares desde el origen 14/11; empresas con
-  su último dato (origen 29/08/2026) puesto en esa semana [SUPUESTO: nivel y mix de agosto].
+- Plan real de la semana 16–21/11/2026: los dos segmentos desde el origen 14/11/2026.
 
 Por qué cociente y no diferencia: es lo mismo que el intervalo 80 % del paso 2
 (percentiles de y / ŷ), el error crece con el nivel de la serie y, sobre todo,
@@ -284,8 +282,8 @@ def correr() -> dict:
     sens = pd.concat(sens, ignore_index=True)
     por_seg = simular(pl[pl["p"] == p_star], cf, cs, por=["segmento"], cs_xl=cs_xl, cf_xl=cf_xl(cf))
 
-    # plan real: semana siguiente a la última semana completa de particulares; empresas con
-    # su último origen (29/08/2026) [SUPUESTO: nivel y mix de agosto]
+    # plan real: semana siguiente a la última semana completa; un segmento con datos más viejos
+    # usaría su último origen (o_hist)
     o_fin = max(fin_seg.values())
     o_hist = {s: f for s, f in fin_seg.items() if f < o_fin}
     fut = semanal(pronosticar_origen(datos, o_fin, cfg, fut_externo=True, origen_hist=o_hist).assign(y=np.nan),

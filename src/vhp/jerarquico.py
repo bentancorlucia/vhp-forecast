@@ -51,8 +51,8 @@ def cargar(cfg: dict | None = None) -> dict:
         seg = uid.split("/")[1] if "/" in uid else None
         G[uid] = ev.armar_grilla(d["ancho"][uid], d["clima"].reset_index(), cfg["serie"]["meses_verano"],
                                  cierres.get(seg) if seg else None)
-    # Todas empiezan el mismo día; empresas y el Total terminan antes (31/08/2026) que
-    # particulares: cada grilla es un tramo inicial de la más larga.
+    # Todas empiezan el mismo día; si un segmento terminara antes (`fin_segmento`), su grilla
+    # sería un tramo inicial de la más larga.
     largo = max(G.values(), key=len).index
     assert all(largo[: len(g)].equals(g.index) for g in G.values()), "Las grillas no comparten índice"
     return {"G": G, "S": S, "segmentos": [s.split("/")[1] for s in tags["total/segmento"]]}

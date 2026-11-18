@@ -1,5 +1,5 @@
 segmento,metodo,p,n,cobertura,sobrante_pct,faltante_pct,plan_sobre_demanda,costo_por_vianda
-empresas,lgbm,45,84,0.4524,4.8396,5.8818,0.9896,19.0517
-empresas,naive_estacional,45,84,0.5119,6.0982,7.3201,0.9878,23.8681
-particulares,lgbm,45,84,0.4048,2.8042,6.2137,0.9659,15.0371
-particulares,naive_estacional,45,84,0.4167,3.8968,6.2649,0.9763,17.3346
+empresas,lgbm,50,84,0.381,3.234,6.0127,0.9722,15.8641
+empresas,naive_estacional,50,84,0.4286,4.9808,6.7011,0.9828,20.5721
+particulares,lgbm,50,84,0.4286,3.3902,5.4807,0.9791,15.1266
+particulares,naive_estacional,50,84,0.4643,4.8888,5.4573,0.9943,18.1375

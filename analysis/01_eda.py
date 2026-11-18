@@ -2,7 +2,7 @@
 # # Fase 4 — Análisis exploratorio
 # Lógica en `src/vhp/eda.py`; las figuras van a `reports/figures/` y las tablas a `reports/tables/`.
 # Datos públicos de `data/processed/` (unidades × K: los niveles no son reales, los cocientes y tests sí).
-# Período: entregas del 06/05/2025 al 31/08/2026, en días hábiles.
+# Período: entregas del 06/05/2025 al 14/11/2026, en días hábiles.
 #
 # Antes de correr: `python main.py calendar clima` (o `all`).
 

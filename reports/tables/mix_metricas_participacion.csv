@@ -1,7 +1,7 @@
 segmento,metodo,logloss_por_vianda,error_abs_medio_pp
-empresas,media_4sem,1.673,2.6311
-empresas,multinomial,1.6741,2.8435
-empresas,multinomial_clima,1.6746,2.8526
-particulares,media_4sem,1.7604,1.5983
-particulares,multinomial_clima,1.7617,1.6825
-particulares,multinomial,1.7618,1.6892
+empresas,media_4sem,1.6792,2.3813
+empresas,multinomial,1.6816,2.6945
+empresas,multinomial_clima,1.6817,2.6829
+particulares,multinomial_clima,1.7485,1.4143
+particulares,multinomial,1.7486,1.4256
+particulares,media_4sem,1.7502,1.5807

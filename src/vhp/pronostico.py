@@ -57,11 +57,8 @@ def fig_backtest(res: pd.DataFrame, nombres: list[str], destino, serie: str = "T
     plt.close(fig)
 
 
-# Series del backtest: el Total termina el 31/08/2026 (empresas no está disponible desde
-# septiembre), así que su backtest queda en 08/06–29/08/2026. Particulares sí tiene
-# septiembre–noviembre: se corre el mismo backtest con fin en la última semana completa.
-SERIES = {"Total": ("fin_test", "backtest_total", "07_backtest_total.png"),
-          "Total/particulares": ("fin_test_particulares", "backtest_particulares", "07b_backtest_particulares.png")}
+# Un solo backtest: el Total (particulares + empresas), con datos hasta la última semana completa.
+SERIES = {"Total": ("fin_test", "backtest_total", "07_backtest_total.png")}
 
 
 def correr() -> dict:

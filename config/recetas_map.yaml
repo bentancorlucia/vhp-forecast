@@ -42,6 +42,7 @@ platos:
   "Guiso de carne a la criolla": "Guiso de carne a la criolla"
   "Guiso de lentejas": "Guiso de lentejas"
   "Hamburguesa Werba": "Hamburguesas Werba"  # MANUAL: mismo plato, nombre escrito distinto
+  "Hamburguesa al pan": SIN_RECETA  # NUEVO sep–nov 2026 (empresas): sin receta en el recetario
   "Hamburguesas Caseras": "Hamburguesas Caseras"
   "Hamburguesas caseras con salsa 3 quesos": "Hamburguesas caseras con salsa 3 quesos"
   "Hamburguesas de espinaca con guarnicion": "Hamburguesas de espinaca con guarnicion"

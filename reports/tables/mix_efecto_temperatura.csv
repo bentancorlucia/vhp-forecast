@@ -1,15 +1,15 @@
 categoria,pct_frio,pct_calor,calor_menos_frio_pp,ic95_inf_pp,ic95_sup_pp,segmento
-carne vacuna,36.199,27.914,-8.285,-9.94,-6.503,empresas
-cerdo,3.685,3.262,-0.423,-1.326,0.445,empresas
-pastas,17.244,19.102,1.859,0.439,3.166,empresas
-pescado,5.228,7.056,1.828,0.882,2.766,empresas
-pollo,19.653,22.529,2.876,1.693,4.07,empresas
-tartas y huevo,10.885,13.838,2.954,1.854,4.249,empresas
-vegetales y legumbres,7.108,6.299,-0.809,-1.93,0.002,empresas
-carne vacuna,29.263,26.552,-2.711,-3.668,-1.89,particulares
-cerdo,3.727,3.783,0.057,-0.269,0.352,particulares
-pastas,18.057,18.814,0.757,-0.02,1.475,particulares
-pescado,6.766,7.921,1.155,0.755,1.545,particulares
-pollo,22.428,24.062,1.634,0.831,2.349,particulares
-tartas y huevo,10.922,12.103,1.181,0.18,2.135,particulares
-vegetales y legumbres,8.836,6.764,-2.072,-2.753,-1.344,particulares
+carne vacuna,36.529,29.308,-7.221,-9.025,-5.422,empresas
+cerdo,3.685,3.284,-0.401,-1.153,0.309,empresas
+pastas,16.78,18.353,1.573,0.402,2.914,empresas
+pescado,5.263,6.946,1.683,1.044,2.44,empresas
+pollo,20.105,22.469,2.365,1.379,3.319,empresas
+tartas y huevo,10.426,13.217,2.791,1.669,3.948,empresas
+vegetales y legumbres,7.213,6.423,-0.79,-1.673,0.118,empresas
+carne vacuna,29.224,26.713,-2.511,-3.402,-1.749,particulares
+cerdo,3.728,3.781,0.053,-0.249,0.327,particulares
+pastas,18.07,18.775,0.705,-0.014,1.37,particulares
+pescado,6.782,7.851,1.068,0.701,1.427,particulares
+pollo,22.454,23.972,1.518,0.775,2.179,particulares
+tartas y huevo,10.939,12.035,1.095,0.17,1.975,particulares
+vegetales y legumbres,8.803,6.873,-1.929,-2.567,-1.249,particulares

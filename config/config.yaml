@@ -27,15 +27,12 @@ serie:
   cierres_segmento:
     empresas: [2025-05-24]
   meses_verano: [1]                    # enero: "verano" (decisión de Lucía)
-  # Último día con datos de cada segmento (si no es el fin del período). Empresas no está
-  # disponible desde septiembre 2026: sus series y el Total terminan el 31/08/2026.
-  fin_segmento:
-    empresas: 2026-08-31
+  # Último día con datos de cada segmento, si no es el fin del período (`fin_segmento:
+  # {segmento: fecha}`). Hoy no se usa: empresas tiene datos hasta el 14/11/2026.
 
 pronostico:
   semanas_test: 12                     # walk-forward: un origen por semana (cada sábado)
-  fin_test: 2026-08-29                 # Total y empresas: la última semana pronosticada termina este sábado
-  fin_test_particulares: 2026-11-14    # particulares: última semana completa con datos (09/11–14/11/2026)
+  fin_test: 2026-11-14                 # Total y segmentos: última semana completa con datos (09/11–14/11/2026)
   semanas_intervalo: 12                # intervalo 80 % = percentiles 10 y 90 de y/ŷ en los 12 orígenes previos
 
 clima:
