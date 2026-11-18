@@ -1,0 +1,5 @@
+y,x,termino,coef,ic95_inf,ic95_sup,p_valor,control,semanas,r2,corr_x_control,desde,hasta
+log_clientes_nuevos,log_gasto_total,log_gasto_total,0.0428,-1.0624,1.1479,0.9396,verano,44,0.1225,-0.9964,2026-01-05,2026-11-02
+log_clientes_nuevos,log_gasto_total,verano,-0.2876,-2.7589,2.1837,0.8196,verano,44,0.1225,-0.9964,2026-01-05,2026-11-02
+log_clientes_nuevos,log_gasto_campania,log_gasto_campania,-1.2914,-3.914,1.3312,0.3345,verano constante: fuera,40,0.0148,,2026-02-02,2026-11-02
+log_clientes_nuevos,log_clics,log_clics,0.2666,0.0419,0.4913,0.02,verano constante: fuera,40,0.0526,,2026-02-02,2026-11-02

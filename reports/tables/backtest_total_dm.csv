@@ -1,0 +1,11 @@
+modelo_1,modelo_2,DM,p_valor,mejor
+lgbm_directo,media_movil_4sem,-0.5945,0.5541,lgbm_directo
+lgbm_directo,ets,-1.731,0.0879,lgbm_directo
+lgbm_directo,sarima,-2.0819,0.0411,lgbm_directo
+lgbm_directo,naive_estacional,-5.752,0.0,lgbm_directo
+media_movil_4sem,ets,-1.0178,0.3123,media_movil_4sem
+media_movil_4sem,sarima,-1.6737,0.0987,media_movil_4sem
+media_movil_4sem,naive_estacional,-4.1622,0.0001,media_movil_4sem
+ets,sarima,-1.8398,0.0701,ets
+ets,naive_estacional,-4.2218,0.0001,ets
+sarima,naive_estacional,-2.766,0.0073,sarima

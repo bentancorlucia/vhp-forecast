@@ -1,0 +1,129 @@
+# Plato vendido ("Producto solicitado" sin [XL]) → receta de Costo del recetario (18/11/2026).
+# Generado por normalización (minúsculas, sin acentos) + decisiones manuales marcadas con # MANUAL.
+# SIN_RECETA = el plato no está entre las 93 recetas del Costo del recetario: queda fuera de la
+# lista de compras y se reporta. Las XL usan "<receta> XL" si existe; si no, × 1,30 [SUPUESTO].
+# Validación: Claude, 18/11/2026 (Lucía pidió tomar las decisiones); PENDIENTE de revisión de Lucía.
+validado: false
+
+platos:
+  "Albondigas con guarnición": "Albondigas con guarnición"
+  "Berenjenas a la parmesana": SIN_RECETA
+  "Bife a la portuguesa": "Bife a la portuguesa"
+  "Bife ancho de cordero, sellado al sarten, curry tailandes": SIN_RECETA
+  "Bife de Vacio con acompañamiento": "Bife de Vacio con acompañamiento"
+  "Bife de vacio en salsa de champignones": "Bife de vacio en salsa de champignones"
+  "Bifes de cuadril a la plancha": "Bifes de cuadril a la plancha"
+  "Bifes de cuadril, salteados con cebollas, manteca y vino tinto": "Bifes de cuadril, salteados con cebollas, manteca y vino tinto"
+  "Bondiola marinada": "Bondiola marinada"
+  "Brochette de carne, pollo y panceta": "Brochette de carne, pollo y panceta"
+  "Canelones de carne picada, marinada con especias y salsa blanca": "Canelones de carne picada, marinada con especias y salsa blanca"
+  "Canelones de espinaca": "Canelones de espinaca"
+  "Canelones de jamón, queso y panceta": "Canelones de jamón, queso y panceta"
+  "Cazuela de Mondongo": "Cazuela de Mondongo"
+  "Cazuela de lentejas": SIN_RECETA
+  "Chop suey de champiñones": "Chop suey de champiñones"
+  "Chop suey de pollo": "Chop suey de pollo"
+  "Colita de cuadril con guarnicion": SIN_RECETA
+  "Cordero al curry con papas a la crema": SIN_RECETA
+  "Crepes de espinaca y ricotta": "Crepes de espinaca y ricotta"
+  "Dados de Pollo al ajillo": "Dados de Pollo al ajillo"
+  "Dados de pollo en salsa 3 Quesos": "Dados de pollo en salsa 3 Quesos"
+  "Dados de pollo en salsa de hierbas": "Dados de pollo en salsa de hierbas"
+  "Dados de pollo en salsa de puerros y panceta": SIN_RECETA
+  "Empanadas (x4)": "Empanadas (x4)"
+  "Ensalada Caesar con pollo": "Ensalada Caesar con pollo"
+  "Ensalada completa": SIN_RECETA
+  "Ensalada de quinoa": SIN_RECETA
+  "Ensalada de rucula con parmesano, con mermelada de cebollas y pollo": "Ensalada de rucula con parmesano, con mermelada de cebollas y pollo"
+  "Ensalada de verdes, tomates y atun en aceite de oliva": "Ensalada de verdes, tomates y atun en aceite de oliva"
+  "Ensalada penne": SIN_RECETA
+  "Feijoada": "Feijoada"
+  "Gnocchi de papa": "Gnocchi de papa"
+  "Guiso de carne a la criolla": "Guiso de carne a la criolla"
+  "Guiso de lentejas": "Guiso de lentejas"
+  "Hamburguesa Werba": "Hamburguesas Werba"  # MANUAL: mismo plato, nombre escrito distinto
+  "Hamburguesas Caseras": "Hamburguesas Caseras"
+  "Hamburguesas caseras con salsa 3 quesos": "Hamburguesas caseras con salsa 3 quesos"
+  "Hamburguesas de espinaca con guarnicion": "Hamburguesas de espinaca con guarnicion"
+  "Hamburguesas de lentejas con guarnicion": SIN_RECETA
+  "Lasagna de carne": "Lasagna de carne"
+  "Lasagna de pollo, calabaza y queso": "Lasagna de pollo, calabaza y queso"
+  "Locro": SIN_RECETA
+  "Lomo de cerdo en barbacoa": SIN_RECETA
+  "Lomo de pescado con guarnición": "Lomo de pescado con guarnición"
+  "Lomo de pescado con salsa champignones": "Lomo de pescado con salsa champignones"
+  "Lomo de pescado con salsa finas hierbas": "Lomo de pescado con salsa finas hierbas"
+  "Malfatti con salsa a eleccion": SIN_RECETA
+  "Matambrito grillado con guarnicion": "Matambrito grillado con guarnicion"
+  "Medallon de cerdo, envuelto en panceta a la plancha, salsa de miel y mostaza": "Medallon de cerdo, envuelto en panceta a la plancha, salsa de miel y mostaza"
+  "Medallones con salsa cheddar y panceta crocante": "Medallones con salsa cheddar y panceta crocante"
+  "Medallones de pollo": "Medallones de pollo"
+  "Medallones de pollo 3 quesos": "Medallones de pollo 3 quesos"
+  "Medallones de pollo Crispy": "Medallones de pollo Crispy"
+  "Medallones de pollo fugazzeta": "Medallones de pollo fugazzeta"
+  "Medallones de pollo napolitana": "Medallones de pollo napolitana"
+  "Merluza con salsa verde": "Merluza con salsa verde"
+  "Milanesa de cerdo": SIN_RECETA
+  "Milanesa de pollo": "Milanesas de pollo"  # MANUAL: mismo plato, nombre escrito distinto
+  "Milanesa de pollo con guarnicion": "Milanesas de pollo"  # MANUAL: mismo plato, nombre escrito distinto
+  "Milanesa de pollo rellena de jamón y queso": "Milanesa de pollo rellena de jamón y queso"
+  "Milanesas al pan": SIN_RECETA
+  "Milanesas de carne acompañadas": "Milanesas de carne acompañadas"
+  "Milanesas de lentejas con guarnicion": "Milanesas de lentejas con guarnicion"
+  "Milanesas de pescado": "Milanesas de pescado"
+  "Muslo de pollo relleno": "Muslo de pollo relleno"
+  "Omelette": SIN_RECETA
+  "Omelette con vegetales": "Omelette con vegetales"
+  "Omelette de broccoli y queso": "Omelette de broccoli y queso"
+  "Omelette de jamon y queso": "Omelette de jamon y queso"
+  "Pamplona de cerdo rellena envuelta en panceta": "Pamplona de cerdo envuelta en panceta rellena"  # MANUAL: mismo plato, nombre escrito distinto
+  "Pasta con vegetales al wok": "Pasta con vegetales al wok"
+  "Pastel de carne": "Pastel de carne"
+  "Pastel de carne, papas y boniatos": "Pastel de carne, papas y boniatos"
+  "Pastel de choclo y pollo con queso": "Pastel de choclo y pollo con queso"
+  "Pechuga de pollo con crema al verdeo": "Pechuga de pollo con crema al verdeo"
+  "Pechuga de pollo con crema de espinacas": "Pechuga de pollo con crema de espinacas"
+  "Penne rigate a la parisienne": "Penne rigate a la parisienne"
+  "Penne rigatte con salsa": SIN_RECETA
+  "Pescado a la florentina": "Pescado a la florentina"
+  "Pollo a la cacerola": SIN_RECETA
+  "Pollo al curry": "Pollo al curry"
+  "Pollo al tandoori": SIN_RECETA
+  "Ravioles": "Ravioles"
+  "Solomillo de cerdo": "Solomillo de cerdo"
+  "Solomillo relleno con guarnicion": SIN_RECETA
+  "Sopas": SIN_RECETA
+  "Sorrentinos de calabaza asada con ajo y queso": SIN_RECETA
+  "Sorrentinos de jamón y queso": "Sorrentinos de jamón y queso"
+  "Sorrentinos de queso, panceta y puerros": SIN_RECETA
+  "Sorrentinos de ricotta y nuez": "Sorrentinos de ricotta y nuez"
+  "Sorrentinos de verdura y ricotta": SIN_RECETA
+  "Spaghetti": "Spaghetti"
+  "Strogonhoff de hongos": SIN_RECETA
+  "Strogonoff de bife de vacio con arroz": "Strogonoff de bife de vacio con arroz"
+  "Strogonoff de pollo": "Strogonoff de pollo"
+  "Suprema de pollo gratinada con acompañamiento": "Suprema de pollo gratinada con acompañamiento"
+  "Suprema de pollo grille": "Suprema de pollo grille"
+  "Suprema de pollo rellena de panceta y puerros con guarnicion": "Suprema de pollo rellena de panceta y puerros con guarnicion"
+  "Suprema en marinada oriental": SIN_RECETA
+  "Suprema en salsa finas hierbas": SIN_RECETA
+  "Tallarines verdes en salsa a eleccion": SIN_RECETA
+  "Tarta Capresse": "Tarta Capresse"
+  "Tarta de Jamon, Queso y Pollo": "Tarta de Jamon, Queso y Pollo"
+  "Tarta de atún": "Tarta de atún"
+  "Tarta de broccoli y queso": "Tarta de broccoli y queso"
+  "Tarta de calabaza y espinaca": "Tarta de calabaza y espinaca"
+  "Tarta de cebolla caramelizada y lomito": "Tarta de cebolla caramelizada y lomito"
+  "Tarta de jamón y queso": "Tarta de jamón y queso"
+  "Tarta de queso, panceta y cebolla": "Tarta de queso, panceta y cebolla"
+  "Tarta de vegetales": "Tarta de vegetales"
+  "Tarta de zapallitos": "Tarta de zapallitos"
+  "Tarta en masa de papa, espinacas, cebolla y muzzarella": "Tarta en masa de papa, espinacas, cebolla y muzzarella"
+  "Torres de vegetales grillados con muzzarella gratinada": "Torres de vegetales grillados con muzzarella gratinada"
+  "Tortilla a la española": "Tortilla a la española"
+  "Tortilla de acelga": "Tortilla de acelga"
+  "Wrap Caesar con pollo": SIN_RECETA
+  "Wrap vegetariano": SIN_RECETA
+  "Zapallitos rellenos de carne": "Zapallitos rellenos de carne"
+  "Zapallitos rellenos de verduras, gratinados con muzzarella": "Zapallitos rellenos de verduras, gratinados con muzzarella"
+

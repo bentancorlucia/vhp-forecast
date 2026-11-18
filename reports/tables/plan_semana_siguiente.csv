@@ -1,0 +1,15 @@
+segmento,categoria,pronostico,plan_p45,plan_p80,plan_p90,plan_p95,origen_datos
+empresas,carne vacuna,837.0,830,919,1020,1111,29/08/2026
+empresas,cerdo,85.4,85,94,105,114,29/08/2026
+empresas,pastas,323.2,321,355,394,429,29/08/2026
+empresas,pescado,107.7,107,119,132,143,29/08/2026
+empresas,pollo,438.1,435,481,534,582,29/08/2026
+empresas,tartas y huevo,185.0,184,203,226,246,29/08/2026
+empresas,vegetales y legumbres,177.8,177,195,217,236,29/08/2026
+particulares,carne vacuna,984.2,972,1097,1168,1212,14/11/2026
+particulares,cerdo,117.8,117,132,140,145,14/11/2026
+particulares,pastas,620.1,612,691,736,764,14/11/2026
+particulares,pescado,253.6,251,283,301,313,14/11/2026
+particulares,pollo,837.9,827,934,995,1032,14/11/2026
+particulares,tartas y huevo,344.4,340,384,409,425,14/11/2026
+particulares,vegetales y legumbres,283.2,280,316,337,349,14/11/2026

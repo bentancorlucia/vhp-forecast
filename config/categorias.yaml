@@ -1,0 +1,145 @@
+# Plato → categoría (solo tipo de producto "Vianda"). PROPUESTA: la valida Lucía.
+# Los nombres son los de "Producto solicitado" sin el sufijo "[XL]".
+#
+# Regla usada: pastas y "tartas y huevo" se asignan por la FORMA del plato
+# (una lasagna de pollo es pasta); el resto, por la PROTEÍNA principal.
+# Los comentarios "# DUDA" marcan los platos ambiguos; Lucía validó la
+# asignación el 17/11/2026 (con los medallones con cheddar en pollo).
+#
+# Con `validado: true`, data/processed/ se publica por categoría.
+validado: true
+
+categorias:
+  carne vacuna:
+    - Milanesas de carne acompañadas
+    - Bifes de cuadril, salteados con cebollas, manteca y vino tinto
+    - Bife de Vacio con acompañamiento
+    - Bifes de cuadril a la plancha
+    - Pastel de carne, papas y boniatos
+    - Pastel de carne
+    - Matambrito grillado con guarnicion
+    - Albondigas con guarnición
+    - Bife de vacio en salsa de champignones
+    - Bife a la portuguesa
+    - Hamburguesas caseras con salsa 3 quesos
+    - Hamburguesas Caseras
+    - Zapallitos rellenos de carne
+    - Strogonoff de bife de vacio con arroz
+    - Cazuela de Mondongo
+    - Guiso de carne a la criolla
+    - Colita de cuadril con guarnicion
+    - Brochette de carne, pollo y panceta               # DUDA: mixta (vacuna + pollo + cerdo)
+    - Milanesas al pan                                  # DUDA: ¿de carne?
+    - Locro                                             # DUDA: mixto (carne, cerdo, maíz)
+    - Cordero al curry con papas a la crema             # DUDA: no hay categoría cordero
+    - Bife ancho de cordero, sellado al sarten, curry tailandes  # DUDA: ídem
+
+  pollo:
+    - Milanesa de pollo rellena de jamón y queso
+    - Suprema de pollo rellena de panceta y puerros con guarnicion
+    - Suprema de pollo gratinada con acompañamiento
+    - Strogonoff de pollo
+    - Muslo de pollo relleno
+    - Suprema de pollo grille
+    - Dados de pollo en salsa 3 Quesos
+    - Medallones de pollo napolitana
+    - Dados de Pollo al ajillo
+    - Medallones de pollo 3 quesos
+    - Dados de pollo en salsa de hierbas
+    - Medallones de pollo fugazzeta
+    - Pechuga de pollo con crema de espinacas
+    - Pastel de choclo y pollo con queso
+    - Milanesa de pollo
+    - Pechuga de pollo con crema al verdeo
+    - Medallones de pollo Crispy
+    - Medallones de pollo
+    - Pollo al curry
+    - Chop suey de pollo
+    - Dados de pollo en salsa de puerros y panceta
+    - Pollo al tandoori
+    - Suprema en salsa finas hierbas
+    - Pollo a la cacerola
+    - Milanesa de pollo con guarnicion
+    - Suprema en marinada oriental
+    - Ensalada de rucula con parmesano, con mermelada de cebollas y pollo  # DUDA: ¿o vegetales?
+    - Ensalada Caesar con pollo                         # DUDA: ¿o vegetales?
+    - Wrap Caesar con pollo
+    - Medallones con salsa cheddar y panceta crocante   # pollo (decisión de Lucía)
+
+  pescado:
+    - Milanesas de pescado
+    - Lomo de pescado con salsa finas hierbas
+    - Lomo de pescado con salsa champignones
+    - Lomo de pescado con guarnición
+    - Merluza con salsa verde
+    - Pescado a la florentina
+    - Ensalada de verdes, tomates y atun en aceite de oliva  # DUDA: ¿o vegetales?
+
+  cerdo:
+    - Medallon de cerdo, envuelto en panceta a la plancha, salsa de miel y mostaza
+    - Pamplona de cerdo rellena envuelta en panceta
+    - Solomillo de cerdo
+    - Solomillo relleno con guarnicion                 # NUEVO sep–nov 2026 [SUPUESTO]: solomillo = cerdo; a validar
+    - Bondiola marinada
+    - Milanesa de cerdo
+    - Lomo de cerdo en barbacoa
+    - Feijoada                                          # DUDA: cerdo + porotos negros
+
+  pastas:
+    - Lasagna de pollo, calabaza y queso
+    - Canelones de carne picada, marinada con especias y salsa blanca
+    - Sorrentinos de jamón y queso
+    - Lasagna de carne
+    - Canelones de espinaca
+    - Ravioles
+    - Sorrentinos de ricotta y nuez
+    - Canelones de jamón, queso y panceta
+    - Gnocchi de papa
+    - Pasta con vegetales al wok
+    - Penne rigate a la parisienne
+    - Penne rigatte con salsa                          # NUEVO sep–nov 2026: forma de pasta
+    - Spaghetti
+    - Sorrentinos de calabaza asada con ajo y queso
+    - Sorrentinos de verdura y ricotta
+    - Sorrentinos de queso, panceta y puerros
+    - Tallarines verdes en salsa a eleccion
+    - Malfatti con salsa a eleccion
+    - Crepes de espinaca y ricotta                      # DUDA: ¿o tartas y huevo?
+    - Ensalada penne                                    # DUDA: ¿o vegetales?
+
+  tartas y huevo:
+    - Tarta de Jamon, Queso y Pollo
+    - Tarta de atún
+    - Tarta de cebolla caramelizada y lomito
+    - Tarta en masa de papa, espinacas, cebolla y muzzarella
+    - Omelette de jamon y queso
+    - Tortilla a la española
+    - Tarta de queso, panceta y cebolla
+    - Tarta Capresse
+    - Tarta de calabaza y espinaca
+    - Tarta de jamón y queso
+    - Tarta de broccoli y queso
+    - Omelette de broccoli y queso
+    - Tarta de zapallitos
+    - Omelette con vegetales
+    - Tortilla de acelga
+    - Tarta de vegetales
+    - Omelette
+    - Empanadas (x4)                                    # DUDA: el relleno no se sabe
+
+  vegetales y legumbres:
+    - Hamburguesas de espinaca con guarnicion
+    - Guiso de lentejas
+    - Zapallitos rellenos de verduras, gratinados con muzzarella
+    - Milanesas de lentejas con guarnicion
+    - Torres de vegetales grillados con muzzarella gratinada
+    - Chop suey de champiñones
+    - Hamburguesa Werba
+    - Hamburguesas de lentejas con guarnicion
+    - Berenjenas a la parmesana
+    - Cazuela de lentejas
+    - Strogonhoff de hongos
+    - Wrap vegetariano
+    - Ensalada de quinoa
+    - Ensalada completa                                 # DUDA: ¿lleva proteína?
+    - Sopas                                             # DUDA: no se sabe cuál

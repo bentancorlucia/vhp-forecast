@@ -1,0 +1,3 @@
+causa,efecto,rezagos,F,p_valor,semanas,desde,hasta
+log_gasto_campania,log_clientes_nuevos,1,1.0909,0.3032,40,2026-02-02,2026-11-02
+log_clics,log_clientes_nuevos,1,4.8729,0.0337,40,2026-02-02,2026-11-02

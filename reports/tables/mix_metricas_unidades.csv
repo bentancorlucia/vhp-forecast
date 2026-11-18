@@ -1,0 +1,5 @@
+nivel,modelo,MASE,WAPE,n,cobertura_80
+categoria,media_4sem,1.0187,0.203,980,0.799
+categoria,multinomial,1.0556,0.2107,980,0.7888
+categoria,multinomial_clima,1.0572,0.2106,980,0.7888
+segmento,lgbm_directo,1.0438,0.1394,140,0.8214

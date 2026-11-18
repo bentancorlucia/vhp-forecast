@@ -1,0 +1,4 @@
+transformacion,n,adf_p,conclusion
+nivel,407,0.6574994368499388,no estacionaria
+dif. estacional (6),401,1.7497113654382038e-11,estacionaria
+dif. estacional + dif. 1,400,2.1002116069694573e-14,estacionaria

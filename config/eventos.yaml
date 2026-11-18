@@ -1,0 +1,63 @@
+# Eventos del negocio (fase 7). Fechas confirmadas por Lucía el 17/11/2026.
+# serie: qué se mide (ver intervention.SERIES).
+#   viandas_particulares      → unidades diarias de viandas de particulares (log)
+#   tasa_postre_particulares  → postres por vianda, particulares
+#   tasa_pan_particulares     → panes por vianda, particulares
+#   tasa_extras_particulares  → (postres + panes) por vianda, particulares
+#   clientes_nuevos_particulares     → clientes cuyo primer pedido es ese día (nivel, × K)
+#   pedidos_recurrentes_particulares → pedidos de clientes que ya habían comprado (nivel, × K)
+# semanas_post: largo del período posterior que se compara con el contrafactual.
+
+eventos:
+  agencia_meta:
+    fecha: 2026-02-02
+    series: [viandas_particulares]
+    semanas_post: 8           # termina antes de Turismo (30/03/2026)
+    nota: "Confundido con Carnaval (16-17/02/2026), que entra como feriado laborable."
+
+  influencer:
+    fecha: 2026-04-15
+    fin: 2026-04-19
+    series: [viandas_particulares]
+    semanas_post: 2
+    nota: "Mismo día que los postres en la web y una semana después de Turismo: efectos confundidos."
+
+  postres_web:
+    fecha: 2026-04-15
+    series: [tasa_postre_particulares]
+    semanas_post: 4
+    nota: "Ajuste de la web que puso los postres más a mano. Coincide con el influencer."
+
+  panes_web:
+    fecha: 2026-06-02
+    series: [tasa_pan_particulares]
+    semanas_post: 4
+    nota: "Ajuste de la web; salto chico y gradual."
+
+  suba_precio:
+    fecha: 2026-08-01
+    series: [viandas_particulares, tasa_extras_particulares]
+    semanas_post: 8           # 01/08–25/09/2026 (antes: 5 semanas, hasta el 31/08). Con 8 semanas entran 4 placebos
+    nota: "Vianda $330 → $350 y XL $390 → $415, solo particulares. Incluye el lunes 17/08 (export incompleto) y el cambio de reparto de Meta del 05/09/2026. Sigue PRELIMINAR: con ventanas de 8 semanas o más entran como mucho 4 placebos (p-placebo mínimo 1/5 = 0,2)."
+
+  suba_precio_13sem:
+    fecha: 2026-08-01
+    series: [viandas_particulares]
+    semanas_post: 13          # 01/08–30/10/2026: sensibilidad, todo lo que hay antes de la baja de pauta
+    nota: "Misma suba con la ventana más larga posible; solo entra 1 placebo."
+
+  meta_reparto:
+    fecha: 2026-09-05
+    series: [clientes_nuevos_particulares]
+    semanas_post: 8           # 05/09–30/10/2026: termina antes de la baja de pauta
+    nota: "La agencia cambió el reparto del presupuesto entre anuncios (el gasto total no cambió). Fecha según Lucía/Tablero."
+
+  baja_pauta:
+    fecha: 2026-11-02
+    series: [clientes_nuevos_particulares, pedidos_recurrentes_particulares]
+    semanas_post: 2           # 02/11–14/11/2026: fin de los datos. PRELIMINAR
+    nota: "Baja de la inversión en Meta (Lucía). [SUPUESTO] inicio = lunes 02/11/2026, primera semana con menos gasto en el Tablero (campaña ~9.100 → 8.400 UYU/semana); no hay gasto diario de oct–nov. Si la pauta mueve a los nuevos, deberían bajar los nuevos y no los recurrentes."
+
+# Notas para preguntar (no se miden como evento).
+notas:
+  - "Empresas: la tasa de pan por vianda salta de ~0,01-0,03 a ~0,12-0,14 el lunes 06/04/2026 y se queda. Preguntar qué pasó."

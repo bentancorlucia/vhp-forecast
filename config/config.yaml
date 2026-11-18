@@ -1,0 +1,76 @@
+# Configuración general del proyecto vhp-forecast.
+# Las rutas son relativas a la raíz del repo.
+
+rutas:
+  raw_private: data/raw_private        # copias de los exports (solo lectura)
+  interim: data/interim                # datos limpios con PII (ignorado por git)
+  control: data/control                # agregados del Tablero (ignorado por git)
+  external: data/external              # feriados y clima (públicos)
+  processed: data/processed            # series anonimizadas (públicas)
+  figuras: reports/figures
+  tablas: reports/tables
+  meta_ads: data/raw_private/meta_ads_semanal.csv   # 05/01–08/11/2026 (44 semanas, reemplazado el 18/11/2026)
+  recetario: data/raw_private/recetario          # Costo del recetario (leído el 18/11/2026), privado
+  reports_private: reports_private               # lista de compras completa (ignorado por git)
+  tablero_control: data/control/tablero_control_semanal.csv
+
+periodo:
+  inicio: 2025-05-01
+  # Corte: último sábado de la última semana completa (lunes a sábado) antes del 18/11/2026.
+  # Las entregas posteriores (pedidos ya cargados para días futuros) se descartan en load.py.
+  fin: 2026-11-14
+
+serie:
+  segmentos: [particulares, empresas]
+  # Cierra solo en feriados NO laborables (public); abre en los laborables (bank).
+  # Cierres de un solo segmento (confirmados por Lucía): ese día no existe para el segmento.
+  cierres_segmento:
+    empresas: [2025-05-24]
+  meses_verano: [1]                    # enero: "verano" (decisión de Lucía)
+  # Último día con datos de cada segmento (si no es el fin del período). Empresas no está
+  # disponible desde septiembre 2026: sus series y el Total terminan el 31/08/2026.
+  fin_segmento:
+    empresas: 2026-08-31
+
+pronostico:
+  semanas_test: 12                     # walk-forward: un origen por semana (cada sábado)
+  fin_test: 2026-08-29                 # Total y empresas: la última semana pronosticada termina este sábado
+  fin_test_particulares: 2026-11-14    # particulares: última semana completa con datos (09/11–14/11/2026)
+  semanas_intervalo: 12                # intervalo 80 % = percentiles 10 y 90 de y/ŷ en los 12 orígenes previos
+
+clima:
+  latitud: -34.90
+  longitud: -56.19
+  variables: [temperature_2m_max, temperature_2m_min, precipitation_sum]
+  zona_horaria: America/Montevideo
+
+# Costos estimados del Tablero (UYU por unidad). Son estimaciones: ajustar si cambian.
+costos:
+  vianda: 200
+  vianda_xl: 260                       # +30 % (estimado)
+  precio_vianda: 350                   # desde agosto 2026
+  precio_vianda_xl: 415
+  postre: 14
+  pan: 7
+
+plan_compras:
+  # plan semanal = pronóstico + colchón (percentil p de los errores y/ŷ de las 12 semanas previas)
+  costo_faltante_vianda: 150           # margen perdido = precio (350) - costo (200); parametrizable
+  costo_sobrante_vianda: 200           # costo del insumo que se pierde
+  # Desde el 18/11/2026: sobrante y faltante ponderados por la proporción de XL del segmento
+  # (12 semanas previas a cada origen): sobrante = 200·(1−x) + 260·x; faltante = 150·(1−x) + 155·x.
+  ponderar_xl: true
+  semanas_colchon: 12                  # semanas previas al origen cuyos errores arman el colchón
+  percentiles: [40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95]   # se elige el de menor costo simulado
+  percentiles_referencia: [80, 90, 95]
+  sensibilidad_costo_faltante: [150, 300, 600]   # faltante = margen perdido (150) o pérdida del cliente (más)
+
+mlp:
+  epocas_max: 300
+  paciencia: 20                        # early stopping
+  semanas_validacion: 4                # tramo interno de validación
+
+recetario:
+  gramos_guarnicion: 250               # por vianda en los platos con acompañamiento
+  factor_xl: 1.30                      # [SUPUESTO] XL sin receta propia = versión normal × 1,30
+  semanas_reparto: 4                   # reparto entre platos y guarniciones: últimas 4 semanas

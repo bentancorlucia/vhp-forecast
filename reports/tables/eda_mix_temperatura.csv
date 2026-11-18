@@ -1,0 +1,8 @@
+categoria,participacion_media_pct,rho_spearman,p_valor
+vegetales y legumbres,7.3968,-0.7017,0.0
+carne vacuna,29.5922,-0.6967,0.0
+cerdo,3.7401,-0.2681,0.026
+pastas,18.2225,0.3383,0.0045
+tartas y huevo,11.9479,0.4282,0.0002
+pollo,22.3885,0.5966,0.0
+pescado,6.712,0.6125,0.0

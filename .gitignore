@@ -1,0 +1,30 @@
+# Datos privados: NUNCA al repo
+data/raw_private/
+data/interim/
+data/control/
+# Lista de compras completa: recetas, gramos, mermas y proveedores (información comercial)
+reports_private/
+config/privado/
+
+# Secretos
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Notebooks prohibidos
+*.ipynb
+.ipynb_checkpoints/
+
+# Sistema
+.DS_Store
+
+# Conteos reales: no se suben (decisión de Lucía)
+reports/tables/calidad_datos.csv
+docs/inventario.md
+
+# Web movida fuera del repo (../vhp-web)
+web/

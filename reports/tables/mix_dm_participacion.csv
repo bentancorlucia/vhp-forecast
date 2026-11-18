@@ -1,0 +1,5 @@
+segmento,modelo_1,modelo_2,dias,DM,p_valor,mejor
+empresas,multinomial_clima,multinomial,70,5.9212,0.0,multinomial
+particulares,multinomial_clima,multinomial,70,-0.6808,0.4982,multinomial_clima
+empresas,multinomial_clima,media_4sem,70,1.4711,0.1458,media_4sem
+particulares,multinomial_clima,media_4sem,70,1.5103,0.1355,media_4sem
