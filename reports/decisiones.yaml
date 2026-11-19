@@ -140,7 +140,7 @@ decisiones:
     fase: mix
     titulo: "El clima va como hallazgo descriptivo, no como mejora del pronóstico"
     decision: "En el informe se muestra el efecto de la temperatura en el mix, pero para pronosticar se usa la participación media de las últimas 4 semanas."
-    porque: "Con calor contra frío la carne vacuna cae 7,2 pp en empresas y 2,5 pp en particulares (IC 95 % sin cero; mix_efecto_temperatura.csv, 06/05/2025–14/11/2026). Para pronosticar, el clima no agrega: en empresas media_4sem tiene la menor log loss (1,6792 contra 1,6817 del multinomial con clima); en particulares el multinomial con clima queda apenas primero (1,7485 contra 1,7502 de media_4sem, −0,1 %), pero sin clima da lo mismo (1,7486): la mejora es del multinomial, no de la temperatura (backtest 24/08–14/11/2026). El mix reciente ya trae la estación."
+    porque: "Con calor (24,6 °C) contra frío (11,3 °C) la carne vacuna cae 7,2 pp en empresas y 2,5 pp en particulares (IC 95 % sin cero; mix_efecto_temperatura.csv, 06/05/2025–14/11/2026). Para pronosticar, el clima no agrega: en empresas media_4sem tiene la menor log loss (1,6792 contra 1,6817 del multinomial con clima); en particulares el multinomial con clima queda apenas primero (1,7485 contra 1,7502 de media_4sem, −0,1 %), pero sin clima da lo mismo (1,7486): la mejora es del multinomial, no de la temperatura (backtest 24/08–14/11/2026). El mix reciente ya trae la estación."
     quien: Lucía
 
   - id: modelo_categorias
@@ -224,7 +224,7 @@ decisiones:
     fase: plan
     titulo: "Faltante = margen perdido, ponderado por XL, con sensibilidad"
     decision: "Desde el 18/11/2026: sobrante $200 normal / $260 XL y faltante $150 / $155 (precio 350 / 415 − costo), ponderados por la proporción de XL del segmento en las 12 semanas previas a cada origen (empresas ~16,5 %, particulares ~5,5 %). Backtest de los dos segmentos 24/08–14/11/2026: p elegido = 50 (antes 45, con empresas en 08/06–29/08), 15,4 UYU por vianda demandada (antes 16,5). p = 45 cuesta 15,5: casi empate. Con costos fijos p también sería 50. Por segmento con p = 50: empresas cobertura 38 %, 15,9 UYU por vianda; particulares 43 %, 15,1. Sensibilidad faltante $150/$300/$600 → p 50/60/75 (antes 45/60/75). El plan de empresas de la semana 16/11–21/11/2026 ya no es [SUPUESTO]: sale de sus datos hasta el 14/11/2026."
-    porque: "Como sobrar duele más que faltar, conviene comprar un poco menos que lo esperado (p < 50). Si quedarse corto hace perder al cliente, el faltante cuesta más y conviene comprar más."
+    porque: "Como sobrar duele más que faltar, no conviene sumar colchón: lo más barato es comprar cerca del pronóstico (p = 50; antes 45, por debajo). Si quedarse corto hace perder al cliente, el faltante cuesta más y conviene comprar más."
     quien: Lucía
 
   - id: platos_a_ingredientes
