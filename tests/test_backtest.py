@@ -26,6 +26,7 @@ MODELOS = {
     "sarima": sarimax.modelo(),
     "lgbm_directo": lgbm.directo(ev.EXOG_CAL),
     "mlp": mlp.modelo(ev.EXOG_CAL, epocas_max=5, paciencia=2),
+    "sarima_cal": sarimax.modelo_calendario(ev.EXOG_CAL),  # control de robustez, fuera del ranking
 }
 
 
@@ -118,3 +119,21 @@ def test_diebold_mariano_detecta_al_mejor():
     e1, e2 = rng.normal(0, 1, 200), rng.normal(0, 3, 200)
     dm, p = ev.diebold_mariano(e1, e2)
     assert dm < 0 and p < 0.01
+
+
+@pytest.mark.parametrize("uid", ["Total", "Total/particulares", "Total/empresas"])
+def test_series_del_backtest_no_miran_el_futuro(uid):
+    """Con las series reales del backtest (Total y segmentos, datos públicos × K):
+    alterar lo posterior al origen no cambia el pronóstico de LightGBM directo."""
+    from vhp import pronostico
+    try:
+        g = pronostico.grilla_total(None, uid)
+    except FileNotFoundError:
+        pytest.skip("faltan los datos procesados")
+    if uid == "Total/empresas":  # cierre propio del segmento (config: serie.cierres_segmento)
+        assert g.loc["2025-05-24", "abierto"] == 0
+    origen = [d for d in g.index if d.dayofweek == 5][-3]
+    g2 = g.copy()
+    g2.loc[g2.index > origen, ["y", "y_modelo"]] *= 10
+    f = lgbm.directo(ev.EXOG_CAL)
+    pd.testing.assert_frame_equal(f(*ev.partir(g, origen)), f(*ev.partir(g2, origen)))

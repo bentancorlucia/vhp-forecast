@@ -22,7 +22,7 @@ Pasos sueltos: `python main.py <paso>`.
 | `calendar` | Feriados de Uruguay, días hábiles, variables de calendario | `data/processed/calendario.csv` |
 | `clima` | Clima diario de Montevideo (Open-Meteo) | `data/external/` |
 | `eda` | STL, ACF/PACF, ADF, perfiles, efectos de calendario, mix vs. temperatura | figuras 01–04 y 06 |
-| `backtest` | 7 modelos (naive, naive estacional, media móvil, ETS, SARIMA, LightGBM directo, MLP), walk-forward de 12 semanas, sobre el Total (semanas 24/08–14/11/2026) | `backtest_total_*`, figura 07 |
+| `backtest` | 7 modelos (naive, naive estacional, media móvil, ETS, SARIMA, LightGBM directo, MLP), walk-forward de 12 semanas, sobre el Total y cada segmento (semanas 24/08–14/11/2026), más el control SARIMA con calendario (solo Total) | `backtest_total_*`, `backtest_particulares_*`, `backtest_empresas_*`, `backtest_total_sarima_cal.csv`, figura 07 |
 | `mix` | Clima → mix de categorías: efecto de la temperatura, participación media de 4 semanas vs. multinomial | `mix_*`, figuras 08–09 |
 | `eventos` | Contrafactuales SARIMA, placebos y efecto mínimo detectable (incluye el cambio de reparto de Meta del 05/09 y la baja de pauta de noviembre 2026) | `eventos_*`, figura 10 |
 | `ads` | Meta Ads: variación del gasto y de los clics, regresiones log-log (gasto total, gasto de campaña, clics) y Granger con 1 rezago | `ads_*`, figura 11 |
@@ -35,6 +35,17 @@ Sin los datos privados, los pasos desde `eda` corren sobre `data/processed/`, y 
 - **Resultados:** [`reports/resultados.md`](reports/resultados.md). Cada tabla dice de qué período es.
 - **Decisiones y su porqué:** [`reports/decisiones.yaml`](reports/decisiones.yaml). Es la fuente única que usan el informe y resultados.md.
 - **Análisis paso a paso:** `analysis/*.py`, con celdas `# %%` (se corren como notebook en VS Code).
+
+## Resultados principales
+
+Detalle y tablas en `reports/resultados.md`; el porqué de cada decisión en `reports/decisiones.yaml`.
+
+- **Por qué LightGBM.** Menor error en el Total en dos ventanas (MASE 0,846, WAPE 8,9 %, 24/08–14/11/2026; también en 08/06–29/08/2026) y en empresas; en particulares ETS queda apenas primero (0,888 contra 0,922), sin diferencia significativa. Ni Diebold-Mariano ni el SARIMA con calendario lo superan, pero tampoco se separan de él (SARIMA con calendario: MASE 0,842, p = 0,95). En Diebold-Mariano la media móvil gana más días (37) que LightGBM (34), pero tiene más error total.
+- **Segmentos.** Cada segmento se pronostica por separado y el plan de compras usa los segmentos. El Total se pronostica directo.
+- **Intervalo 80 %.** Cubrió el 76 % (54 de 71 días; IC 95 % de Wilson 65–84 %, Total, 24/08–14/11/2026), algo por debajo del 80 %. Con 71 días esa diferencia es compatible con el azar.
+- **MASE entre niveles.** El MASE de cada serie se escala con su propio naive estacional, así que no se compara entre niveles (categorías 0,901 contra segmento 0,989). El WAPE sí: 17,9 % contra 12,3 %.
+- **Eventos.** Postres en la web: +0,126 postres por vianda, efecto claro (0 de 7 placebos). Panes en la web: efecto chico, a confirmar: 2 de 8 placebos también dieron significativos. La agencia de Meta (+80 %) es una cota superior: coincide con la vuelta del verano.
+- **Compra.** Conviene comprar cerca de lo esperado. El factor de p = 50 (×1,06 en empresas y ×1,01 en particulares, semana 16–21/11/2026) solo corrige que el modelo se quedó corto más veces de las que se pasó; no es un margen de seguridad. Asegurarse el 90 % cuesta 38,9 contra 15,4 UYU por vianda (backtest 24/08–14/11/2026).
 
 ## Presentación (`presentacion/`)
 

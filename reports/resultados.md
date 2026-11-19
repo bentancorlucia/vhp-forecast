@@ -48,7 +48,7 @@ Efectos de calendario: regresión lineal de log(y) en días hábiles (06/05/2025
 | Naive estacional | 1,172 | 12,3 % | 80 % |
 | Naive | 3,430 | 36,0 % | 85 % |
 
-LightGBM directo es el de menor MASE (0,846); Diebold-Mariano no lo separa de SARIMA (p = 0,46) ni de ETS (p = 0,45). Los mejores le ganan al naive estacional (p ≤ 0,018). El MLP (MASE 1,036) no le gana a LightGBM (0,846). El intervalo 80 % de todos los modelos son los percentiles 10 y 90 del error relativo (y / ŷ) del propio modelo en las 12 semanas previas al origen. Ljung-Box sobre los residuos de ETS y SARIMA (rezagos 6 y 12): p entre 0,07 y 0,79, sin autocorrelación que quede por modelar.
+LightGBM directo es el de menor MASE (0,846); Diebold-Mariano no lo separa de SARIMA (p = 0,46) ni de ETS (p = 0,45). Los mejores le ganan al naive estacional (p ≤ 0,018). El MLP (MASE 1,036) no le gana a LightGBM (0,846). El intervalo 80 % de todos los modelos son los percentiles 10 y 90 del error relativo (y / ŷ) del propio modelo en las 12 semanas previas al origen. Con LightGBM directo cubrió el 76 % (54 de 71 días; IC 95 % de Wilson 65–84 %), algo por debajo del 80 %. Con 71 días esa diferencia es compatible con el azar. Ljung-Box sobre los residuos de ETS y SARIMA (rezagos 6 y 12): p entre 0,07 y 0,79, sin autocorrelación que quede por modelar.
 
 Diebold-Mariano (error absoluto, h = 1 a 6, backtest 24/08/2026–14/11/2026):
 
@@ -66,6 +66,40 @@ Diebold-Mariano (error absoluto, h = 1 a 6, backtest 24/08/2026–14/11/2026):
 | Media móvil 4 semanas | Naive estacional | −2,41 | 0,018 | Media móvil 4 semanas |
 
 ![Backtest del total](figures/07_backtest_total.png)
+
+### Backtest por segmento (24/08/2026–14/11/2026)
+
+Mismos 12 orígenes, los mismos 7 modelos y el mismo intervalo que el Total. Empresas usa su cierre propio del 24/05/2025.
+
+| Segmento | Modelo | MASE | WAPE | Cobertura 80 % |
+|---|---|---|---|---|
+| Particulares | ETS | 0,888 | 12,4 % | 76 % |
+| Particulares | LightGBM directo | 0,922 | 12,9 % | 80 % |
+| Particulares | SARIMA | 0,972 | 13,6 % | 80 % |
+| Particulares | MLP | 0,987 | 13,8 % | 80 % |
+| Particulares | Media móvil 4 semanas | 1,030 | 14,4 % | 76 % |
+| Particulares | Naive estacional | 1,246 | 17,4 % | 80 % |
+| Particulares | Naive | 2,185 | 30,7 % | 75 % |
+| Empresas | LightGBM directo | 1,056 | 11,3 % | 80 % |
+| Empresas | MLP | 1,063 | 11,4 % | 75 % |
+| Empresas | ETS | 1,068 | 11,4 % | 77 % |
+| Empresas | Media móvil 4 semanas | 1,106 | 11,8 % | 73 % |
+| Empresas | SARIMA | 1,167 | 12,5 % | 73 % |
+| Empresas | Naive estacional | 1,222 | 13,1 % | 79 % |
+| Empresas | Naive | 7,300 | 78,0 % | 87 % |
+
+En particulares, ETS queda primero (0,888) y LightGBM directo segundo (0,922), pero Diebold-Mariano no los separa (p = 0,54). LightGBM le gana al naive estacional (1,246; p = 0,057). En empresas, LightGBM directo es el de menor MASE (1,056); Diebold-Mariano no lo separa de MLP (p = 0,91) y contra el naive estacional (1,222) da p = 0,060. El plan de compras sigue usando LightGBM directo en los dos segmentos: es el primero en el Total y en empresas, y en particulares la diferencia con ETS no es significativa.
+
+### Control: SARIMA con calendario (Total, 24/08/2026–14/11/2026)
+
+El mismo SARIMA sobre log(y), con la misma grilla de órdenes y AIC, más las variables de calendario (feriado laborable, víspera y día después de un cierre, Turismo, verano) como exógenas: una regresión con errores SARIMA. No entra al ranking; sirve para ver si la ventaja de LightGBM es solo que ve el calendario.
+
+| Modelo | MASE | WAPE | Cobertura 80 % |
+|---|---|---|---|
+| SARIMA con calendario | 0,842 | 8,8 % | 82 % |
+| LightGBM directo | 0,846 | 8,9 % | 76 % |
+
+SARIMA con calendario le gana a LightGBM directo (MASE 0,842 contra 0,846); Diebold-Mariano p = 0,95.
 
 ## 3. Clima → mix de categorías
 
@@ -89,6 +123,8 @@ Unidades por categoría = pronóstico del segmento (LightGBM directo) × partici
 | categoria | multinomial | 0,907 | 17,9 % | 78,9 % |
 | segmento | lgbm_directo | 0,989 | 12,3 % | 80,3 % |
 
+El MASE de cada serie se escala con su propio naive estacional, así que no se compara entre niveles (categoría contra segmento). El WAPE sí: 17,9 % en categorías contra 12,3 % en segmentos.
+
 ![Efecto de la temperatura](figures/08_mix_efecto_temperatura.png)
 
 ## 4. Efecto de eventos (contrafactual SARIMA + placebos)
@@ -108,9 +144,11 @@ Para cada evento se ajusta un SARIMA sobre log(y) solo con los días previos (ó
 | baja pauta | clientes nuevos particulares | 02/11/2026–14/11/2026 | −8 % [−51; +278] | (1,0,1)(0,1,1)[6] | 0 de 8 | ±45 % |
 | baja pauta | pedidos recurrentes particulares | 02/11/2026–14/11/2026 | −2 % [−13; +14] | (1,0,1)(0,1,1)[6] | 1 de 8 | ±19 % |
 
-Baja de pauta de noviembre 2026 (PRELIMINAR, 12 días hábiles, 02/11–14/11/2026): clientes nuevos −8 % [−51; +278], pedidos de clientes que ya compraron −2 % [−13; +14]. Con este ruido, en dos semanas solo se distinguiría un efecto de ±45 % en los nuevos y ±19 % en los recurrentes. La fecha de inicio (02/11/2026) es un supuesto: es la primera semana con menos gasto en el Tablero (la campaña bajó ~8 %); no hay gasto diario de octubre–noviembre. Cambio de reparto entre anuncios del 05/09/2026 (8 semanas): clientes nuevos −7 % [−50; +265], 0 de 3 placebos significativos. Suba de precio con 8 semanas posteriores: viandas +12 % [−23; +64], p-placebo 0,20 con 4 placebos. Sigue PRELIMINAR: con ventanas de 8 semanas o más entran como mucho 4 placebos, así que el p-placebo no puede bajar de 0,2.
+Baja de pauta de noviembre 2026 (PRELIMINAR, 12 días hábiles, 02/11–14/11/2026): clientes nuevos −8 % [−51; +278], pedidos de clientes que ya compraron −2 % [−13; +14]. Con este ruido, en dos semanas solo se distinguiría un efecto de ±45 % en los nuevos y ±19 % en los recurrentes. La fecha de inicio (02/11/2026) es un supuesto: es la primera semana con menos gasto en el Tablero (la campaña bajó ~8 %); no hay gasto diario de octubre–noviembre. Cambio de reparto entre anuncios del 05/09/2026 (8 semanas): clientes nuevos −7 % [−50; +265], 0 de 3 placebos significativos. Suba de precio con 8 semanas posteriores: viandas +12 % [−23; +64], p-placebo 0,20 con 4 placebos. Sigue PRELIMINAR: con ventanas de 8 semanas o más entran como mucho 4 placebos, así que el p-placebo no puede bajar de 0,2. Panes en la web: efecto chico, a confirmar: 2 de 8 placebos también dieron significativos. Los postres sí son claros (0 de 7): +0,126 postres por vianda.
 
 ![Eventos](figures/10_eventos.png)
+
+![Eventos, continuación](figures/10b_eventos.png)
 
 ## 5. Gasto en Meta Ads (semanal, 05/01/2026–08/11/2026)
 
@@ -222,8 +260,9 @@ Cadena de multiplicaciones: plan por segmento × categoría → reparto entre lo
 | Pronóstico del total | MASE, WAPE y cobertura del intervalo 80 %; nada de MAPE | MAPE explota con días chicos y castiga asimétricamente. MASE, WAPE y la cobertura además no cambian con el escalado K. | técnica |
 | Pronóstico del total | Siete modelos, de lo más simple a lo más complejo | Son los modelos de series temporales clásicos y los de ML que se vieron en el curso (boosting y redes MLP), así que todo se puede explicar. ETS elige por AIC entre estacionalidad aditiva o multiplicativa y sin tendencia o con tendencia amortiguada. El MLP escala con media y desvío de su tramo de entrenamiento y frena con early stopping sobre las últimas 4 semanas de cada origen; semilla 42. | técnica |
 | Pronóstico del total | Órdenes del SARIMA elegidos por AIC en cada origen | El log estabiliza la varianza, que crece con el nivel. D = 1 porque con una diferencia estacional de 6 días la serie es estacionaria (ADF del EDA) y d = 0 para no diferenciar de más; la constante es el crecimiento medio semana a semana. El AIC premia el ajuste y castiga los parámetros de más, y elegir en cada origen con su propio entrenamiento evita mirar el test. | técnica |
-| Pronóstico del total | Intervalo 80 % con los errores recientes de cada modelo | Es el mismo método para todos los modelos, no supone ninguna distribución y solo usa semanas que ya terminaron al momento del origen (la semana pronosticada desde o − 1 termina justo en o), así que no mira el test. Se usa el cociente y no la diferencia porque la serie crece y el error escala con el nivel. 12 semanas: suficientes errores (~70 días) y lo bastante recientes. | técnica |
-| Pronóstico del total | LightGBM directo como modelo del total (y de los segmentos) | Sigue siendo el de menor error en la ventana nueva, aunque Diebold-Mariano no lo separa de SARIMA (p = 0,46) ni de ETS (p = 0,45) al 5 %. Los cuatro mejores le ganan al naive estacional (p ≤ 0,018). El MLP (1,036) no le gana a LightGBM y se reporta así. Cambió el orden de los que siguen (la media móvil pasa del 2.º al 4.º lugar), no el primero. | técnica |
+| Pronóstico del total | Intervalo 80 % con los errores recientes de cada modelo | Es el mismo método para todos los modelos, no supone ninguna distribución y solo usa semanas que ya terminaron al momento del origen (la semana pronosticada desde o − 1 termina justo en o), así que no mira el test. Se usa el cociente y no la diferencia porque la serie crece y el error escala con el nivel. 12 semanas: suficientes errores (~70 días) y lo bastante recientes. Con LightGBM en el Total cubrió el 76 % (54 de 71 días; IC 95 % de Wilson 65–84 %, backtest 24/08–14/11/2026), algo por debajo del 80 %. Con 71 días esa diferencia es compatible con el azar. | técnica |
+| Pronóstico del total | LightGBM directo como modelo del total (y de los segmentos) | Menor error en el Total en dos ventanas (08/06–29/08 y 24/08–14/11/2026) y en empresas; en particulares ETS queda apenas primero, sin diferencia significativa (DM p = 0,54). Ni Diebold-Mariano ni el SARIMA con calendario lo superan, pero tampoco se separan de él: SARIMA (p = 0,46), ETS (p = 0,45), SARIMA con calendario (MASE 0,842, p = 0,95). En Diebold-Mariano la media móvil de 4 semanas gana más días que LightGBM (37 contra 34), pero tiene más error total (p = 0,11). El MLP (1,036) no le gana a LightGBM y se reporta así. Cambiar de modelo no mejora el error de forma significativa y movería todo el plan. | técnica |
+| Pronóstico del total | Control: SARIMA con calendario | LightGBM era el único modelo que veía el calendario, así que la comparación no era pareja. Con el calendario, SARIMA lo iguala: la ventaja de LightGBM no viene de ver el calendario, y ese argumento deja de usarse para elegirlo. Se mantiene LightGBM porque la diferencia es nula y cambiarlo movería todo el plan sin ganar precisión. | técnica |
 | Pronóstico del total | El clima no entra al pronóstico del total | El clima no mueve cuántas viandas se piden, sino cuáles. Además es dato observado: en producción habría que usar el pronóstico del tiempo, que agrega error. | técnica |
 | Clima y mix de categorías | El clima va como hallazgo descriptivo, no como mejora del pronóstico | Con calor (24,6 °C) contra frío (11,3 °C) la carne vacuna cae 7,2 pp en empresas y 2,5 pp en particulares (IC 95 % sin cero; mix_efecto_temperatura.csv, 06/05/2025–14/11/2026). Para pronosticar, el clima no agrega: en empresas media_4sem tiene la menor log loss (1,6792 contra 1,6817 del multinomial con clima); en particulares el multinomial con clima queda apenas primero (1,7485 contra 1,7502 de media_4sem, −0,1 %), pero sin clima da lo mismo (1,7486): la mejora es del multinomial, no de la temperatura (backtest 24/08–14/11/2026). El mix reciente ya trae la estación. | negocio |
 | Clima y mix de categorías | Categorías = segmento (LightGBM) × participación media de 4 semanas | MASE 0,901 en categorías contra 0,907 del multinomial y 0,905 del multinomial con clima (backtest 24/08–14/11/2026), y el intervalo 80 % cubre 78,5 %. Es coherente por construcción (las categorías suman el segmento) y aprovecha el mejor modelo del total. | negocio |
@@ -237,7 +276,7 @@ Cadena de multiplicaciones: plan por segmento × categoría → reparto entre lo
 | Plan de compras | Plan = pronóstico + colchón | Es la idea más simple que corrige el pronóstico con sus propios errores recientes, sin suponer una distribución y sin mirar el test (solo semanas ya terminadas). Elegir p en el mismo backtest es algo optimista; se declara. | técnica |
 | Plan de compras | Una compra semanal por segmento × categoría | Es como se compra en el negocio: el fin de semana para toda la semana. | negocio |
 | Plan de compras | El colchón junta las 7 categorías del segmento | Hay un error por serie y semana: con 12 semanas, el percentil 90 y el 95 serían ambos el máximo. Juntando las 7 categorías hay 84 errores. | técnica |
-| Plan de compras | Faltante = margen perdido, ponderado por XL, con sensibilidad | Como sobrar duele más que faltar, no conviene sumar colchón: lo más barato es comprar cerca del pronóstico (p = 50; antes 45, por debajo). Si quedarse corto hace perder al cliente, el faltante cuesta más y conviene comprar más. | negocio |
+| Plan de compras | Faltante = margen perdido, ponderado por XL, con sensibilidad | Conviene comprar cerca de lo esperado. El factor de p = 50 (×1,06 en empresas y ×1,01 en particulares, semana 16–21/11/2026; plan_semana_siguiente.csv) solo corrige que el modelo se quedó corto más veces de las que se pasó; no es un margen de seguridad. Asegurarse el 90 % cuesta 38,9 contra 15,4 UYU por vianda (plan_curva_costo.csv, backtest 24/08–14/11/2026). La teoría da el cuantil 150 / (150 + 200) ≈ 0,43 y la simulación elige 50, con 45 casi empatado, porque la curva de costo es plana entre 40 y 60. Si quedarse corto hace perder al cliente, el faltante cuesta más y conviene comprar más. | negocio |
 | De platos a ingredientes | Del plan a los ingredientes con el recetario, solo multiplicaciones | No agrega teoría: son las cuentas que hace la cocina. Mapeo plato vendido → receta en config/recetas_map.yaml (86 por nombre normalizado, 4 a mano, 31 sin receta); 26 platos sin receta suman 13,7 % de las viandas de las últimas 12 semanas (22/08–14/11/2026, los dos segmentos; antes 9,5 % con empresas en junio–agosto) y quedan fuera. Los 5 ingredientes sin match en la lista de ingredientes (marcados $0 en la app) y el agua quedan fuera. | técnica |
 | De platos a ingredientes | XL sin receta propia = normal × 1,30 | Es el mismo +30 % que se usa para el costo de la XL ($260). | técnica |
 | De platos a ingredientes | La lista de compras completa no se sube | Es información comercial del negocio. El % por familia no depende de K ni permite reconstruir recetas. | negocio |

@@ -1,0 +1,5 @@
+modelo,rezago,lb_stat,lb_pvalue
+ets,6,10.9806,0.089
+ets,12,17.0568,0.1475
+sarima (log),6,5.7684,0.4496
+sarima (log),12,16.3484,0.1758

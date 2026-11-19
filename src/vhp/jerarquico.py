@@ -30,6 +30,7 @@ from vhp import evaluate as ev  # noqa: E402
 from vhp.config import cargar_config, ruta  # noqa: E402
 from vhp.models import lgbm  # noqa: E402
 from vhp.models import mix as mx  # noqa: E402
+from vhp.nombres import nombre  # noqa: E402
 
 NIVELES = {0: "total", 1: "segmento", 2: "categoria"}
 
@@ -183,11 +184,11 @@ def fig_efecto(ef: pd.DataFrame, info: dict, destino) -> None:
         colores = np.where(d["calor_menos_frio_pp"] > 0, "#c8553d", "#2f6690")
         ax.barh(d["categoria"], d["calor_menos_frio_pp"], xerr=err, color=colores, capsize=3)
         ax.axvline(0, color="k", lw=0.8)
-        ax.set_title(s.capitalize())
+        ax.set_title(nombre(s))
         ax.set_xlabel("puntos porcentuales del mix")
     fig.suptitle(f"Cambio en el mix con calor ({info['t_calor']:.1f} °C) vs. frío ({info['t_frio']:.1f} °C), "
                  f"{info['periodo']} — IC 95 % bootstrap por semanas", fontsize=10)
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(destino, dpi=150, bbox_inches="tight")
     plt.close(fig)
 
@@ -206,16 +207,16 @@ def fig_participaciones(part: pd.DataFrame, segmento: str, modelos: list[str], d
     fig, axs = plt.subplots(2, 4, figsize=(14, 5.5), sharex=True)
     for ax, c in zip(axs.ravel(), cats):
         for m in modelos:
-            ax.plot(semanal[m][0].index, semanal[m][0][c], "o-", ms=3, lw=1, label=m)
+            ax.plot(semanal[m][0].index, semanal[m][0][c], "o-", ms=3, lw=1, label=nombre(m))
         real = semanal[modelos[0]][1]
-        ax.plot(real.index, real[c], "k.-", lw=1.2, label="real")
-        ax.set_title(c, fontsize=9)
+        ax.plot(real.index, real[c], "k.-", lw=1.2, label="Real")
+        ax.set_title(nombre(c), fontsize=9)
         ax.tick_params(axis="x", labelrotation=45, labelsize=7)
     axs.ravel()[-1].axis("off")
     axs[0, 0].legend(fontsize=7)
-    fig.suptitle(f"Mix semanal de {segmento} (% de viandas), backtest {eda.periodo(d['fecha'])}; "
+    fig.suptitle(f"Mix semanal, {nombre(segmento).lower()} (% de viandas), backtest {eda.periodo(d['fecha'])}; "
                  "eje x = sábado de origen", fontsize=10)
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.95))
     fig.savefig(destino, dpi=150, bbox_inches="tight")
     plt.close(fig)
 

@@ -44,6 +44,7 @@ from vhp import evaluate as ev  # noqa: E402
 from vhp.config import RAIZ, cargar_config, ruta  # noqa: E402
 from vhp.models.comun import SEMILLA, columnas_variables  # noqa: E402
 from vhp.models.sarimax import GRILLA  # noqa: E402
+from vhp.nombres import nombre  # noqa: E402
 
 RUTA_EVENTOS = RAIZ / "config" / "eventos.yaml"
 EN_LOG = {"viandas_particulares": True}
@@ -205,8 +206,25 @@ def analizar(G: dict, eventos: dict, n_sim: int = 1000, n_placebo: int = 8, verb
     return pd.DataFrame(filas), pd.concat(placebos, ignore_index=True), diarios
 
 
-def fig_eventos(G: dict, efectos: pd.DataFrame, diarios: dict, destino, semanas_pre: int = 6) -> None:
-    claves = list(diarios)
+def _coma(x: float, d: int) -> str:
+    x = round(float(x), 4)  # igual que eventos_efectos.csv (y la tabla de resultados.md)
+    return f"{x:+.{d}f}".replace("-", "−").replace(".", ",")
+
+
+def titulo_evento(ev_id: str, s: str, r) -> str:
+    """Título de panel con la misma unidad que la tabla de eventos: % en conteos y
+    diferencia por vianda en las tasas."""
+    if s.startswith("tasa"):
+        ef = f"{_coma(r.efecto, 3)} [{_coma(r.efecto_inf, 3)}; {_coma(r.efecto_sup, 3)}] por vianda"
+    else:
+        ef = f"{_coma(r.efecto_pct, 0)} % [{_coma(r.pct_inf, 0)}; {_coma(r.pct_sup, 0)}]"
+    return f"{nombre(ev_id)} — {nombre(s)}: efecto {ef}"
+
+
+def fig_eventos(G: dict, efectos: pd.DataFrame, diarios: dict, destino, semanas_pre: int = 6,
+                claves: list | None = None) -> None:
+    """Observado contra contrafactual, un panel por análisis, con un solo título por panel."""
+    claves = claves or list(diarios)
     fig, axs = plt.subplots(len(claves), 1, figsize=(11, 2.7 * len(claves)))
     for ax, (ev_id, s) in zip(np.atleast_1d(axs), claves):
         d = diarios[(ev_id, s)]
@@ -214,16 +232,14 @@ def fig_eventos(G: dict, efectos: pd.DataFrame, diarios: dict, destino, semanas_
         pre = g[(g.index < d.index.min()) & (g["abierto"] == 1)].iloc[-H * semanas_pre:]
         abiertos = g.loc[d.index, "abierto"] == 1
         ax.plot(pre.index, pre["y"], "k.-", lw=0.8)
-        ax.fill_between(d.index, d["cf_inf"], d["cf_sup"], alpha=0.25, color="C0", label="contrafactual 95 %")
-        ax.plot(d.index, d["cf_med"], "C0-", lw=1, label="contrafactual (mediana)")
-        ax.plot(d.index[abiertos], d["y"][abiertos], "k.-", lw=0.8, label="observado")
+        ax.fill_between(d.index, d["cf_inf"], d["cf_sup"], alpha=0.25, color="C0", label="Contrafactual, banda 95 %")
+        ax.plot(d.index, d["cf_med"], "C0-", lw=1, label="Contrafactual (mediana)")
+        ax.plot(d.index[abiertos], d["y"][abiertos], "k.-", lw=0.8, label="Observado")
         ax.axvline(d.index.min(), color="C3", ls="--", lw=1)
         r = efectos[(efectos.evento == ev_id) & (efectos.serie == s)].iloc[0]
-        ax.set_title(f"{ev_id} — {s}: efecto {r.efecto_pct:+.1f} % [{r.pct_inf:+.1f}; {r.pct_sup:+.1f}]", fontsize=9)
+        ax.set_title(titulo_evento(ev_id, s, r), fontsize=9)
         ax.tick_params(labelsize=7)
     np.atleast_1d(axs)[0].legend(fontsize=7, ncol=3)
-    fig.suptitle("Observado vs. contrafactual (SARIMA entrenado antes de cada evento); viandas × K, tasas por vianda",
-                 fontsize=10)
     fig.tight_layout()
     fig.savefig(destino, dpi=150, bbox_inches="tight")
     plt.close(fig)
@@ -238,7 +254,9 @@ def correr() -> dict:
     tablas, figs = ruta("tablas", cfg), ruta("figuras", cfg)
     efectos.round(4).to_csv(tablas / "eventos_efectos.csv", index=False)
     placebos.round(4).to_csv(tablas / "eventos_placebo.csv", index=False)
-    fig_eventos(G, efectos, diarios, figs / "10_eventos.png")
+    claves = list(diarios)  # dos figuras, como en el informe: los primeros cinco análisis y el resto
+    fig_eventos(G, efectos, diarios, figs / "10_eventos.png", claves=claves[:5])
+    fig_eventos(G, efectos, diarios, figs / "10b_eventos.png", claves=claves[5:])
     cols = ["evento", "serie", "desde", "hasta", "dias", "observado", "contrafactual", "efecto", "efecto_inf",
             "efecto_sup", "efecto_pct", "pct_inf", "pct_sup", "prob_efecto_positivo", "metrica_placebo", "n_placebos", "placebos_significativos", "p_placebo", "efecto_minimo_detectable", "orden"]
     print(efectos[[c for c in cols if c in efectos]].round(3).to_string(index=False))

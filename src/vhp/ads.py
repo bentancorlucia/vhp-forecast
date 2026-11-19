@@ -167,7 +167,7 @@ def fig_ads(d: pd.DataFrame, destino) -> None:
     ax.set_title("Clics vs. clientes nuevos (desde el 02/02/2026)", fontsize=9)
     ax.legend(fontsize=7)
     fig.suptitle(f"Meta Ads y clientes nuevos de particulares, semanas {eda.periodo(d.index)}", fontsize=10)
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
     fig.savefig(destino, dpi=150, bbox_inches="tight")
     plt.close(fig)
 

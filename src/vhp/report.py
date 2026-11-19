@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import pandas as pd
 import yaml
+from statsmodels.stats.proportion import proportion_confint
 
 from vhp import eda
 from vhp.config import RAIZ, cargar_config, ruta
@@ -16,7 +17,8 @@ FASES = {"datos": "Datos y preparación", "eda": "Análisis exploratorio", "mode
          "mix": "Clima y mix de categorías", "eventos": "Efecto de eventos", "ads": "Gasto en Meta Ads",
          "plan": "Plan de compras", "compras": "De platos a ingredientes"}
 NOMBRES = {"naive": "Naive", "naive_estacional": "Naive estacional", "media_movil_4sem": "Media móvil 4 semanas",
-           "ets": "ETS", "sarima": "SARIMA", "lgbm_directo": "LightGBM directo", "mlp": "MLP"}
+           "ets": "ETS", "sarima": "SARIMA", "lgbm_directo": "LightGBM directo", "mlp": "MLP",
+           "sarima_cal": "SARIMA con calendario"}
 NOTA_ESCALA = ("Unidades multiplicadas por una constante secreta K (anonimización). Las métricas relativas "
                "(MASE, WAPE, coberturas, %) no cambian con K.")
 
@@ -50,6 +52,7 @@ class Num:
 
     def __init__(self):
         self.met = _t("backtest_total_metricas").set_index("modelo")
+        self.pred = _t("backtest_total_predicciones", parse_dates=["fecha"])
         self.dm = _t("backtest_total_dm")
         self.sim = _t("plan_simulacion")
         self.sens = _t("plan_sensibilidad_costo")
@@ -73,6 +76,13 @@ class Num:
         pc = cargar_config()["plan_compras"]
         self.faltante, self.sobrante = pc["costo_faltante_vianda"], pc["costo_sobrante_vianda"]
         self.p_elegido = int(self.sim.loc[self.sim.elegido, "p"].iat[0])
+
+    def cobertura(self, m):
+        """Días adentro del intervalo 80 %, días y IC 95 % de Wilson de la proporción."""
+        d = self.pred[self.pred.modelo == m]
+        k = int(((d["y"] >= d["q0.1"]) & (d["y"] <= d["q0.9"])).sum())
+        lo, hi = proportion_confint(k, len(d), alpha=0.05, method="wilson")
+        return k, len(d), lo, hi
 
     def mase(self, m):
         return self.met.loc[m, "MASE"]
@@ -184,6 +194,10 @@ def texto_modelos(N: Num) -> str:
               f"le gana a LightGBM ({n(N.mase('lgbm_directo'), 3)}). ")
     t += ("El intervalo 80 % de todos los modelos son los percentiles 10 y 90 del error relativo (y / ŷ) del propio "
           "modelo en las 12 semanas previas al origen. ")
+    k, dias, lo, hi = N.cobertura(g)
+    t += (f"Con {NOMBRES[g]} cubrió el {pct(100 * k / dias, 0)} ({k} de {dias} días; IC 95 % de Wilson "
+          f"{n(100 * lo, 0)}–{n(100 * hi, 0)} %), {'algo por debajo del' if k / dias < 0.8 else 'en o por encima del'} "
+          f"80 %. Con {dias} días esa diferencia es compatible con el azar. ")
     lb = N.lb
     t += (f"Ljung-Box sobre los residuos de ETS y SARIMA (rezagos 6 y 12): p entre {n(lb.lb_pvalue.min(), 2)} y "
           f"{n(lb.lb_pvalue.max(), 2)}, sin autocorrelación que quede por modelar.")
@@ -215,6 +229,10 @@ def texto_eventos(N: Num) -> str:
                  f"[{n(a.pct_inf, 0, True)}; {n(a.pct_sup, 0, True)}], p-placebo {n(a.p_placebo, 2)} con "
                  f"{int(a.n_placebos)} placebos. Sigue PRELIMINAR: con ventanas de 8 semanas o más entran como mucho "
                  "4 placebos, así que el p-placebo no puede bajar de 0,2.")
+    pa, po = ev.loc[("panes_web", "tasa_pan_particulares")], ev.loc[("postres_web", "tasa_postre_particulares")]
+    t.append(f"Panes en la web: efecto chico, a confirmar: {int(pa.placebos_significativos)} de {int(pa.n_placebos)} "
+             f"placebos también dieron significativos. Los postres sí son claros ({int(po.placebos_significativos)} "
+             f"de {int(po.n_placebos)}): {n(po.efecto, 3, True)} postres por vianda.")
     return " ".join(t)
 
 
@@ -310,6 +328,56 @@ def seccion_compras(N: Num) -> list[str]:
                              "Ingredientes en unidades": fam.ingredientes_en_unidades})), ""]
 
 
+def _wape_niveles(N: Num) -> str:
+    m = N.muni.set_index(["nivel", "modelo"])["WAPE"]
+    return (f"{pct(100 * m.loc[('categoria', 'media_4sem')])} en categorías contra "
+            f"{pct(100 * m.loc[('segmento', 'lgbm_directo')])} en segmentos")
+
+
+def seccion_segmentos(N: Num, pb: str) -> list[str]:
+    """Backtest de cada segmento (mismos orígenes, modelos e intervalo) y control SARIMA con calendario."""
+    filas, textos = [], []
+    for s in ["particulares", "empresas"]:
+        if not (ruta("tablas") / f"backtest_{s}_metricas.csv").exists():
+            return []
+        m = _t(f"backtest_{s}_metricas")
+        for r in m.itertuples():
+            filas.append({"Segmento": s.capitalize(), "Modelo": NOMBRES[r.modelo], "MASE": n(r.MASE, 3),
+                          "WAPE": pct(100 * r.WAPE), "Cobertura 80 %": pct(100 * r.cobertura_80, 0)})
+        dm = _t(f"backtest_{s}_dm_lgbm").set_index("modelo_2")
+        g = m.modelo.iloc[0]
+        ne = m.set_index("modelo").loc["naive_estacional", "MASE"]
+        lg = m.set_index("modelo").loc["lgbm_directo", "MASE"]
+        if g == "lgbm_directo":
+            s2 = m.modelo.iloc[1]
+            textos.append(f"En {s}, LightGBM directo es el de menor MASE ({n(lg, 3)}); Diebold-Mariano no lo separa "
+                          f"de {NOMBRES[s2]} (p = {n(dm.loc[s2, 'p_valor'], 2)}) y contra el naive estacional "
+                          f"({n(ne, 3)}) da p = {n(dm.loc['naive_estacional', 'p_valor'], 3)}.")
+        else:
+            textos.append(f"En {s}, {NOMBRES[g]} queda primero ({n(m.MASE.iloc[0], 3)}) y LightGBM directo segundo "
+                          f"({n(lg, 3)}), pero Diebold-Mariano no los separa (p = {n(dm.loc[g, 'p_valor'], 2)}). "
+                          f"LightGBM le gana al naive estacional ({n(ne, 3)}; p = "
+                          f"{n(dm.loc['naive_estacional', 'p_valor'], 3)}).")
+    L = [f"### Backtest por segmento ({pb})", "",
+         "Mismos 12 orígenes, los mismos 7 modelos y el mismo intervalo que el Total. Empresas usa su cierre propio "
+         "del 24/05/2025.", "", md(pd.DataFrame(filas)), "", " ".join(textos) + " El plan de compras sigue usando "
+         "LightGBM directo en los dos segmentos: es el primero en el Total y en empresas, y en particulares la "
+         "diferencia con ETS no es significativa.", ""]
+    if (ruta("tablas") / "backtest_total_sarima_cal.csv").exists():
+        c = _t("backtest_total_sarima_cal").set_index("modelo")
+        sc, lg = c.loc["sarima_cal"], c.loc["lgbm_directo"]
+        L += [f"### Control: SARIMA con calendario (Total, {pb})", "",
+              "El mismo SARIMA sobre log(y), con la misma grilla de órdenes y AIC, más las variables de calendario "
+              "(feriado laborable, víspera y día después de un cierre, Turismo, verano) como exógenas: una regresión "
+              "con errores SARIMA. No entra al ranking; sirve para ver si la ventaja de LightGBM es solo que ve el "
+              "calendario.", "",
+              md(pd.DataFrame([{"Modelo": NOMBRES.get(k, k), "MASE": n(r.MASE, 3), "WAPE": pct(100 * r.WAPE),
+                                "Cobertura 80 %": pct(100 * r.cobertura_80, 0)} for k, r in c.iterrows()])), "",
+              f"SARIMA con calendario {'no le gana' if sc.MASE >= lg.MASE else 'le gana'} a LightGBM directo "
+              f"(MASE {n(sc.MASE, 3)} contra {n(lg.MASE, 3)}); Diebold-Mariano p = {n(sc.p_valor_vs_lgbm, 2)}.", ""]
+    return L
+
+
 # ============================================================ resultados.md
 def resultados_md() -> str:
     N = Num()
@@ -342,6 +410,7 @@ def resultados_md() -> str:
     L += [f"## 2. Pronóstico del total (backtest {pb})", "", md(tabla_modelos(N)), "", texto_modelos(N), "",
           f"Diebold-Mariano (error absoluto, h = 1 a 6, backtest {pb}):", "", md(tabla_dm(N)), "",
           "![Backtest del total](figures/07_backtest_total.png)", ""]
+    L += seccion_segmentos(N, pb)
 
     c_e, c_p = N.efecto("empresas", "carne vacuna"), N.efecto("particulares", "carne vacuna")
     L += ["## 3. Clima → mix de categorías", "",
@@ -354,6 +423,8 @@ def resultados_md() -> str:
                            "Error absoluto medio (pp)": N.mpart.error_abs_medio_pp.map(lambda x: n(x, 2))})), "",
           f"Unidades por categoría = pronóstico del segmento (LightGBM directo) × participación prevista (backtest {pb}; "
           "intervalo 80 % con los errores de las 12 semanas previas):", "", md(tabla_mix_unidades(N)), "",
+          "El MASE de cada serie se escala con su propio naive estacional, así que no se compara entre niveles "
+          "(categoría contra segmento). El WAPE sí: " + _wape_niveles(N) + ".", "",
           "![Efecto de la temperatura](figures/08_mix_efecto_temperatura.png)", ""]
 
     L += ["## 4. Efecto de eventos (contrafactual SARIMA + placebos)", "",
@@ -364,7 +435,7 @@ def resultados_md() -> str:
           f"{eda.periodo(dias.index)}). Clientes nuevos y pedidos de clientes que ya compraron van en nivel (hay días "
           "con 0) y el efecto se da en %. Efecto mínimo detectable = 2,8 × desvío de los efectos placebo (test al 5 %, "
           "potencia 80 %):", "", md(tabla_eventos(N)), "", texto_eventos(N), "",
-          "![Eventos](figures/10_eventos.png)", ""]
+          "![Eventos](figures/10_eventos.png)", "", "![Eventos, continuación](figures/10b_eventos.png)", ""]
 
     L += seccion_meta(N)
 

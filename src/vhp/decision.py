@@ -34,8 +34,8 @@ cerdo): un error de +10 % significa lo mismo en las dos, uno de +50 viandas no.
 Por qué juntar las 7 categorías del segmento: hay un error por serie y semana;
 con 12 semanas el percentil 90 y el 95 de una sola categoría serían casi el
 máximo. Juntando las 7 hay 84 errores por segmento. El intervalo diario de las
-categorías del mix (mismo método) cubre 79,9 % (fase 6), así que el cociente
-está bien calibrado.
+categorías del mix (mismo método) cubre 78,5 % (backtest 24/08–14/11/2026),
+cerca del 80 %.
 
 Datos públicos (unidades × K): cocientes, % de sobrante/faltante, coberturas y
 costo por vianda demandada no dependen de K. El plan en porciones públicas está

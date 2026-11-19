@@ -18,6 +18,7 @@ from vhp import eda  # noqa: E402
 from vhp import evaluate as ev  # noqa: E402
 from vhp.config import cargar_config, ruta  # noqa: E402
 from vhp.models import baselines, ets, lgbm, mlp, sarimax  # noqa: E402
+from vhp.nombres import nombre  # noqa: E402
 
 
 def modelos(cfg: dict) -> dict:
@@ -39,34 +40,78 @@ def grilla_total(cfg: dict | None = None, uid: str = "Total") -> pd.DataFrame:
     """Grilla de modelado del Total (o de otra serie de la jerarquía, ej. Total/particulares)."""
     cfg = cfg or cargar_config()
     d = eda.cargar_datos()
-    return ev.armar_grilla(d["ancho"][uid], d["clima"], cfg["serie"]["meses_verano"])
+    seg = uid.split("/")[-1]
+    cierres = (cfg["serie"].get("cierres_segmento") or {}).get(seg) if uid != "Total" else None
+    return ev.armar_grilla(d["ancho"][uid], d["clima"], cfg["serie"]["meses_verano"], cierres_extra=cierres)
 
 
 def fig_backtest(res: pd.DataFrame, nombres: list[str], destino, serie: str = "Total") -> None:
     fig, axs = plt.subplots(len(nombres), 1, figsize=(12, 2.6 * len(nombres)), sharex=True)
     for ax, m in zip(axs, nombres):
         d = res[res["modelo"] == m].sort_values("fecha")
-        ax.fill_between(d["fecha"], d["q0.1"], d["q0.9"], alpha=0.25, step="mid", label="intervalo 80 %")
-        ax.plot(d["fecha"], d["y"], "k.-", lw=0.8, label="real")
-        ax.plot(d["fecha"], d["q0.5"], "o-", ms=3, lw=1, label="pronóstico")
-        ax.set_title(m, fontsize=10)
+        ax.fill_between(d["fecha"], d["q0.1"], d["q0.9"], alpha=0.25, step="mid", label="Intervalo 80 %")
+        ax.plot(d["fecha"], d["y"], "k.-", lw=0.8, label="Real")
+        ax.plot(d["fecha"], d["q0.5"], "o-", ms=3, lw=1, label="Pronóstico")
+        ax.set_title(nombre(m), fontsize=10)
     axs[0].legend(ncol=3, fontsize=8)
-    fig.suptitle(f"Backtest walk-forward de {serie}, {eda.periodo(res['fecha'])} (unidades × K)")
-    fig.tight_layout()
+    fig.suptitle(f"Backtest walk-forward, {nombre(serie)}, {eda.periodo(res['fecha'])} (unidades × K)")
+    fig.tight_layout(rect=(0, 0, 1, 0.97))
     fig.savefig(destino, dpi=150, bbox_inches="tight")
     plt.close(fig)
 
 
-# Un solo backtest: el Total (particulares + empresas), con datos hasta la última semana completa.
-SERIES = {"Total": ("fin_test", "backtest_total", "07_backtest_total.png")}
+# Backtest del Total y de cada segmento: mismos orígenes, modelos e intervalo.
+# La figura es solo del Total (figura = None en los segmentos).
+SERIES = {
+    "Total": ("fin_test", "backtest_total", "07_backtest_total.png"),
+    "Total/particulares": ("fin_test", "backtest_particulares", None),
+    "Total/empresas": ("fin_test", "backtest_empresas", None),
+}
 
 
 def correr() -> dict:
-    return {uid: correr_serie(uid, *v) for uid, v in SERIES.items()}
+    out = {uid: correr_serie(uid, *v) for uid, v in SERIES.items()}
+    out["sarima_cal"] = control_sarima_calendario()
+    return out
+
+
+def dm_contra(res: pd.DataFrame, base: str = "lgbm_directo") -> pd.DataFrame:
+    """Diebold-Mariano de `base` contra cada uno de los otros modelos, con los días
+    que gana cada uno y el error absoluto total de cada uno (mismos días)."""
+    ancho = res.pivot_table(index="fecha", columns="modelo", values="q0.5")
+    y = res.drop_duplicates("fecha").set_index("fecha")["y"].reindex(ancho.index)
+    filas = []
+    for m in [c for c in ancho.columns if c != base]:
+        e_b, e_m = (y - ancho[base]).abs(), (y - ancho[m]).abs()
+        dm, p = ev.diebold_mariano(y - ancho[base], y - ancho[m])
+        filas.append({"modelo_1": base, "modelo_2": m, "DM": dm, "p_valor": p, "mejor": base if dm < 0 else m,
+                      "dias_gana_1": int((e_b < e_m).sum()), "dias_gana_2": int((e_m < e_b).sum()),
+                      "error_abs_1": e_b.sum(), "error_abs_2": e_m.sum()})
+    return pd.DataFrame(filas)
+
+
+def control_sarima_calendario() -> pd.DataFrame:
+    """Control de robustez sobre el Total: SARIMA con las variables de calendario como
+    exógenas contra LightGBM directo, mismos orígenes e intervalo. No cambia el ranking."""
+    cfg = cargar_config()
+    p = cfg["pronostico"]
+    g = grilla_total(cfg, "Total")
+    origs = ev.origenes(g, p["semanas_test"], p["fin_test"])
+    print(f"Control SARIMA con calendario: {len(origs)} orígenes")
+    res = ev.backtest(g, {"sarima_cal": sarimax.modelo_calendario(ev.EXOG_CAL),
+                          "lgbm_directo": lgbm.directo(ev.EXOG_CAL)}, origs, p["semanas_intervalo"])
+    met = ev.metricas(res)
+    dm = dm_contra(res).iloc[0]
+    out = met.assign(DM_vs_lgbm=lambda d: d["modelo"].map({"sarima_cal": dm["DM"]}),
+                     p_valor_vs_lgbm=lambda d: d["modelo"].map({"sarima_cal": dm["p_valor"]}),
+                     periodo=eda.periodo(res["fecha"]))
+    out.round(4).to_csv(ruta("tablas", cfg) / "backtest_total_sarima_cal.csv", index=False)
+    print(out.round(3).to_string(index=False))
+    return out
 
 
 def correr_serie(uid: str = "Total", clave_fin: str = "fin_test", prefijo: str = "backtest_total",
-                 figura: str = "07_backtest_total.png") -> dict:
+                 figura: str | None = "07_backtest_total.png") -> dict:
     cfg = cargar_config()
     p = cfg["pronostico"]
     g = grilla_total(cfg, uid)
@@ -80,6 +125,7 @@ def correr_serie(uid: str = "Total", clave_fin: str = "fin_test", prefijo: str =
     if "naive_estacional" not in mejores:
         mejores.append("naive_estacional")
     dm = ev.tabla_dm(res, mejores)
+    dm_lgbm = dm_contra(res)
 
     hist_final, _ = ev.partir(g, origs[-1])
     resid_sarima, espec = sarimax.ajuste_final(hist_final)
@@ -95,7 +141,9 @@ def correr_serie(uid: str = "Total", clave_fin: str = "fin_test", prefijo: str =
     por_h.round(4).to_csv(tablas / f"{prefijo}_mase_por_h.csv")
     dm.round(4).to_csv(tablas / f"{prefijo}_dm.csv", index=False)
     lb.round(4).to_csv(tablas / f"{prefijo}_ljung_box.csv", index=False)
-    fig_backtest(res, list(met["modelo"].head(3)) + ["naive_estacional"], figs / figura, uid.split("/")[-1])
+    dm_lgbm.round(4).to_csv(tablas / f"{prefijo}_dm_lgbm.csv", index=False)
+    if figura:
+        fig_backtest(res, list(met["modelo"].head(3)) + ["naive_estacional"], figs / figura, uid)
 
     print(f"Métricas, backtest {periodo} ({res['fecha'].nunique()} días abiertos):")
     print(met.round(3).to_string(index=False))
@@ -103,4 +151,5 @@ def correr_serie(uid: str = "Total", clave_fin: str = "fin_test", prefijo: str =
     print("Diebold-Mariano (pérdida absoluta, HLN):\n" + dm.round(3).to_string(index=False))
     print(f"SARIMA elegido por AIC al último origen: {espec}")
     print("Ljung-Box, residuos dentro de la muestra al último origen:\n" + lb.round(4).to_string(index=False))
-    return {"res": res, "metricas": met, "dm": dm, "ljung_box": lb, "por_h": por_h, "spec_sarima": espec}
+    print("Diebold-Mariano de lgbm_directo contra cada modelo:\n" + dm_lgbm.round(3).to_string(index=False))
+    return {"res": res, "metricas": met, "dm": dm, "dm_lgbm": dm_lgbm, "ljung_box": lb, "por_h": por_h, "spec_sarima": espec}

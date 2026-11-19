@@ -22,6 +22,7 @@ from statsmodels.tsa.stattools import adfuller  # noqa: E402
 
 from vhp import series  # noqa: E402
 from vhp.config import cargar_config, ruta  # noqa: E402
+from vhp.nombres import nombre  # noqa: E402
 
 SERIES_PRINCIPALES = {"Total": "Total", "Total/particulares": "Particulares", "Total/empresas": "Empresas"}
 DIAS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
@@ -207,7 +208,7 @@ def fig_stl(comp: pd.DataFrame, titulo: str) -> None:
     fig, axs = plt.subplots(4, 1, figsize=(11, 8), sharex=True)
     for ax, c in zip(axs, comp.columns):
         ax.plot(comp.index, comp[c], lw=0.8)
-        ax.set_ylabel(c)
+        ax.set_ylabel(nombre(c))
     axs[0].set_title(titulo)
     _guardar(fig, "02_stl_total.png")
 
@@ -217,10 +218,10 @@ def fig_acf(y: pd.Series) -> None:
     d = y.diff(6).dropna()
     plot_acf(y, lags=36, ax=axs[0, 0], title="ACF — Total en nivel")
     plot_pacf(y, lags=36, ax=axs[0, 1], method="ywm", title="PACF — Total en nivel")
-    plot_acf(d, lags=36, ax=axs[1, 0], title="ACF — dif. estacional (6)")
-    plot_pacf(d, lags=36, ax=axs[1, 1], method="ywm", title="PACF — dif. estacional (6)")
-    fig.suptitle(f"Autocorrelación, {periodo(y.index)}")
-    fig.tight_layout()
+    plot_acf(d, lags=36, ax=axs[1, 0], title="ACF — diferencia estacional (6)")
+    plot_pacf(d, lags=36, ax=axs[1, 1], method="ywm", title="PACF — diferencia estacional (6)")
+    fig.suptitle(f"Autocorrelación del Total, {periodo(y.index)}")
+    fig.tight_layout(rect=(0, 0, 1, 0.96))
     _guardar(fig, "03_acf_pacf.png")
 
 
@@ -238,13 +239,13 @@ def fig_mix(part: pd.DataFrame, temp: pd.Series, corr: pd.DataFrame) -> None:
     for ax, c in zip(axs.flat, cats):
         ax.scatter(temp.reindex(part.index), 100 * part[c], s=12)
         rho = corr.set_index("categoria").loc[c, "rho_spearman"]
-        ax.set_title(f"{c} (ρ = {rho:+.2f})", fontsize=10)
+        ax.set_title(f"{nombre(c)} (ρ = {rho:+.2f})".replace(".", ","), fontsize=10)
         ax.set_ylabel("% de viandas")
     axs.flat[-1].axis("off")
     for ax in axs[1]:
         ax.set_xlabel("temp. máx. media semanal (°C)")
-    fig.suptitle(f"Mix de categorías vs. temperatura, semanas {periodo(part.index)}")
-    fig.tight_layout()
+    fig.suptitle(f"Mix de categorías contra temperatura, semanas {periodo(part.index)}")
+    fig.tight_layout(rect=(0, 0, 1, 0.96))
     _guardar(fig, "06_mix_temperatura.png")
 
 
