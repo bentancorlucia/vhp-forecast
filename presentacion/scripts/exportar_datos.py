@@ -44,7 +44,7 @@ NOMBRES_MODELO = {
     "mlp": "MLP",
 }
 NOMBRES_EVENTO = {
-    "agencia_meta": "Agencia de Marketing",
+    "agencia_meta": "Agencia de Meta",
     "influencer": "Influencer",
     "postres_web": "Postres en la web",
     "panes_web": "Panes en la web",
@@ -297,6 +297,27 @@ def construir(F: Fuentes) -> dict:
         g = bp[bp.modelo == mod].sort_values("fecha")
         pred[mod] = [{"f": x.fecha, "o": x.origen, "h": int(x.h), "y": r(x.y, 1), "lo": r(x._6, 1), "m": r(x._7, 1), "hi": r(x._8, 1)} for x in g.itertuples()]
     fechas_bt = sorted(bp.fecha.unique())
+    # cobertura del intervalo 80 % del mejor modelo, con IC 95 % de Wilson (mismo cálculo que report.py)
+    from statsmodels.stats.proportion import proportion_confint
+    g0 = bp[bp.modelo == met.modelo.iloc[0]]
+    k_cob = int(((g0.y >= g0["q0.1"]) & (g0.y <= g0["q0.9"])).sum())
+    lo_cob, hi_cob = proportion_confint(k_cob, len(g0), alpha=0.05, method="wilson")
+    cob_ic = {"k": k_cob, "n": int(len(g0)), "lo": r(lo_cob, 3), "hi": r(hi_cob, 3)}
+    # DM de LightGBM contra cada modelo (días que gana cada uno y error total), segmentos y control SARIMA con calendario
+    dml = F.csv(T + "backtest_total_dm_lgbm.csv")
+    dm_lgbm = [{"m2": x.modelo_2, "n2": NOMBRES_MODELO[x.modelo_2], "p": r(x.p_valor, 3), "gana1": int(x.dias_gana_1),
+                "gana2": int(x.dias_gana_2), "err1": r(x.error_abs_1, 0), "err2": r(x.error_abs_2, 0)}
+               for x in dml.itertuples() if x.modelo_2 != "naive"]
+    segmentos = {}
+    for s in ["particulares", "empresas"]:
+        ms = F.csv(T + f"backtest_{s}_metricas.csv").sort_values("MASE")
+        ds = F.csv(T + f"backtest_{s}_dm_lgbm.csv").set_index("modelo_2")
+        segmentos[s] = {"metricas": [{"id": x.modelo, "nombre": NOMBRES_MODELO[x.modelo], "mase": r(x.MASE), "wape": r(x.WAPE)}
+                                     for x in ms.itertuples()],
+                        "pPrimero": None if ms.modelo.iloc[0] == "lgbm_directo" else r(ds.loc[ms.modelo.iloc[0], "p_valor"], 3)}
+    sc = F.csv(T + "backtest_total_sarima_cal.csv").set_index("modelo")
+    sarima_cal = {"mase": r(sc.loc["sarima_cal", "MASE"]), "wape": r(sc.loc["sarima_cal", "WAPE"]),
+                  "maseLgbm": r(sc.loc["lgbm_directo", "MASE"]), "p": r(sc.loc["sarima_cal", "p_valor_vs_lgbm"], 3)}
     origenes = sorted(bp.origen.unique())
     horizonte = int(bp.h.max())
     bt_periodo = f"{corta(fechas_bt[0])}–{larga(fechas_bt[-1])}"
@@ -387,6 +408,8 @@ def construir(F: Fuentes) -> dict:
     sens_out = [{"faltante": int(x.costo_faltante), "p": int(x.p), "costo": r(x.costo_por_vianda, 4)} for x in sens.itertuples()]
     ss = F.csv(T + "plan_semana_siguiente.csv")
     elegido = next(s for s in simul if s["elegido"])
+    sg = ss.groupby("segmento")[["pronostico", f"plan_p{elegido['p']}"]].sum()
+    factor = {s: r(x[f"plan_p{elegido['p']}"] / x.pronostico, 3) for s, x in sg.iterrows()}
     semana = [{"seg": x.segmento, "cat": x.categoria, "pron": r(x.pronostico, 0), "plan": int(getattr(x, f"plan_p{elegido['p']}")), "p80": int(x.plan_p80), "p90": int(x.plan_p90)} for x in ss.itertuples()]
     # La semana planificada sigue a la última semana completa del backtest.
     lunes_plan = pd.Timestamp(fechas_bt[-1]) + pd.Timedelta(days=2)  # el sábado + 2 = lunes siguiente
@@ -439,14 +462,14 @@ def construir(F: Fuentes) -> dict:
         "dataset": dataset,
         "serie": serie_out,
         "eda": {"stl": stl_out, "autocorr": autocorr, "diaSemana": dia_semana, "efectos": efectos, "estacionariedad": estacionariedad, "rho": rho},
-        "total": {"metricas": metricas, "dm": dm_out, "ljungBox": lb_out, "pred": pred, "sarimaUltimo": sarima_ultimo,
+        "total": {"metricas": metricas, "dm": dm_out, "ljungBox": lb_out, "pred": pred, "sarimaUltimo": sarima_ultimo, "cobIC": cob_ic, "dmLgbm": dm_lgbm, "segmentos": segmentos, "sarimaCal": sarima_cal,
                   "ejemplo": {"fecha": dia0, "modelos": ej, "semana": ej_semana}},
         "mix": {"temperatura": mix_temp, "temps": temps, "participacion": mix_part, "unidades": mix_unid},
         "eventos": eventos,
         "ads": ads,
         "plan": {"curva": curva, "simulacion": simul, "sensibilidad": sens_out, "semana": semana, "pElegido": elegido["p"], "elegido": elegido,
                  "pCostosFijos": int(pinfo.p_costos_fijos), "pAntes": int(pinfo.p_antes_18_11), "periodo": pinfo.periodo_test,
-                 "xl": {k: r(v, 4) for k, v in xl.items()}, "hasta": hasta_seg},
+                 "xl": {k: r(v, 4) for k, v in xl.items()}, "hasta": hasta_seg, "factor": factor},
         "compras": compras,
         "decisiones": [dec_id[i] for i in DECISIONES_CLAVE],
         "limitaciones": LIMITACIONES,

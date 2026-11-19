@@ -346,8 +346,8 @@ function Candidatos() {
         </Paso>
         <Paso n={1} style={{ height: '100%' }}>
           <Col n="02" paso={1} titulo="ETS" archivo="models/ets.py"
-            que={<>Lleva un <b>nivel</b>, una <b>tendencia</b> y un <b>patrón por día</b>, y los corrige con cada dato nuevo. <K t="\alpha" /> decide cuánto pesa lo último: alto, reacciona rápido; bajo, es más estable.</>}
-            tex={`\\ell_t = \\alpha\\,(y_t - s_{t-${s}}) + (1-\\alpha)\\,\\ell_{t-1}`}
+            que={<>Lleva un <b>nivel</b>, una <b>tendencia</b> y un <b>patrón por día</b>, y los corrige con cada dato nuevo. <K t="\alpha" /> decide cuánto pesa lo último: alto, reacciona rápido; bajo, es más estable. Abajo, la ecuación del nivel (<K t="b" /> = tendencia amortiguada por <K t="\phi" />).</>}
+            tex={`\\ell_t = \\alpha\\,(y_t - s_{t-${s}}) + (1-\\alpha)\\,(\\ell_{t-1} + \\phi\\, b_{t-1})`}
             pie="aditiva o multiplicativa, con o sin tendencia: la elige el AIC cada sábado"
             cifra={num(mase('ets'), 3)} etiqueta="MASE" />
         </Paso>

@@ -42,6 +42,10 @@ export interface Datos {
     ljungBox: { modelo: string; rezago: number; stat: number; p: number }[];
     pred: Record<string, Pred[]>;
     sarimaUltimo: string;
+    cobIC: { k: number; n: number; lo: number; hi: number };
+    dmLgbm: { m2: string; n2: string; p: number; gana1: number; gana2: number; err1: number; err2: number }[];
+    segmentos: Record<string, { metricas: { id: string; nombre: string; mase: number; wape: number }[]; pPrimero: number | null }>;
+    sarimaCal: { mase: number; wape: number; maseLgbm: number; p: number };
     ejemplo: {
       fecha: string;
       modelos: Record<string, { y: number; yhat: number; lo: number; hi: number; escala: number }>;
@@ -67,7 +71,7 @@ export interface Datos {
     curva: PlanFila[]; simulacion: PlanFila[]; sensibilidad: { faltante: number; p: number; costo: number }[];
     semana: { seg: string; cat: string; pron: number; plan: number; p80: number; p90: number }[];
     pElegido: number; elegido: PlanFila; pCostosFijos: number; pAntes: number; periodo: string;
-    xl: Record<string, number>; hasta: Record<string, string>;
+    xl: Record<string, number>; hasta: Record<string, string>; factor: Record<string, number>;
   };
   compras: {
     semana: string; ingredientes: number; proveedores: number; sinReceta12: number; sinRecetaSemana: number;

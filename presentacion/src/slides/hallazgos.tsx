@@ -32,7 +32,7 @@ function Patrones() {
           <span className="dato-d">IC [{pctSigned(ver.lo, 0)}; {pctSigned(ver.hi, 0)}] · estacionalidad, no quiebre</span>
         </Paso>
         <Paso n={4} className="dato dato-fin">
-          <p>Empresas el sábado: {num(sabE, 2)} ×. Cada segmento se pronostica <b>por separado</b> y se suman.</p>
+          <p>Empresas el sábado: {num(sabE, 2)} ×. Cada segmento se pronostica <b>por separado</b> y el plan de compras usa los segmentos.</p>
         </Paso>
         <Paso n={2} style={{ marginTop: 'auto' }}><Periodo>Regresión de log(y) con calendario, IC&nbsp;95&nbsp;%</Periodo></Paso>
       </div>
@@ -43,9 +43,11 @@ function Patrones() {
 function PorQueLgbm() {
   const { total, meta } = useDatos();
   const [g, m2, m3] = total.metricas;
+  const { particulares: sp, empresas: se } = total.segmentos;
+  const mm = total.dmLgbm.find((x) => x.m2 === 'media_movil_4sem')!;
   const razones = [
-    { t: 'El menor error', d: <>MASE <b>{num(g.mase, 3)}</b> y WAPE <b>{pctFrac(g.wape, 1)}</b>: primero de siete modelos.</> },
-    { t: 'Usa el calendario', d: <>Feriados, Turismo y verano entran como variables; {m2.nombre} y {m3.nombre} solo ven el patrón de la semana.</> },
+    { t: 'El menor error', d: <>Total: MASE <b>{num(g.mase, 3)}</b> y WAPE <b>{pctFrac(g.wape, 1)}</b>, primero de siete. Empresas: primero ({num(se.metricas[0].mase, 3)}). Particulares: {sp.metricas[0].nombre} queda apenas adelante ({num(sp.metricas[0].mase, 3)} contra {num(sp.metricas.find((m) => m.id === 'lgbm_directo')!.mase, 3)}; p&nbsp;=&nbsp;{num(sp.pPrimero ?? 1, 2)}).</> },
+    { t: 'Nadie lo supera, pero tampoco se separa', d: <>SARIMA con calendario lo iguala (MASE {num(total.sarimaCal.mase, 3)}; p&nbsp;=&nbsp;{num(total.sarimaCal.p, 2)}): la ventaja <b>no</b> viene de ver el calendario. La media móvil gana más días ({mm.gana2} contra {mm.gana1}), pero con más error total.</> },
   ];
   return (
     <div className="col" style={{ height: '100%' }}>
@@ -70,7 +72,7 @@ function PorQueLgbm() {
           ))}
           <Paso n={2}>
             <div className="tarjeta crema" style={{ padding: '16px 22px' }}>
-              <h3 style={{ fontSize: 22, margin: '0 0 6px' }}>Elegimos {g.nombre.split(' ')[0]} por el menor error y el calendario, pero…</h3>
+              <h3 style={{ fontSize: 22, margin: '0 0 6px' }}>Elegimos {g.nombre.split(' ')[0]} por el menor error, pero…</h3>
               <p style={{ fontSize: 18, margin: 0, lineHeight: 1.4 }}>…{m2.nombre} y {m3.nombre} andan parejo y el test no los separa.</p>
             </div>
           </Paso>
@@ -177,12 +179,12 @@ function Eventos() {
         <Paso n={2} className="col" style={{ gap: 10, borderTop: '2px solid var(--tinta-12)', paddingTop: 16 }}>
           <h2 style={{ margin: 0, fontSize: 30 }}>Extras por vianda</h2>
           <div><EventosForest w={670} h={230} unidad="tasa" resaltar={['postres_web', 'panes_web']} /><Periodo>Punto = efecto · barra = IC 95 %: <b>si cruza el 0, el efecto no es seguro</b></Periodo></div>
-          <p style={{ ...txt, marginTop: 8, borderLeft: '4px solid var(--ambar)', paddingLeft: 16 }}><b>Postres y panes en la web: sí.</b> Placebos con efecto: postres {pl('postres_web').sigPlac} de {pl('postres_web').nPlac}, panes {pl('panes_web').sigPlac} de {pl('panes_web').nPlac}.</p>
+          <p style={{ ...txt, marginTop: 8, borderLeft: '4px solid var(--ambar)', paddingLeft: 16 }}><b>Postres en la web: claro</b> (placebos con efecto: {pl('postres_web').sigPlac} de {pl('postres_web').nPlac}). <b>Panes: efecto chico, a confirmar:</b> {pl('panes_web').sigPlac} de {pl('panes_web').nPlac} placebos también dieron significativos.</p>
         </Paso>
         <Paso n={3} className="col" style={{ gap: 10, borderTop: '2px solid var(--tinta-12)', paddingTop: 16 }}>
           <h2 style={{ margin: 0, fontSize: 30 }}>Viandas de particulares</h2>
           <div><EventosForest w={670} h={230} unidad="pct" resaltar={['agencia_meta']} solo={['agencia_meta', 'influencer', 'suba_precio']} /><Periodo>Particulares, efecto medio en %, datos {meta.datosPeriodoPart}</Periodo></div>
-          <p style={{ ...txt, marginTop: 8, borderLeft: '4px solid var(--oro)', paddingLeft: 16 }}>Suba de precio e influencer: cruzan el 0, <b>no se distinguen</b> (la suba, con solo {sp.nPlac} placebos, es preliminar). Agencia de Marketing {pctSigned(ag.ef, 0)}: <b>cota superior</b>, mezclada con la vuelta del verano.</p>
+          <p style={{ ...txt, marginTop: 8, borderLeft: '4px solid var(--oro)', paddingLeft: 16 }}>Suba de precio e influencer: cruzan el 0, <b>no se distinguen</b> (la suba, con solo {sp.nPlac} placebos, es preliminar). Agencia de Meta {pctSigned(ag.ef, 0)}: <b>cota superior</b>, mezclada con la vuelta del verano.</p>
         </Paso>
       </div>
     </div>
@@ -234,7 +236,7 @@ function PlanCompras() {
     <div className="plan">
       <div className="col" style={{ gap: 0, minHeight: 0 }}>
         <Paso n={0}>
-          <p className="pregunta" style={{ margin: 0, fontSize: 28 }}>Conviene comprar <b>lo que dice el pronóstico</b>, sin sumar colchón.</p>
+          <p className="pregunta" style={{ margin: 0, fontSize: 28 }}>Conviene comprar <b>cerca de lo esperado</b>: asegurarse no paga.</p>
           <p className="chica" style={{ margin: '6px 0 18px' }}><b>p</b> = en qué % de las semanas alcanza lo que se compra. Con p&nbsp;=&nbsp;50 alcanza 1 de cada 2 semanas; con p&nbsp;=&nbsp;90, 9 de cada 10. Para que alcance más seguido hay que comprar más.</p>
         </Paso>
         <Paso n={0} className="plan-ej">
@@ -265,13 +267,13 @@ function PlanCompras() {
 
       <div className="col" style={{ gap: 14, minHeight: 0 }}>
         <Paso n={1} className="col" style={{ gap: 10 }}>
-          <h3 style={{ margin: 0, fontSize: 22 }}>¿Por qué sin colchón?</h3>
+          <h3 style={{ margin: 0, fontSize: 22 }}>¿Por qué no asegurarse?</h3>
           <div className="plan-porque">
             <div><div className="v">${cs.sobrante}</div><div className="d">tirar una vianda</div></div>
             <span className="mayor">&gt;</span>
             <div style={{ textAlign: 'right' }}><div className="v" style={{ color: 'var(--tinta-70)' }}>${cs.faltante}</div><div className="d">perder una venta</div></div>
           </div>
-          <p className="chica" style={{ margin: 0, fontSize: '16px' }}>Tirar duele más: comprar de más no paga. Si perder una venta costara <b>${caro.faltante}</b>, convendría p&nbsp;=&nbsp;{caro.p}.</p>
+          <p className="chica" style={{ margin: 0, fontSize: '16px' }}>Tirar duele más: comprar de más no paga. El factor de p&nbsp;=&nbsp;{plan.pElegido} (×{num(plan.factor.empresas, 2)} en empresas, ×{num(plan.factor.particulares, 2)} en particulares) solo corrige que el modelo se quedó corto más veces de las que se pasó; <b>no es un margen de seguridad</b>. Si perder una venta costara <b>${caro.faltante}</b>, convendría p&nbsp;=&nbsp;{caro.p}.</p>
           <p className="plan-supuesto"><b>Supuesto:</b> no se consultó qué pasa en la práctica cuando falta un ingrediente (¿se cambia el plato?, ¿se compra en el día?). Los ${cs.faltante} son una estimación.</p>
         </Paso>
 
@@ -348,7 +350,7 @@ function Conclusion() {
   const frases = [
     <>La demanda de la semana se puede anticipar con un error del <b>{pctFrac(g.wape, 1)}</b>. LightGBM es el más preciso, pero SARIMA y ETS andan casi igual: <b>lo simple también sirve</b>.</>,
     <>El clima cambia <b>qué</b> se pide, no <b>cuánto</b>. De las acciones, solo postres y panes en la web tuvieron un efecto claro; Meta no se puede evaluar hasta <b>variar el gasto a propósito</b>.</>,
-    <>Conviene comprar <b>lo que dice el pronóstico</b>, sin colchón: pierde <b>${num(plan.elegido.costo, 0)}</b> por vianda, contra ${num(p90.costo, 0)} si se asegura el 90&nbsp;%. El plan sale cada sábado, en kilos por ingrediente.</>,
+    <>Conviene comprar <b>cerca de lo esperado</b>: asegurarse el 90&nbsp;% cuesta <b>${num(p90.costo, 1)}</b> contra ${num(plan.elegido.costo, 1)} por vianda. El plan sale cada sábado, en kilos por ingrediente.</>,
   ];
   return (
     <section className="diapo" style={{ justifyContent: 'center' }}>
@@ -371,17 +373,17 @@ export const HALLAZGOS: Diapo[] = [
   { id: 'patrones', seccion: S, titulo: 'Patrones: dos semanas opuestas', pasos: 5, Comp: Patrones,
     notas: (d) => `Los particulares piden sobre todo el lunes: ${num(d.eda.diaSemana[0].particulares, 2)} veces su media. Las empresas casi no piden el sábado. En los feriados en que se abre, las empresas caen mucho más porque las oficinas cierran. Y enero cae por el verano. Por eso pronosticamos cada segmento por separado.` },
   { id: 'por-que-lgbm', seccion: 'Método', titulo: 'Por qué LightGBM', pasos: 3, Comp: PorQueLgbm,
-    notas: (d) => `Comparamos siete modelos en las mismas ${d.meta.nOrigenes} semanas. Elegimos LightGBM por dos razones. Uno: tiene el menor error, MASE ${num(d.total.metricas[0].mase, 3)} y WAPE ${pctFrac(d.total.metricas[0].wape, 1)}. Dos: usa el calendario, feriados, Turismo y verano; SARIMA y ETS solo ven el patrón de la semana. Siendo honestas: con Diebold-Mariano no se separa de ${d.total.metricas[1].nombre} ni de ${d.total.metricas[2].nombre}, así que esos quedan como respaldo más simple. Elegimos LightGBM ahora por tener el menor error, pero los tres andan parejo.` },
+    notas: (d) => `Comparamos siete modelos en las mismas ${d.meta.nOrigenes} semanas. Elegimos LightGBM porque tiene el menor error en el Total, MASE ${num(d.total.metricas[0].mase, 3)} y WAPE ${pctFrac(d.total.metricas[0].wape, 1)}, también en la ventana anterior y en empresas; en particulares ETS queda apenas adelante, sin diferencia significativa. Siendo honestas: con Diebold-Mariano no se separa de ${d.total.metricas[1].nombre} ni de ${d.total.metricas[2].nombre}. Probamos además darle el calendario a SARIMA, y lo iguala: MASE ${num(d.total.sarimaCal.mase, 3)}. O sea que la ventaja no viene del calendario. La media móvil gana más días, ${d.total.dmLgbm.find((x) => x.m2 === 'media_movil_4sem')!.gana2} contra ${d.total.dmLgbm.find((x) => x.m2 === 'media_movil_4sem')!.gana1}, pero cuando pierde, pierde por más. Nadie lo supera, pero tampoco se separa.` },
   { id: 'backtest', seccion: 'Método', titulo: 'El backtest en el tiempo', pasos: 3, Comp: BacktestTiempo,
     notas: (d) => `Así se ve semana a semana: la línea oscura es lo real, la ámbar el pronóstico y la banda el intervalo del 80 %. Los círculos vacíos son los días que quedaron afuera. El peor día es el lunes ${fechaLarga(d.meta.diaIncompleto)}, que tiene un export incompleto; sacarlo no cambia el ranking.` },
   { id: 'clima', seccion: S, titulo: 'El clima cambia qué se pide', pasos: 5, Comp: ClimaMix,
     notas: () => 'Con calor se pide menos carne vacuna, sobre todo en empresas, y el intervalo no toca el cero. Pero para pronosticar a una semana el clima no ayuda: la log loss del modelo con clima es igual o peor que usar el mix de las últimas cuatro semanas, que ya trae la estación.' },
   { id: 'eventos', seccion: S, titulo: 'Efecto de los eventos', pasos: 4, Comp: Eventos,
-    notas: () => 'Para medir un evento entrenamos un SARIMA solo con lo anterior y lo proyectamos: eso es lo que habría pasado sin el evento, y la diferencia con lo observado es el efecto. Para confiar, repetimos en fechas falsas, como un placebo: ahí no pasó nada y debería dar cero. Poner postres y panes en la web subió claramente los extras por vianda. La suba de precio, ahora con ocho semanas, y el influencer no se distinguen de cero; la suba sigue preliminar porque entran pocos placebos. La agencia de Marketing da un efecto grande, pero coincide con la vuelta del verano y no tenemos un febrero anterior para separarlo: lo tomamos como cota superior.' },
+    notas: (d) => `Para medir un evento entrenamos un SARIMA solo con lo anterior y lo proyectamos: eso es lo que habría pasado sin el evento, y la diferencia con lo observado es el efecto. Para confiar, repetimos en fechas falsas, como un placebo: ahí no pasó nada y debería dar cero. Poner postres en la web subió claramente los postres por vianda, y ningún placebo dio efecto. Con los panes el efecto es chico y hay que confirmarlo: ${d.eventos.find((e) => e.evento === 'panes_web')!.sigPlac} de ${d.eventos.find((e) => e.evento === 'panes_web')!.nPlac} placebos también dieron significativos. La suba de precio, ahora con ocho semanas, y el influencer no se distinguen de cero; la suba sigue preliminar porque entran pocos placebos. La agencia de Meta da un efecto grande, pero coincide con la vuelta del verano y no tenemos un febrero anterior para separarlo: lo tomamos como cota superior.` },
   { id: 'meta-ads', seccion: S, titulo: 'Meta Ads: el gasto casi no varía', pasos: 5, Comp: MetaAds,
     notas: () => 'Para medir el efecto de algo, ese algo tiene que moverse. Desde febrero, y hasta noviembre, el gasto casi no cambia; el movimiento grande está en enero a febrero, mezclado con el verano. La regresión y Granger sobre el gasto no encuentran nada. La recomendación es variar el gasto a propósito.' },
   { id: 'plan', seccion: S, titulo: 'Plan de compras', pasos: 3, Comp: PlanCompras,
-    notas: (d) => `La compra es el pronóstico de la semana por un percentil de los errores recientes. Probamos varios percentiles y el más barato fue p = ${d.plan.pElegido}: como sobrar cuesta más que faltar, no conviene sumar colchón y se compra cerca del pronóstico. El sobrante y el faltante se ponderan por la proporción de viandas XL. Con empresas hasta noviembre p pasó de 45 a 50, casi empatados en costo. Si perder un cliente costara más, p sube. A la derecha, el plan real para la semana siguiente, con datos de los dos segmentos hasta el sábado anterior.` },
+    notas: (d) => `La compra es el pronóstico de la semana por un percentil de los errores recientes. Probamos varios percentiles y el más barato fue p = ${d.plan.pElegido}: conviene comprar cerca de lo esperado. El factor de p = ${d.plan.pElegido}, por ${num(d.plan.factor.empresas, 2)} en empresas y por ${num(d.plan.factor.particulares, 2)} en particulares, solo corrige que el modelo se quedó corto más veces de las que se pasó; no es un margen de seguridad. Asegurarse el 90 % cuesta mucho más por vianda. La teoría da el cuantil ${num(d.meta.costos.faltante / (d.meta.costos.faltante + d.meta.costos.sobrante), 2)} y la simulación elige ${d.plan.pElegido} porque la curva de costo es casi plana alrededor de ese punto. El sobrante y el faltante se ponderan por la proporción de viandas XL. Con empresas hasta noviembre p pasó de 45 a 50, casi empatados en costo. Si perder un cliente costara más, p sube. A la derecha, el plan real para la semana siguiente, con datos de los dos segmentos hasta el sábado anterior.` },
 ];
 
 export const CIERRE: Diapo[] = [
