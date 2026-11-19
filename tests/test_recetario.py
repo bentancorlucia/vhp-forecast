@@ -57,7 +57,7 @@ def test_lote_se_divide_por_porciones_y_xl():
     recetas = set(rec["platos"]["plato"])
     assert rc.receta_de("Guiso", True, mapa, recetas, 1.3) == ("Guiso XL", 1.0, "XL con receta propia")
     r, f, nota = rc.receta_de("Pollo con salsa", True, mapa, recetas, 1.3)
-    assert r == "Pollo con salsa" and f == 1.3 and nota.startswith("[SUPUESTO]")
+    assert r == "Pollo con salsa" and f == 1.3 and nota.startswith("supuesto")
 
 
 def _cadena(columnas=("pronostico",)):

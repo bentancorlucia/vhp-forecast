@@ -83,7 +83,7 @@ Las métricas absolutas (MAE) quedan multiplicadas por `K`. Por eso en el inform
 ## Limitaciones de los datos
 
 - **Noviembre cortado en la última semana completa (14/11/2026).** Empresas de septiembre a noviembre sale del export de Excel: la pantalla de Resumen comercial las muestra en 0.
-- **Recetario:** 26 platos vendidos (≈10 % de las viandas de las últimas 12 semanas) no tienen receta en el Costo del recetario y quedan fuera de la lista de compras. Las XL sin receta propia se estiman como la normal × 1,30.
+- **Recetario:** 26 platos vendidos (13,7 % de las viandas de las últimas 12 semanas, 22/08–14/11/2026, los dos segmentos) no tienen receta en el Costo del recetario y quedan fuera de la lista de compras. Las XL sin receta propia se estiman como la normal × 1,30.
 
 - Faltan los pedidos por WhatsApp, teléfono o carga manual.
 - **Lunes 17/08/2026, particulares:** la cantidad de pedidos coincide con el Tablero del negocio, pero casi no tienen líneas de producto (mediana de 1 vianda por pedido, contra ~7 un lunes normal). Parece un export incompleto. Se dejó como está. Desde que empresas llega a noviembre queda fuera de las semanas pronosticadas (24/08–14/11/2026), pero sigue en el entrenamiento.

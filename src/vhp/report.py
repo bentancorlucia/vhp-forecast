@@ -293,7 +293,7 @@ def seccion_compras(N: Num) -> list[str]:
             "la receta, abriendo las preparaciones base de forma recursiva (escaladas por rendimiento real) → "
             "÷ (1 − merma) → kg por ingrediente y por proveedor. Guarniciones: 250 g por vianda en los platos con "
             "acompañamiento, repartidos según la columna Guarniciones de las últimas 4 semanas. XL sin receta propia: "
-            "gramos × 1,30 [SUPUESTO].", "",
+            "gramos × 1,30 (supuesto, a validar).", "",
             f"- Semana {c.semana}: {int(c.ingredientes)} ingredientes de {int(c.proveedores)} proveedores. La lista "
             "completa (con recetas, mermas y proveedores) es información comercial y queda en `reports_private/` "
             "(no se sube).",

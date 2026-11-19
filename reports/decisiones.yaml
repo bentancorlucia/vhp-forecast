@@ -20,7 +20,7 @@ decisiones:
   - id: platos_nuevos
     fase: datos
     titulo: "Tres platos nuevos en categorias.yaml"
-    decision: "Penne rigatte con salsa → pastas (forma); Solomillo relleno con guarnicion → cerdo [SUPUESTO: el solomillo de la carta es de cerdo, como 'Solomillo de cerdo']. Entre los dos suman 5 viandas de particulares en sep–nov 2026. Hamburguesa al pan (empresas, sep–nov 2026) → carne vacuna [SUPUESTO: como las Hamburguesas Caseras]; sin receta en el recetario (SIN_RECETA en recetas_map.yaml)."
+    decision: "Penne rigatte con salsa → pastas (forma); Solomillo relleno con guarnicion → cerdo (supuesto: el solomillo de la carta es de cerdo, como 'Solomillo de cerdo'). Entre los dos suman 5 viandas de particulares en sep–nov 2026. Hamburguesa al pan (empresas, sep–nov 2026) → carne vacuna (supuesto: como las Hamburguesas Caseras); sin receta en el recetario (SIN_RECETA en recetas_map.yaml)."
     porque: "asignar_categoria falla si hay platos sin categoría (para no perder unidades en silencio). Pendiente de validar por Lucía."
     quien: Lucía
 
@@ -181,7 +181,7 @@ decisiones:
   - id: eventos_meta_nuevos
     fase: eventos
     titulo: "Cambio de reparto (05/09) y baja de pauta (02/11): sin efecto detectable"
-    decision: "Sobre clientes nuevos de particulares por día (en nivel: hay días con 0). Reparto entre anuncios del 05/09/2026, 8 semanas: −7 % [−50; +265], 0 de 3 placebos. Baja de pauta desde el 02/11/2026 [SUPUESTO: primera semana con menos gasto en el Tablero], 2 semanas: clientes nuevos −8 % [−51; +278] (EMD ±45 %), pedidos de clientes que ya compraron −2 % [−13; +14] (EMD ±19 %). PRELIMINAR."
+    decision: "Sobre clientes nuevos de particulares por día (en nivel: hay días con 0). Reparto entre anuncios del 05/09/2026, 8 semanas: −7 % [−50; +265], 0 de 3 placebos. Baja de pauta desde el 02/11/2026 (supuesto: primera semana con menos gasto en el Tablero), 2 semanas: clientes nuevos −8 % [−51; +278] (EMD ±45 %), pedidos de clientes que ya compraron −2 % [−13; +14] (EMD ±19 %). PRELIMINAR."
     porque: "La baja es chica hasta ahora (campaña ~9.100 → 8.400 UYU en la semana del 02/11, −8 %) y hay solo 12 días hábiles posteriores. Que ni nuevos ni recurrentes se muevan es coherente con una baja que todavía no se nota; hay que volver a medir cuando haya más semanas y el gasto diario."
     quien: método
 
@@ -223,7 +223,7 @@ decisiones:
   - id: costo_faltante
     fase: plan
     titulo: "Faltante = margen perdido, ponderado por XL, con sensibilidad"
-    decision: "Desde el 18/11/2026: sobrante $200 normal / $260 XL y faltante $150 / $155 (precio 350 / 415 − costo), ponderados por la proporción de XL del segmento en las 12 semanas previas a cada origen (empresas ~16,5 %, particulares ~5,5 %). Backtest de los dos segmentos 24/08–14/11/2026: p elegido = 50 (antes 45, con empresas en 08/06–29/08), 15,4 UYU por vianda demandada (antes 16,5). p = 45 cuesta 15,5: casi empate. Con costos fijos p también sería 50. Por segmento con p = 50: empresas cobertura 38 %, 15,9 UYU por vianda; particulares 43 %, 15,1. Sensibilidad faltante $150/$300/$600 → p 50/60/75 (antes 45/60/75). El plan de empresas de la semana 16/11–21/11/2026 ya no es [SUPUESTO]: sale de sus datos hasta el 14/11/2026."
+    decision: "Desde el 18/11/2026: sobrante $200 normal / $260 XL y faltante $150 / $155 (precio 350 / 415 − costo), ponderados por la proporción de XL del segmento en las 12 semanas previas a cada origen (empresas ~16,5 %, particulares ~5,5 %). Backtest de los dos segmentos 24/08–14/11/2026: p elegido = 50 (antes 45, con empresas en 08/06–29/08), 15,4 UYU por vianda demandada (antes 16,5). p = 45 cuesta 15,5: casi empate. Con costos fijos p también sería 50. Por segmento con p = 50: empresas cobertura 38 %, 15,9 UYU por vianda; particulares 43 %, 15,1. Sensibilidad faltante $150/$300/$600 → p 50/60/75 (antes 45/60/75). El plan de empresas de la semana 16/11–21/11/2026 ya no es un supuesto: sale de sus datos hasta el 14/11/2026."
     porque: "Como sobrar duele más que faltar, no conviene sumar colchón: lo más barato es comprar cerca del pronóstico (p = 50; antes 45, por debajo). Si quedarse corto hace perder al cliente, el faltante cuesta más y conviene comprar más."
     quien: Lucía
 
@@ -237,7 +237,7 @@ decisiones:
   - id: xl_sin_receta
     fase: compras
     titulo: "XL sin receta propia = normal × 1,30"
-    decision: "Solo 4 XL tienen receta propia (pastel de carne, pastel de carne con papas y boniatos, strogonoff de vacío y de pollo). Las demás: gramos de la normal × 1,30, también la guarnición. [SUPUESTO] a validar con Lucía."
+    decision: "Solo 4 XL tienen receta propia (pastel de carne, pastel de carne con papas y boniatos, strogonoff de vacío y de pollo). Las demás: gramos de la normal × 1,30, también la guarnición. Supuesto, a validar."
     porque: "Es el mismo +30 % que se usa para el costo de la XL ($260)."
     quien: método
 

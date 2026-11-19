@@ -176,7 +176,7 @@ Plan para la semana 16/11–21/11/2026, una compra semanal (porciones × K), con
 
 ## 7. De platos a ingredientes (recetario)
 
-Cadena de multiplicaciones: plan por segmento × categoría → reparto entre los platos de la categoría (participación de las últimas 4 semanas, normal y XL por separado) → gramos de cada ingrediente según la receta, abriendo las preparaciones base de forma recursiva (escaladas por rendimiento real) → ÷ (1 − merma) → kg por ingrediente y por proveedor. Guarniciones: 250 g por vianda en los platos con acompañamiento, repartidos según la columna Guarniciones de las últimas 4 semanas. XL sin receta propia: gramos × 1,30 [SUPUESTO].
+Cadena de multiplicaciones: plan por segmento × categoría → reparto entre los platos de la categoría (participación de las últimas 4 semanas, normal y XL por separado) → gramos de cada ingrediente según la receta, abriendo las preparaciones base de forma recursiva (escaladas por rendimiento real) → ÷ (1 − merma) → kg por ingrediente y por proveedor. Guarniciones: 250 g por vianda en los platos con acompañamiento, repartidos según la columna Guarniciones de las últimas 4 semanas. XL sin receta propia: gramos × 1,30 (supuesto, a validar).
 
 - Semana 16/11/2026–21/11/2026: 112 ingredientes de 21 proveedores. La lista completa (con recetas, mermas y proveedores) es información comercial y queda en `reports_private/` (no se sube).
 - Platos sin receta: 26 platos, 13,7 % de las viandas de las últimas 12 semanas (12,4 % del pronóstico de la semana): quedan fuera de la lista y se reportan.

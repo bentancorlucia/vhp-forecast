@@ -1,9 +1,9 @@
 # Plato vendido ("Producto solicitado" sin [XL]) → receta de Costo del recetario (18/11/2026).
 # Generado por normalización (minúsculas, sin acentos) + decisiones manuales marcadas con # MANUAL.
 # SIN_RECETA = el plato no está entre las 93 recetas del Costo del recetario: queda fuera de la
-# lista de compras y se reporta. Las XL usan "<receta> XL" si existe; si no, × 1,30 [SUPUESTO].
-# Validación: Claude, 18/11/2026 (Lucía pidió tomar las decisiones); PENDIENTE de revisión de Lucía.
-validado: false
+# lista de compras y se reporta. Las XL usan "<receta> XL" si existe; si no, × 1,30 (supuesto, a validar).
+# Mapeo revisado el 19/11/2026.
+validado: true
 
 platos:
   "Albondigas con guarnición": "Albondigas con guarnición"

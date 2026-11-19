@@ -56,7 +56,7 @@ eventos:
     fecha: 2026-11-02
     series: [clientes_nuevos_particulares, pedidos_recurrentes_particulares]
     semanas_post: 2           # 02/11–14/11/2026: fin de los datos. PRELIMINAR
-    nota: "Baja de la inversión en Meta (Lucía). [SUPUESTO] inicio = lunes 02/11/2026, primera semana con menos gasto en el Tablero (campaña ~9.100 → 8.400 UYU/semana); no hay gasto diario de oct–nov. Si la pauta mueve a los nuevos, deberían bajar los nuevos y no los recurrentes."
+    nota: "Baja de la inversión en Meta (Lucía). Supuesto: inicio = lunes 02/11/2026, primera semana con menos gasto en el Tablero (campaña ~9.100 → 8.400 UYU/semana); no hay gasto diario de oct–nov. Si la pauta mueve a los nuevos, deberían bajar los nuevos y no los recurrentes."
 
 # Notas para preguntar (no se miden como evento).
 notas:

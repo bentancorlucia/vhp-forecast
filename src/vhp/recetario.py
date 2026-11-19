@@ -18,7 +18,7 @@ Reglas del recetario (Costo del recetario, leído el 18/11/2026):
   por plural/singular o por la clave del proveedor. Sin match: se reporta y queda fuera.
 - Merma: la del ingrediente en ingredientes.csv (si falta, la de su familia). Merma < 0
   (spaghetti, −1,5: absorbe agua): no se divide, se usa el peso seco tal cual y se avisa.
-- XL: receta "<plato> XL" si existe; si no, [SUPUESTO] gramos × 1,30.
+- XL: receta "<plato> XL" si existe; si no, gramos × 1,30 (supuesto, a validar).
 
 TODO lo que sale de acá es información comercial (recetas, gramos, mermas, proveedores):
 la lista completa va a reports_private/ (ignorado por git). Al repo sube solo un índice
@@ -149,7 +149,7 @@ def receta_de(plato: str, es_xl: bool, mapa: dict, recetas: set[str], factor_xl:
         return m, 1.0, ""
     if f"{m} XL" in recetas:
         return f"{m} XL", 1.0, "XL con receta propia"
-    return m, factor_xl, f"[SUPUESTO] XL = normal × {factor_xl:.2f}"
+    return m, factor_xl, f"supuesto: XL = normal × {factor_xl:.2f}"
 
 
 def proponer_mapa(vendidos: list[str], recetas: list[str]) -> dict:
@@ -257,7 +257,7 @@ def lista_compras(up: pd.DataFrame, columnas: list[str], rec: dict, res: Resolut
                 cache[k] = pd.DataFrame(abrir(b.base, 1.0, rec, res))  # por gramo de guarnición
             d = cache[k].copy()
             for c in columnas:
-                # XL: la guarnición también crece (+30 %) [SUPUESTO]
+                # XL: la guarnición también crece (+30 %), supuesto
                 g_tot = (d_s[c] * np.where(d_s["es_xl"], factor_xl, 1.0)).sum() * gramos_guarnicion * b.participacion
                 d[c] = d["cantidad"] * g_tot
             d["origen"], d["segmento"], d["plato"], d["es_xl"] = "guarnicion", s, b.base, False
@@ -345,7 +345,7 @@ def correr() -> dict:
                             "viandas_repartidas": [u[c].sum() for c in columnas],
                             "viandas_sin_receta": [sin_sem[c].sum() for c in columnas]})
     control["pct_sin_receta"] = 100 * control["viandas_sin_receta"] / control["viandas_plan"]
-    xl_sup = u[u["nota"].str.startswith("[SUPUESTO]")].groupby("plato")["pronostico"].sum()
+    xl_sup = u[u["nota"].str.startswith("supuesto")].groupby("plato")["pronostico"].sum()
 
     # salidas privadas
     priv = RAIZ / cfg["rutas"]["reports_private"]
@@ -378,7 +378,7 @@ def correr() -> dict:
     print(f"Platos sin receta, últimas 12 semanas ({', '.join(f'{s} {d:%d/%m}–{h:%d/%m/%Y}' for s, (d, h) in ult12.items())}): "
           f"{len(sin)} platos, {sin['pct_viandas'].sum():.2f} % de las viandas")
     print(sin.round(2).to_string(index=False))
-    print("XL sin receta propia [SUPUESTO ×1,30]:", ", ".join(xl_sup.index))
+    print("XL sin receta propia (supuesto ×1,30):", ", ".join(xl_sup.index))
     print("Platos con acompañamiento:", int(acomp["con_acompaniamiento"].sum()), "de", len(acomp), "(plato × segmento)")
     print("Control de viandas:\n" + control.round(1).to_string(index=False))
     for a in avisos:

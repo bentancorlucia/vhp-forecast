@@ -69,5 +69,5 @@ mlp:
 
 recetario:
   gramos_guarnicion: 250               # por vianda en los platos con acompañamiento
-  factor_xl: 1.30                      # [SUPUESTO] XL sin receta propia = versión normal × 1,30
+  factor_xl: 1.30                      # supuesto, a validar: XL sin receta propia = versión normal × 1,30
   semanas_reparto: 4                   # reparto entre platos y guarniciones: últimas 4 semanas
