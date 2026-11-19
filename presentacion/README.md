@@ -5,7 +5,7 @@ Presentación web (tipo diapositivas) para la defensa del trabajo final. Vite + 
 ## Uso
 ```bash
 npm install
-npm run datos     # lee ../vhp-forecast (solo archivos públicos) → public/data/presentacion.json, y chequea contra resultados.md
+npm run datos     # lee el repo (solo archivos públicos) → public/data/presentacion.json, y chequea contra resultados.md
 npm run dev       # para presentar
 npm run build     # dist/ estático
 ```
@@ -30,7 +30,7 @@ npm run build     # dist/ estático
 ## Datos
 - Ningún número está escrito a mano en los componentes: todo sale de `presentacion.json`.
 - `scripts/exportar_datos.py` se niega a leer `raw_private`, `interim`, `control`, `.env` y `calidad_datos.csv`, y termina con error si algún número clave no coincide con `reports/resultados.md`.
-- Las diapositivas «En código» muestran funciones reales de `../vhp-forecast/src/vhp/`: el script las extrae con `ast` (sin docstrings), así nunca se desfasan del repo.
+- Las diapositivas «En código» muestran funciones reales de `../src/vhp/`: el script las extrae con `ast` (sin docstrings), así nunca se desfasan del repo.
 - El simulador del colchón recalcula el costo como (sobrante × % sobrante + faltante × % faltante) / 100 con la curva del backtest. Desde el 18/11/2026 el plan pondera los costos por la proporción de XL, así que el simulador (costos de la vianda normal) es una aproximación; la diapositiva lo dice.
 - Datos nuevos (18/11/2026): empresas termina el 31/08/2026 (`serie[].e` = null después); diapositivas nuevas «Particulares hasta noviembre» y «De platos a ingredientes»; «Meta: clics y el cambio del 05/09» se eliminó (48 en total).
 - STL y ACF/PACF se recalculan desde `data/processed/` (mismo método que `src/vhp/eda.py`) para dibujarlos con la paleta de la marca.

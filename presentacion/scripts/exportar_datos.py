@@ -1,8 +1,8 @@
-"""Exporta los resultados públicos de vhp-forecast a public/data/presentacion.json.
+"""Exporta los resultados públicos del repo a public/data/presentacion.json.
 
 Uso (desde vhp-presentacion/):
     npm run datos
-    # equivale a: ../vhp-forecast/.venv/bin/python scripts/exportar_datos.py [--repo RUTA]
+    # equivale a: ../.venv/bin/python scripts/exportar_datos.py [--repo RUTA]
 
 Lee SOLO archivos públicos (versionados) del repo:
   - reports/tables/*.csv  (salvo calidad_datos.csv: tiene conteos reales y no se sube)
@@ -31,7 +31,7 @@ import pandas as pd
 import yaml
 
 AQUI = Path(__file__).resolve().parent.parent
-REPO_DEF = AQUI.parent / "vhp-forecast"
+REPO_DEF = AQUI.parent  # la presentación vive en presentacion/ dentro del repo
 PROHIBIDOS = ("raw_private", "interim", "control", ".env", "calidad_datos")
 
 NOMBRES_MODELO = {

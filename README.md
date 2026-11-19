@@ -36,6 +36,20 @@ Sin los datos privados, los pasos desde `eda` corren sobre `data/processed/`, y 
 - **Decisiones y su porqué:** [`reports/decisiones.yaml`](reports/decisiones.yaml). Es la fuente única que usan el informe y resultados.md.
 - **Análisis paso a paso:** `analysis/*.py`, con celdas `# %%` (se corren como notebook en VS Code).
 
+## Presentación (`presentacion/`)
+
+Presentación web tipo diapositivas para la defensa (Vite + React + TypeScript). Todos los números salen de `presentacion/public/data/presentacion.json`, que se genera desde los archivos públicos del repo y se contrasta con `reports/resultados.md`.
+
+```bash
+cd presentacion
+npm install
+npm run datos     # regenera el JSON con el .venv del repo (no lee datos privados)
+npm run dev       # para presentar
+npm run build     # sitio estático en dist/
+```
+
+Teclas: → / espacio para avanzar, ← para volver, F pantalla completa, O índice, N notas. `?notas` abre la vista del orador y `?imprimir` todas las diapositivas para PDF. Más detalle en [`presentacion/README.md`](presentacion/README.md).
+
 ## Datos públicos (`data/processed/`)
 
 | Archivo | Contenido |
