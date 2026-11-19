@@ -148,6 +148,7 @@ function TirasResiduos() {
 function DmLjung() {
   const { total, meta } = useDatos();
   const dm = total.dm.find((d) => d.m1 === 'lgbm_directo' && d.m2 === 'media_movil_4sem')!;
+  const mm = total.dmLgbm.find((x) => x.m2 === 'media_movil_4sem')!;
   const pmin = Math.min(...total.ljungBox.map((x) => x.p));
   const ceja = { fontSize: 15, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase' as const, color: 'var(--ambar)', marginBottom: 6 };
   const sub = { margin: 0, fontSize: 21, lineHeight: 1.4, color: 'var(--tinta-70)' };
@@ -171,7 +172,7 @@ function DmLjung() {
         </Paso>
         <Paso n={0}><DiferenciaDiaria a={total.pred.lgbm_directo} b={total.pred.media_movil_4sem} /></Paso>
         <Paso n={1} style={{ marginTop: 'auto' }}>
-          <Resultado p={`p = ${pval(dm.p)}`} titulo="Empate: ninguno gana claro" periodo={`backtest ${meta.btPeriodo}`} regla={<>Con <b>p &lt; 0,05</b> la diferencia sería real. Acá se reparten casi mitad y mitad.<br /><span style={{ color: 'var(--tinta-45)' }}>Empate no es igualdad: 12 semanas no alcanzan para separarlos. Elegimos LightGBM por tener menor error y porque tiene en cuenta el calendario (feriados, Turismo, verano).</span></>} />
+          <Resultado p={`p = ${pval(dm.p)}`} titulo="Empate: ninguno gana claro" periodo={`backtest ${meta.btPeriodo}`} regla={<>Con <b>p &lt; 0,05</b> la diferencia sería real. Acá se reparten casi mitad y mitad: la media móvil gana {mm.gana2} días y LightGBM {mm.gana1}, pero cuando pierde, pierde por más.<br /><span style={{ color: 'var(--tinta-45)' }}>Empate no es igualdad: 12 semanas no alcanzan para separarlos. Elegimos LightGBM por tener el menor error total; con el calendario, SARIMA lo iguala, así que la elección no se apoya en el calendario.</span></>} />
         </Paso>
       </div>
       <div style={{ background: 'var(--tinta-12)' }} />
