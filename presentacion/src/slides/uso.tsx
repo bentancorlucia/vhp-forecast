@@ -26,7 +26,7 @@ function ModeloFinal() {
   const lg = total.metricas.find((m) => m.id === 'lgbm_directo')!;
   const cat = mix.unidades.find((x) => x.nivel === 'categoria' && x.id === 'media_4sem')!;
   const factores = [
-    { v: num(ej.total), t: 'Pronóstico', s: `Viandas de ${ej.seg} en la semana, con LightGBM.`, m: `MASE ${num(total.segmentos[ej.seg]?.metricas.find((m) => m.id === 'lgbm_directo')?.mase ?? lg.mase, 2)} en ${ej.seg}` },
+    { v: num(ej.total), t: 'Pronóstico', s: `Viandas de ${ej.seg} en la semana, con LightGBM.`, m: `MASE ${num(total.segmentos[ej.seg]?.metricas.find((m) => m.id === 'lgbm_directo')?.mase ?? lg.mase, 2)} en ${ej.seg} (naive: ${num(total.segmentos[ej.seg]?.metricas.find((m) => m.id === 'naive_estacional')?.mase ?? 0, 2)})` },
     { v: pct(ej.part * 100, 1), t: 'Participación', s: `Parte de ${ej.cat} en las últimas 4 semanas.`, m: `MASE por categoría ${num(cat.mase, 2)}` },
     { v: num(ej.factor, 2), t: 'Colchón', s: 'Factor que sale de los errores recientes.', m: `p = ${plan.pElegido}` },
   ];
@@ -116,7 +116,7 @@ function Colchon() {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 19, margin: '18px 0 0', lineHeight: 1.45 }}><b>Cada sábado se rehacen las dos cosas.</b> p cambia poco, porque 11 de las 12 semanas se repiten (hasta el 18/11 era {plan.pAntes}); el factor sí cambia con los errores nuevos. En {ej.cat}: {num(ej.pron)} × {num(ej.factor, 2)} ≈ {num(ej.compra)}.</p>
+          <p style={{ fontSize: 19, margin: '18px 0 0', lineHeight: 1.45 }}><b>Cada sábado se rehacen las dos cosas.</b> p cambia poco: {plan.pAntes} y {plan.pElegido} cuestan casi lo mismo y con los datos nuevos ganó {plan.pElegido}; el factor sí cambia con los errores nuevos. En {ej.cat}: {num(ej.pron)} × {num(ej.factor, 2)} ≈ {num(ej.compra)}.</p>
         </>)}
       </div>
     </div>
@@ -213,7 +213,7 @@ export const USO: Diapo[] = [
     notas: (d) => `Variables de LightGBM, por si preguntan: ${d.meta.variablesModelo}. ` + 'Todo el modelo final cabe en una cuenta. Sigamos un ejemplo: carne vacuna en empresas para la semana que viene. LightGBM pronostica el total de empresas en la semana. Ese total se reparte con la participación que tuvo carne vacuna en las últimas cuatro semanas. Y se multiplica por el colchón, un factor que sale de los errores recientes. Las próximas dos diapos abren estos factores: primero el código de los dos primeros, después el colchón.' },
   COD_MODELO,
   { id: 'colchon', seccion: S, titulo: 'El tercer factor: el colchón', pasos: 3, Comp: Colchon,
-    notas: (d) => `El colchón tiene dos partes. Primero, en el backtest de las últimas doce semanas, elegimos qué percentil usar: para cada p armamos la compra con los errores de las doce semanas previas, la comparamos con lo que realmente se vendió y medimos el costo de lo que sobra y lo que falta. La curva tiene forma de U: con poco colchón falta, con mucho sobra. El mínimo está en p = ${d.plan.pElegido}. Después calculamos el factor como el percentil ${d.plan.pElegido} de los errores de las últimas doce semanas y lo aplicamos al pronóstico. Las dos cosas se rehacen cada sábado: p cambia poco, porque la ventana se corre una sola semana (hasta el 18 de noviembre era ${d.plan.pAntes}); el factor sí cambia semana a semana.` },
+    notas: (d) => `El colchón tiene dos partes. Primero, en el backtest de las últimas doce semanas, elegimos qué percentil usar: para cada p armamos la compra con los errores de las doce semanas previas, la comparamos con lo que realmente se vendió y medimos el costo de lo que sobra y lo que falta. La curva tiene forma de U: con poco colchón falta, con mucho sobra. El mínimo está en p = ${d.plan.pElegido}. Después calculamos el factor como el percentil ${d.plan.pElegido} de los errores de las últimas doce semanas y lo aplicamos al pronóstico. Las dos cosas se rehacen cada sábado: p cambia poco: ${d.plan.pAntes} y ${d.plan.pElegido} cuestan casi lo mismo y con los datos nuevos ganó ${d.plan.pElegido}; el factor sí cambia semana a semana.` },
   { id: 'sabado', seccion: S, titulo: 'Cada sábado, en la práctica', pasos: 3, Comp: Sabado,
     notas: () => 'En la práctica son tres pasos: bajar el export, correr un comando y comprar. La comanda es la compra real para la semana que viene; el número resaltado es el mismo de la cuenta del principio.' },
   { id: 'hoja-de-ruta', seccion: S, titulo: 'Qué mejoraría los resultados', pasos: 3, Comp: HojaDeRuta,

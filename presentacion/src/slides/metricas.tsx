@@ -1,5 +1,5 @@
 // Método · cómo medimos (etapa 4, evaluate.py): fórmula, cómo se lee y un ejemplo real.
-import { Paso, Periodo, useDatos } from '../components/marca';
+import { K, Paso, Periodo, useDatos } from '../components/marca';
 import { Backtest } from '../charts/graficos';
 import { fechaCorta, fechaLarga, num, pctFrac, pval } from '../lib/format';
 import type { Diapo } from './tipos';
@@ -7,15 +7,152 @@ import type { ReactNode } from 'react';
 
 const S = 'Método';
 
+/** Línea de tiempo de las dos ventanas: 12 semanas cada una, se pisan una semana. */
+function LineaVentanas() {
+  const { total } = useDatos();
+  const rb = total.robustez;
+  const aFecha = (t: string) => { const [d, m, a] = t.split('/').map(Number); return Date.UTC(a, m - 1, d); };
+  const [aIni, aFin] = rb.ventanas.anterior.split('–').map(aFecha);
+  const [nIni, nFin] = rb.ventanas.nueva.split('–').map(aFecha);
+  const DIA = 864e5, t0 = aIni - 7 * DIA, t1 = nFin + 9 * DIA;
+  const W = 1408, X0 = 150, X1 = W - 10;
+  const x = (t: number) => X0 + ((t - t0) / (t1 - t0)) * (X1 - X0);
+  const semanas = (ini: number, fin: number) => Array.from({ length: Math.floor((fin - ini) / DIA / 7) + 1 }, (_, i) => ini + i * 7 * DIA);
+  const filas = [
+    { v: 'anterior' as const, nombre: 'Anterior', ini: aIni, fin: aFin, y: 80, fondo: 'var(--oro)' },
+    { v: 'nueva' as const, nombre: 'Nueva', ini: nIni, fin: nFin, y: 240, fondo: 'var(--ambar)' },
+  ];
+  const H = 76;
+  const meses = ['jun', 'jul', 'ago', 'sep', 'oct', 'nov'].map((m, i) => ({ m, t: Date.UTC(2026, 5 + i, 1) })).filter((m) => m.t > t0 && m.t < t1);
+  return (
+    <svg viewBox={`0 0 ${W} 380`} width="100%" style={{ display: 'block', overflow: 'visible' }} role="img" aria-label={`Ventana anterior ${rb.ventanas.anterior} y ventana nueva ${rb.ventanas.nueva}; se superponen ${rb.superposicion}`}>
+      {/* semana en común */}
+      <rect x={x(nIni) - 6} y={40} width={x(aFin + DIA) - x(nIni) + 12} height={300} rx={12} fill="var(--crema-osc)" />
+      <text x={(x(nIni) + x(aFin + DIA)) / 2} y={28} textAnchor="middle" fontSize={17} fill="var(--tinta-70)" fontWeight={600}>1 semana en común</text>
+      {filas.map((f) => (
+        <g key={f.v}>
+          <text x={0} y={f.y + H / 2 - 2} fontSize={30} fontWeight={700} fill="var(--tinta)" fontFamily="var(--f-titulo)">{f.nombre}</text>
+          <text x={0} y={f.y + H / 2 + 24} fontSize={17} fill="var(--tinta-70)">{rb.ventanasCortas[f.v]}</text>
+          {/* lo que el modelo ya vio */}
+          <line x1={X0} x2={x(f.ini) - (f.v === 'nueva' ? 150 : 10)} y1={f.y + H / 2} y2={f.y + H / 2} stroke="var(--tinta-25)" strokeWidth={2} strokeDasharray="2 6" strokeLinecap="round" />
+          {semanas(f.ini, f.fin).map((t, i) => (
+            <rect key={i} x={x(t) + 2} y={f.y} width={x(t + 6 * DIA) - x(t) - 4} height={H} rx={8} fill={f.fondo} />
+          ))}
+          <text x={x(f.ini) + 2} y={f.y - 12} fontSize={17} fontWeight={600} fill="var(--tinta-70)">{semanas(f.ini, f.fin).length} semanas pronosticadas →</text>
+        </g>
+      ))}
+      {/* eje de meses */}
+      <line x1={X0} x2={X1} y1={358} y2={358} stroke="var(--tinta-12)" />
+      {meses.map((m) => (
+        <g key={m.m}>
+          <line x1={x(m.t)} x2={x(m.t)} y1={352} y2={364} stroke="var(--tinta-25)" />
+          <text x={x(m.t) + 6} y={380} fontSize={17} fill="var(--tinta-45)">{m.m}</text>
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function Ventanas() {
+  const { meta } = useDatos();
+  const ideas = [
+    { n: 1, t: 'Qué es una ventana', d: <>{meta.nOrigenes} semanas seguidas que el modelo pronostica <b>sin haberlas visto</b>, entrenando cada sábado con todo lo anterior.</> },
+    { n: 1, t: 'Por qué dos', d: <>Con una sola, el ganador puede ser <b>suerte de ese período</b>. Si un modelo es bueno, tiene que serlo en las dos.</> },
+  ];
+  return (
+    <div className="col" style={{ height: '100%', gap: 0 }}>
+      <Paso n={0}>
+        <p className="pregunta" style={{ margin: '0 0 20px' }}>Probamos los modelos en <b>dos períodos distintos</b>, no en uno.</p>
+      </Paso>
+      <Paso n={0}><LineaVentanas /></Paso>
+      <div className="grid2" style={{ gap: 48, marginTop: 'auto' }}>
+        {ideas.map((x) => (
+          <Paso n={x.n} key={x.t} className="dato">
+            <span className="dato-t" style={{ marginTop: 0 }}>{x.t}</span>
+            <span className="dato-d" style={{ fontSize: 19 }}>{x.d}</span>
+          </Paso>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Colores de un diagrama según la tarjeta (blanca o ámbar). */
+type Tono = { c: string; acc: string; suave: string; fondo: string };
+
+// Ejemplo ilustrativo (no son datos): 6 días, real y pronóstico.
+const EJ_REAL = [148, 112, 104, 96, 100, 70];
+const EJ_PRON = [132, 118, 100, 108, 92, 74];
+const EJ_DIAS = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
+
+/** MAE: cada tramo vertical es el error de un día; el MAE es su promedio. */
+function DiagMae({ t }: { t: Tono }) {
+  const y = (v: number) => 170 - (v - 60) * 1.45;
+  const x = (i: number) => 40 + i * 64;
+  return (
+    <svg viewBox="0 0 400 210" width="100%" style={{ display: 'block', overflow: 'visible' }} role="img" aria-label="Errores diarios entre real y pronóstico">
+      {EJ_REAL.map((r, i) => {
+        const p = EJ_PRON[i];
+        return (
+          <g key={i}>
+            <line x1={x(i)} x2={x(i)} y1={y(r)} y2={y(p)} stroke={t.acc} strokeWidth={6} strokeLinecap="round" />
+            <circle cx={x(i)} cy={y(r)} r={8} fill={t.c} />
+            <circle cx={x(i)} cy={y(p)} r={7} fill={t.fondo} stroke={t.c} strokeWidth={2.5} />
+            <text x={x(i)} y={200} textAnchor="middle" fontSize={15} fill={t.suave}>{EJ_DIAS[i]}</text>
+          </g>
+        );
+      })}
+      <circle cx={232} cy={12} r={6} fill={t.c} /><text x={244} y={17} fontSize={14} fill={t.suave}>real</text>
+      <circle cx={292} cy={12} r={5.5} fill={t.fondo} stroke={t.c} strokeWidth={2} /><text x={304} y={17} fontSize={14} fill={t.suave}>pronóstico</text>
+    </svg>
+  );
+}
+
+/** WAPE: una barra con todo lo vendido; adentro, la parte que erramos. Ejemplo ilustrativo (los 6 días del MAE). */
+function DiagWape({ t }: { t: Tono }) {
+  const err = EJ_REAL.reduce((a, r, i) => a + Math.abs(r - EJ_PRON[i]), 0);
+  const tot = EJ_REAL.reduce((a, b) => a + b, 0);
+  const pct = Math.round((err / tot) * 100);
+  const X0 = 10, W = 380, w = Math.max(W * (err / tot), 8);
+  return (
+    <svg viewBox="0 0 400 210" width="100%" style={{ display: 'block', overflow: 'visible' }} role="img" aria-label={`De todo lo vendido, erramos un ${pct} %`}>
+      <text x={X0} y={20} fontSize={16} fill={t.c} fontWeight={600}>todo lo vendido en la semana</text>
+      <rect x={X0} y={32} width={W} height={44} rx={8} fill={t.suave} />
+      <rect x={X0} y={32} width={w} height={44} rx={8} fill={t.acc} />
+      <text x={X0 + W - 14} y={61} textAnchor="end" fontSize={18} fill={t.c} fontWeight={700}>100 %</text>
+      <path d={`M ${X0 + w / 2} 80 L ${X0 + w / 2} 112 L ${X0 + w / 2 + 24} 112`} fill="none" stroke={t.acc} strokeWidth={2} />
+      <text x={X0 + w / 2 + 32} y={118} fontSize={16} fill={t.c}>lo que erramos, sumando</text>
+      <text x={X0 + w / 2 + 32} y={140} fontSize={16} fill={t.c}>los errores de cada día</text>
+      <text x={X0} y={196} fontSize={16} fill={t.c}>WAPE = esa parte, en % <tspan fill={t.suave === 'var(--tinta-25)' ? 'var(--tinta-45)' : t.suave}>(acá, {pct} %)</tspan></text>
+    </svg>
+  );
+}
+
+/** MASE: la barra de copiar la semana pasada es la vara (vale 1); el modelo se mide contra ella. Ejemplo ilustrativo. */
+function DiagMase({ t }: { t: Tono }) {
+  const X0 = 10, uno = 300, m = X0 + (uno - X0) * 0.75;
+  return (
+    <svg viewBox="0 0 400 210" width="100%" style={{ display: 'block', overflow: 'visible' }} role="img" aria-label="El error del modelo medido con la vara del error de copiar la semana pasada">
+      <text x={X0} y={20} fontSize={16} fill={t.c} fontWeight={600}>error de copiar la semana pasada, en el histórico</text>
+      <rect x={X0} y={30} width={uno - X0} height={26} rx={6} fill={t.suave} />
+      <text x={uno + 12} y={50} fontSize={20} fill={t.c} fontWeight={700}>= 1</text>
+      <text x={X0} y={92} fontSize={16} fill={t.c} fontWeight={600}>error del modelo</text>
+      <rect x={X0} y={102} width={m - X0} height={26} rx={6} fill={t.c} />
+      <text x={uno + 12} y={122} fontSize={20} fill={t.c} fontWeight={700}>= 0,75</text>
+      <line x1={uno} x2={uno} y1={58} y2={134} stroke={t.c} strokeWidth={2} strokeDasharray="4 5" />
+      <text x={X0} y={170} fontSize={16} fill={t.c}><tspan fontWeight={700}>menos de 1:</tspan> erra menos que copiar en el histórico</text>
+      <text x={X0} y={196} fontSize={16} fill={t.c}><tspan fontWeight={700}>más de 1:</tspan> erra más que copiar en el histórico</text>
+    </svg>
+  );
+}
+
 function ErrorPron() {
-  const { total, meta } = useDatos();
-  const lg = total.metricas.find((m) => m.id === 'lgbm_directo')!;
-  const ne = total.metricas.find((m) => m.id === 'naive_estacional')!;
-  const comp = ['lgbm_directo', 'sarima', 'ets', 'mlp', 'naive_estacional'].map((id) => total.metricas.find((m) => m.id === id)!);
+  const { total } = useDatos();
+  const maseNaive = total.metricas.find((m) => m.id === 'naive_estacional')!.mase;
   const items = [
-    { n: 0, nombre: 'MAE', sigla: 'Mean Absolute Error', a: lg.mae, b: ne.mae, k: 'mae' as const, f: (x: number) => num(x, 0), unidad: 'viandas × K', mide: <>Cuántas viandas (× K) le erramos <b>por día</b>.</> },
-    { n: 1, nombre: 'WAPE', sigla: 'Weighted Absolute Percentage Error', a: lg.wape, b: ne.wape, k: 'wape' as const, f: (x: number) => `${num(x * 100, 1)} %`, unidad: '', mide: <>Ese error como <b>% de lo vendido</b>.</> },
-    { n: 2, nombre: 'MASE', sigla: 'Mean Absolute Scaled Error', a: lg.mase, b: ne.mase, k: 'mase' as const, f: (x: number) => num(x, 2), unidad: '', mide: <>El error frente a <b>copiar la semana pasada</b>. Con esta elegimos.</>, hero: true },
+    { n: 0, nombre: 'MAE', sigla: 'Mean Absolute Error', f: '\\frac{1}{n}\\sum |y_t-\\hat y_t|', Diag: DiagMae, mide: <>Cuántas viandas (× K) le erramos <b>por día</b>, en promedio.</> },
+    { n: 1, nombre: 'WAPE', sigla: 'Weighted Absolute Percentage Error', f: '\\frac{\\sum |y_t-\\hat y_t|}{\\sum y_t}', Diag: DiagWape, mide: <>Ese error como <b>% de lo vendido</b>: no depende de K.</> },
+    { n: 2, nombre: 'MASE', sigla: 'Mean Absolute Scaled Error', f: '\\frac{\\text{MAE}_{\\text{modelo}}}{\\text{MAE}_{\\text{copiar semana pasada}}}', Diag: DiagMase, mide: <>1 = el error que tuvo <b>copiar la semana pasada en el histórico</b>. Por eso, en el backtest, el propio naive da {num(maseNaive, 2)}. Con esta elegimos.</>, hero: true },
   ];
   return (
     <div className="col" style={{ height: '100%', justifyContent: 'center', gap: 26 }}>
@@ -23,32 +160,25 @@ function ErrorPron() {
         {items.map((m) => {
           const tinta = m.hero ? 'var(--blanco)' : 'var(--tinta)';
           const suave = m.hero ? 'rgba(255,255,255,.72)' : 'var(--tinta-45)';
-          const barra = (v: number, quien: string, fuerte: boolean) => (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 12, fontSize: 14, color: fuerte ? tinta : suave }}>
-              <div>
-                <div style={{ marginBottom: 3 }}>{quien}</div>
-                <div style={{ height: 6, borderRadius: 6, width: `${(v / m.b) * 100}%`, background: fuerte ? (m.hero ? 'var(--blanco)' : 'var(--ambar)') : (m.hero ? 'rgba(255,255,255,.35)' : 'var(--tinta-12)') }} />
-              </div>
-              <b style={{ fontWeight: fuerte ? 700 : 500, alignSelf: 'end' }}>{m.f(v)}</b>
-            </div>
-          );
+          const tono: Tono = m.hero
+            ? { c: 'var(--blanco)', acc: 'var(--blanco)', suave: 'rgba(255,255,255,.4)', fondo: 'var(--ambar)' }
+            : { c: 'var(--tinta)', acc: 'var(--ambar)', suave: 'var(--tinta-25)', fondo: 'var(--blanco)' };
           return (
             <Paso n={m.n} key={m.nombre} style={{ height: '100%' }}>
               <div style={{ height: '100%', boxSizing: 'border-box', borderRadius: 28, padding: '34px 36px 32px', display: 'flex', flexDirection: 'column', color: tinta, background: m.hero ? 'var(--ambar)' : 'var(--blanco)', boxShadow: 'var(--sombra)' }}>
-                <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: '.18em', color: suave }}>{m.nombre}</div>
-                <div style={{ fontSize: 14, marginTop: 4, color: suave }}>{m.sigla}</div>
-                <div className="cifra" style={{ fontSize: 100, margin: '18px 0 6px' }}>{m.f(m.a)}</div>
-                <div style={{ fontSize: 15, color: suave, minHeight: 18 }}>{m.unidad}</div>
-                <p style={{ margin: '14px 0 26px', fontSize: 22, lineHeight: 1.35, color: tinta }}>{m.mide}</p>
-                <div style={{ marginTop: 'auto', display: 'grid', gap: 9 }}>
-                  {comp.map((c) => <div key={c.id}>{barra(c[m.k], c.nombre, c.id === lg.id)}</div>)}
-                </div>
+                <div style={{ fontFamily: 'var(--f-titulo)', fontSize: 64, fontWeight: 650, lineHeight: 1, color: tinta }}>{m.nombre}</div>
+                <div style={{ fontSize: 15, marginTop: 8, color: suave }}>{m.sigla}</div>
+                <div style={{ fontSize: 30, margin: '22px 0 0', minHeight: 70, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><K t={m.f} /></div>
+                <p style={{ margin: '14px 0 22px', fontSize: 22, lineHeight: 1.35, color: tinta }}>{m.mide}</p>
+                <div style={{ marginTop: 'auto' }}><m.Diag t={tono} /></div>
               </div>
             </Paso>
           );
         })}
       </div>
-      <Paso n={2}><Periodo>todo el backtest, {meta.btPeriodo} · menor es mejor</Periodo></Paso>
+      <Paso n={2}>
+        <Periodo>En las tres, menor es mejor</Periodo>
+      </Paso>
     </div>
   );
 }
@@ -130,7 +260,7 @@ function TirasResiduos() {
     <rect key={i} x={196 + i * paso} width={paso * 0.6} rx={2} y={v > 0 ? y0 - v * 60 : y0} height={Math.max(1.5, Math.abs(v * 60))} fill={color(i)} />
   ));
   return (
-    <svg viewBox={`0 0 ${W} 300`} width="100%" style={{ display: 'block', overflow: 'visible' }} role="img" aria-label="Residuos con patrón semanal frente a residuos sin patrón">
+    <svg viewBox={`0 0 ${W} 380`} width="100%" style={{ display: 'block', overflow: 'visible' }} role="img" aria-label="Residuos con patrón semanal frente a residuos sin patrón">
       <text x={0} y={76} fontSize={21} fill="var(--tinta-70)" fontWeight={600}>Con patrón ✗</text>
       <text x={0} y={102} fontSize={17} fill="var(--tinta-70)">se repite cada lunes</text>
       <line x1={192} x2={W} y1={84} y2={84} stroke="var(--tinta-25)" />
@@ -171,7 +301,7 @@ function DmLjung() {
         </Paso>
         <Paso n={0}><DiferenciaDiaria a={total.pred.lgbm_directo} b={total.pred.media_movil_4sem} /></Paso>
         <Paso n={1} style={{ marginTop: 'auto' }}>
-          <Resultado p={`p = ${pval(mm.p)}`} titulo="Empate: ninguno gana claro" periodo={`backtest ${meta.btPeriodo}`} regla={<>Con <b>p &lt; 0,05</b> la diferencia sería real. Acá se reparten casi mitad y mitad: la media móvil gana {mm.gana2} días y LightGBM {mm.gana1}, pero cuando pierde, pierde por más.<br /><span style={{ color: 'var(--tinta-45)' }}>Empate no es igualdad: 12 semanas no alcanzan para separarlos. Por eso lo elegimos por robustez, no por ganar (próxima diapositiva).</span></>} />
+          <Resultado p={`p = ${pval(mm.p)}`} titulo="Empate: ninguno gana claro" periodo={`backtest ${meta.btPeriodo}`} regla={<>Con <b>p &lt; 0,05</b> la diferencia sería real. Acá se reparten casi mitad y mitad: la media móvil gana {mm.gana2} días y LightGBM {mm.gana1}, pero cuando la media móvil pierde, pierde por más: error total {num(mm.err2)} contra {num(mm.err1)}.<br /><span style={{ color: 'var(--tinta-45)' }}>Empate no es igualdad: 12 semanas no alcanzan para separarlos. Si las pruebas no separan a los modelos, ¿cómo elegimos?</span></>} />
         </Paso>
       </div>
       <div style={{ background: 'var(--tinta-12)' }} />
@@ -190,9 +320,11 @@ function DmLjung() {
   );
 }
 
+export const VENTANAS: Diapo = { id: 'ventanas', seccion: S, etapa: 4, titulo: 'Dos ventanas de prueba', pasos: 2, Comp: Ventanas,
+  notas: (d) => `Una ventana son ${d.meta.nOrigenes} semanas seguidas que el modelo pronostica sin haberlas visto, reentrenando cada sábado. Usamos dos: ${d.total.robustez.ventanasCortas.anterior} y ${d.total.robustez.ventanasCortas.nueva}; comparten una semana. Con una sola ventana, el ganador puede ser suerte de ese período: si un modelo es bueno, tiene que serlo en las dos.` };
 export const ERROR: Diapo = { id: 'error', seccion: S, etapa: 4, titulo: 'Métricas', pasos: 3, Comp: ErrorPron,
-  notas: (d) => `El MAE es cuántas viandas le erramos por día; el WAPE, el mismo error como porcentaje de lo vendido, así no depende de K. El MASE divide por el error de copiar la semana pasada: es la métrica con la que elegimos. LightGBM queda en ${num(d.total.metricas.find((m) => m.id === 'lgbm_directo')!.mase, 3)} contra ${num(d.total.metricas.find((m) => m.id === 'naive_estacional')!.mase, 3)} del naive estacional.` };
+  notas: (d) => `El MAE es cuántas viandas le erramos por día, en promedio: cada tramo del diagrama es el error de un día. El WAPE pone todos los errores en fila y los compara con todo lo vendido: es el mismo error como porcentaje, así no depende de K. El MASE divide el error del modelo por el que tuvo copiar la semana pasada en el histórico, con los datos de entrenamiento: menos de 1 es errar menos que eso. Por eso, en el backtest, el propio naive estacional da ${num(d.total.metricas.find((m) => m.id === 'naive_estacional')!.mase, 2)}: el futuro fue más difícil que el histórico. Es la métrica con la que elegimos.` };
 export const INTERVALO: Diapo = { id: 'intervalo', seccion: S, etapa: 4, titulo: '¿Cuánto puede fallar? Intervalo 80 %', pasos: 3, Comp: Intervalo,
   notas: (d) => `Un pronóstico es un número, pero para comprar hace falta saber cuánto puede fallar. Miramos un día: el modelo dijo un número. En las últimas semanas, 8 de cada 10 días el real cayó dentro de cierto margen alrededor del pronóstico; técnicamente, los percentiles 10 y 90 del cociente real sobre pronóstico, sin suponer ninguna distribución. Aplicamos ese margen y sale el rango. Si es de 80 %, tiene que contener cerca del 80 % de los días reales: en el backtest cubrió el ${pctFrac(d.total.cobIC.k / d.total.cobIC.n, 0)}, ${d.total.cobIC.k} de ${d.total.cobIC.n} días, algo por debajo del 80 %. Con ${d.total.cobIC.n} días esa diferencia es compatible con el azar. Ese mismo margen es el que usa la compra.` };
 export const DM_LJUNG: Diapo = { id: 'dm-ljung', seccion: S, etapa: 4, titulo: 'Diebold-Mariano y Ljung-Box', pasos: 4, Comp: DmLjung,
-  notas: () => 'Dos chequeos. Diebold-Mariano: cada punto es un día del backtest; naranja si LightGBM erró menos, gris si erró menos la media móvil. Se reparten casi mitad y mitad, así que p = 0,11: no podemos decir que uno sea mejor. La prueba también pesa por cuánto gana cada uno: cuando LightGBM gana, suele ganar por más, pero no alcanza. Ljung-Box: mira lo que el modelo no explicó. Si eso repite una forma, por ejemplo todos los lunes, quedó un patrón sin usar. En ETS y SARIMA los p son grandes: los residuos son ruido, no queda nada que modelar. Se aplica a ETS y SARIMA porque esos modelos suponen que lo que sobra es ruido; LightGBM no tiene ese supuesto, y sus residuos dentro de la muestra saldrían limpios de mentira porque los árboles se ajustan mucho a lo que ya vieron.' };
+  notas: () => 'Dos chequeos. Diebold-Mariano: cada punto es un día del backtest; naranja si LightGBM erró menos, gris si erró menos la media móvil. Se reparten casi mitad y mitad, así que p = 0,11: no podemos decir que uno sea mejor. La prueba también pesa por cuánto gana cada uno: cuando LightGBM gana, suele ganar por más, pero no alcanza. Entonces, si las pruebas no separan a los modelos, ¿cómo elegimos? Eso viene ahora. Ljung-Box: mira lo que el modelo no explicó. Si eso repite una forma, por ejemplo todos los lunes, quedó un patrón sin usar. En ETS y SARIMA los p son grandes: los residuos son ruido, no queda nada que modelar. Se aplica a ETS y SARIMA porque esos modelos suponen que lo que sobra es ruido; LightGBM no tiene ese supuesto, y sus residuos dentro de la muestra saldrían limpios de mentira porque los árboles se ajustan mucho a lo que ya vieron.' };

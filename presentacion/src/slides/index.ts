@@ -1,6 +1,6 @@
 import { APERTURA } from './apertura';
 import { CANDIDATOS, COMPONENTES, ESTRUCTURA, ML, WALK } from './teoria';
-import { DM_LJUNG, ERROR, INTERVALO } from './metricas';
+import { DM_LJUNG, ERROR, INTERVALO, VENTANAS } from './metricas';
 import { DATASET, FLUJO } from './flujo';
 import { CIERRE, HALLAZGOS } from './hallazgos';
 import { USO } from './uso';
@@ -18,7 +18,8 @@ const ETAPA: Record<string, number> = {
 const conEtapa = (ds: Diapo[]) => ds.map((d) => (ETAPA[d.id] && !d.etapa ? { ...d, etapa: ETAPA[d.id] } : d));
 
 /** Diapos de resultados del modelo que van al final de Método, antes de Hallazgos. */
-const METODO_FINAL = ['por-que-lgbm', 'backtest'];
+const METODO_FINAL = ['backtest'];
+const POR_QUE_LGBM = conEtapa(HALLAZGOS.filter((d) => d.id === 'por-que-lgbm'));
 
 
 /**
@@ -40,13 +41,15 @@ export const DIAPOS: Diapo[] = [
   ML,
   // 4 · Validar y medir
   WALK,
+  VENTANAS,
   ERROR,
-  INTERVALO,
   DM_LJUNG,
+  ...POR_QUE_LGBM,
+  INTERVALO,
   ...conEtapa(HALLAZGOS.filter((d) => METODO_FINAL.includes(d.id))),
   // 5–6 · Explicar y decidir
   SEP_HALLAZGOS,
-  ...conEtapa(HALLAZGOS.filter((d) => !METODO_FINAL.includes(d.id))),
+  ...conEtapa(HALLAZGOS.filter((d) => !METODO_FINAL.includes(d.id) && d.id !== 'por-que-lgbm')),
   SEP_USO,
   ...conEtapa(USO),
   SEP_CIERRE,

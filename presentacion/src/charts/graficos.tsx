@@ -762,3 +762,61 @@ export function PeorCaso({ w, h, resaltar = 'lgbm_directo', tope = 50 }: { w: nu
     </Svg>
   );
 }
+
+// ---------------------------------------------------------------- robustez: rango de puestos de cada modelo
+/** Una fila por modelo (ordenadas por su peor puesto). Eje x: puesto 1 (mejor) a 8. Cada punto es una de las
+ *  pruebas (serie × ventana); la cápsula va del mejor al peor puesto. La franja sombreada marca "los 2 mejores":
+ *  el único modelo cuya cápsula entra entera en la franja es el más confiable. */
+export function RangoPuestos({ w, h, resaltar = 'lgbm_directo', pasoResalte = 1 }: { w: number; h: number; resaltar?: string; pasoResalte?: number }) {
+  const { total } = useDatos();
+  const filas = useMemo(() => total.robustez.puestos.map((f) => {
+    const p = f.celdas.map((c) => c.puesto);
+    const cuenta = d3.rollups(p, (v) => v.length, (v) => v).sort((a, b) => a[0] - b[0]);
+    return { id: f.id, nombre: f.nombre, min: Math.min(...p), max: Math.max(...p), media: d3.mean(p)!, cuenta };
+  }).sort((a, b) => a.max - b.max || a.media - b.media), [total]);
+  const nMod = filas.length;
+  const m = { t: 58, r: 120, b: 8, l: 230 };
+  const iw = w - m.l - m.r, ih = h - m.t - m.b;
+  const x = d3.scaleLinear().domain([0.5, nMod + 0.5]).range([0, iw]);
+  const y = d3.scaleBand<string>().domain(filas.map((f) => f.id)).range([0, ih]).paddingInner(0.25);
+  const visto = useVisto(pasoResalte);
+  const animar = useAnimar();
+  const r = Math.min(y.bandwidth() * 0.36, 17);
+  const yc = y.bandwidth() / 2;
+  return (
+    <Svg w={w} h={h} label="Mejor y peor puesto de cada modelo en las seis pruebas">
+      <g transform={`translate(${m.l},${m.t})`}>
+        <rect x={x(0.5)} y={-20} width={x(2.5) - x(0.5)} height={ih + 20} rx={12} fill={C.t12} />
+        <text className="etq-b" x={(x(0.5) + x(2.5)) / 2} y={-30} textAnchor="middle" fontSize={16} fill={C.tinta}>los 2 mejores</text>
+        {d3.range(1, nMod + 1).map((p) => (
+          <text key={p} className="etq" x={x(p)} y={-30} textAnchor="middle" fontSize={15} fill={C.t45} style={{ display: p <= 2 ? 'none' : undefined }}>{p}.º</text>
+        ))}
+        <text className="etq" x={iw + 14} y={-30} fontSize={15} fill={C.t70}>peor puesto</text>
+        {filas.map((f, j) => {
+          const es = f.id === resaltar;
+          const apagar = visto && !es;
+          const col = es && visto ? C.ambar : C.t45;
+          return (
+            <motion.g key={f.id} transform={`translate(0,${y(f.id)})`} animate={{ opacity: apagar ? 0.45 : 1 }} transition={{ duration: animar ? 0.5 : 0 }}>
+              <text className={es && visto ? 'etq-b' : 'etq'} x={-18} y={yc} dy="0.32em" textAnchor="end" fontSize={es && visto ? 21 : 18}>{f.nombre}</text>
+              <line x1={0} x2={iw} y1={yc} y2={yc} stroke={C.t12} strokeDasharray="2 5" />
+              <motion.rect y={yc - r} height={2 * r} rx={r} fill={es && visto ? 'rgba(234,154,2,0.22)' : C.t12}
+                initial={animar ? { x: x(f.min) - r, width: 2 * r } : false}
+                animate={{ x: x(f.min) - r, width: x(f.max) - x(f.min) + 2 * r }}
+                transition={{ duration: animar ? 0.6 : 0, delay: animar ? j * 0.06 : 0 }} />
+              {f.cuenta.map(([p, n]) => (
+                <g key={p}>
+                  <circle cx={x(p)} cy={yc} r={r * 0.78} fill={col} />
+                  {n > 1 && <text x={x(p)} y={yc} dy="0.35em" textAnchor="middle" fontSize={13} fontWeight={700} style={{ fill: 'var(--blanco)' }}>×{n}</text>}
+                  <title>{`${f.nombre}: ${n} ${n > 1 ? 'pruebas' : 'prueba'} en el puesto ${p}`}</title>
+                </g>
+              ))}
+              <text className={es && visto ? 'etq-b' : 'etq'} x={iw + 14} y={yc} dy="0.32em" fontSize={es && visto ? 22 : 18}
+                style={{ fill: es && visto ? 'var(--ambar)' : undefined }}>{f.max}.º</text>
+            </motion.g>
+          );
+        })}
+      </g>
+    </Svg>
+  );
+}
