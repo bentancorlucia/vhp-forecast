@@ -73,6 +73,11 @@ SERIES = {
 }
 
 
+# Modelos de la figura del backtest, en orden fijo (decisión de Lucía, 21/11/2026):
+# el modelo del proyecto primero, después SARIMA, ETS y la referencia naive estacional.
+FIG_MODELOS = ["lgbm_directo", "sarima", "ets", "naive_estacional"]
+
+
 def correr() -> dict:
     cfg = cargar_config()
     out = {uid: correr_serie(uid, *v) for uid, v in SERIES.items()}
@@ -242,7 +247,7 @@ def correr_serie(uid: str = "Total", clave_fin: str = "fin_test", prefijo: str =
     dm_lgbm.round(4).to_csv(tablas / f"{prefijo}_dm_lgbm.csv", index=False)
     dm_sarimax.round(4).to_csv(tablas / f"{prefijo}_dm_sarimax.csv", index=False)
     if figura:
-        fig_backtest(res, list(met["modelo"].head(3)) + ["naive_estacional"], figs / figura, uid)
+        fig_backtest(res, FIG_MODELOS, figs / figura, uid)
 
     print("MASE por horizonte (1 = lunes … 6 = sábado):\n" + por_h.loc[met["modelo"]].round(2).to_string())
     print("Diebold-Mariano (pérdida absoluta, HLN):\n" + dm.round(3).to_string(index=False))
