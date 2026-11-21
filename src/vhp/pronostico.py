@@ -81,7 +81,82 @@ def correr() -> dict:
         out[f"{uid} (ventana anterior)"] = correr_serie(uid, "fin_test_ventana_anterior",
                                                         f"{prefijo}_ventana_anterior", None, completo=False)
     out["coeficientes"] = tabla_coeficientes(cfg)
+    out["robustez"] = robustez(cfg)
     return out
+
+
+# ---------------------------------------------------------------- robustez
+VENTANAS = {"anterior": "_ventana_anterior", "nueva": ""}
+DIA_EXPORT_INCOMPLETO = "2026-08-17"
+
+
+def _metricas_ventanas(cfg: dict) -> pd.DataFrame:
+    """MASE de cada modelo en cada serie × ventana, con el período de la ventana
+    (leído de las predicciones guardadas por `correr_serie`)."""
+    tablas = ruta("tablas", cfg)
+    filas = []
+    for uid, (_, prefijo, _) in SERIES.items():
+        for ventana, suf in VENTANAS.items():
+            met = pd.read_csv(tablas / f"{prefijo}{suf}_metricas.csv")
+            pred = pd.read_csv(tablas / f"{prefijo}{suf}_predicciones.csv", parse_dates=["fecha"])
+            filas.append(met[["modelo", "MASE"]].assign(serie=uid, ventana=ventana,
+                                                        periodo=eda.periodo(pred["fecha"])))
+    return pd.concat(filas, ignore_index=True)
+
+
+def tabla_puestos(m: pd.DataFrame) -> pd.DataFrame:
+    """Puesto (1 = menor MASE) de cada modelo en cada serie × ventana."""
+    m = m.copy()
+    m["puesto"] = m.groupby(["serie", "ventana"])["MASE"].rank(method="min").astype(int)
+    return m[["serie", "ventana", "periodo", "modelo", "puesto", "MASE"]].sort_values(
+        ["serie", "ventana", "puesto"]).reset_index(drop=True)
+
+
+def tabla_peor_caso(m: pd.DataFrame) -> pd.DataFrame:
+    """Para cada modelo, el MASE relativo al mejor de cada serie × ventana, en %
+    ((MASE / MASE del mejor − 1) × 100), y el máximo de esos valores con la serie
+    y la ventana donde ocurre. Ordenada de menor a mayor."""
+    m = m.copy()
+    m["pct_sobre_mejor"] = (m["MASE"] / m.groupby(["serie", "ventana"])["MASE"].transform("min") - 1) * 100
+    peor = m.loc[m.groupby("modelo")["pct_sobre_mejor"].idxmax()]
+    out = peor.rename(columns={"pct_sobre_mejor": "peor_pct_sobre_mejor", "serie": "serie_peor",
+                               "ventana": "ventana_peor", "periodo": "periodo_peor", "MASE": "MASE_peor"})
+    ancho = m.assign(col=m["serie"] + " | " + m["ventana"]).pivot(index="modelo", columns="col",
+                                                                  values="pct_sobre_mejor")
+    out = out.merge(ancho.add_prefix("pct ").reset_index(), on="modelo")
+    return out.sort_values("peor_pct_sobre_mejor").reset_index(drop=True)
+
+
+def tabla_sin_dia(cfg: dict, dia: str = DIA_EXPORT_INCOMPLETO) -> pd.DataFrame:
+    """MASE y puesto de los 8 modelos en la ventana anterior, con y sin `dia`
+    en la evaluación (mismo recorte para todos). Solo para informar."""
+    tablas = ruta("tablas", cfg)
+    filas = []
+    for uid, (_, prefijo, _) in SERIES.items():
+        res = pd.read_csv(tablas / f"{prefijo}_ventana_anterior_predicciones.csv", parse_dates=["fecha"])
+        con = ev.metricas(res)[["modelo", "MASE"]]
+        sin = ev.metricas(res[res["fecha"] != pd.Timestamp(dia)])[["modelo", "MASE", "n"]]
+        t = con.merge(sin, on="modelo", suffixes=("_con", "_sin"))
+        t["puesto_con"] = t["MASE_con"].rank(method="min").astype(int)
+        t["puesto_sin"] = t["MASE_sin"].rank(method="min").astype(int)
+        filas.append(t.assign(serie=uid, periodo=eda.periodo(res["fecha"]), dia_excluido=f"{pd.Timestamp(dia):%d/%m/%Y}"))
+    out = pd.concat(filas, ignore_index=True)
+    return out[["serie", "periodo", "dia_excluido", "modelo", "n", "MASE_con", "puesto_con", "MASE_sin",
+                "puesto_sin"]].sort_values(["serie", "puesto_sin"]).reset_index(drop=True)
+
+
+def robustez(cfg: dict | None = None) -> dict:
+    """Tablas de robustez: puestos, peor caso y chequeo sin el 17/08/2026."""
+    cfg = cfg or cargar_config()
+    tablas = ruta("tablas", cfg)
+    m = _metricas_ventanas(cfg)
+    puestos, peor, sin = tabla_puestos(m), tabla_peor_caso(m), tabla_sin_dia(cfg)
+    puestos.round(4).to_csv(tablas / "robustez_puestos.csv", index=False)
+    peor.round(2).to_csv(tablas / "robustez_peor_caso.csv", index=False)
+    sin.round(4).to_csv(tablas / "robustez_sin_17_08.csv", index=False)
+    print("Robustez, peor caso (% de MASE por encima del mejor de cada serie × ventana):")
+    print(peor[["modelo", "peor_pct_sobre_mejor", "serie_peor", "ventana_peor", "periodo_peor"]].round(1).to_string(index=False))
+    return {"puestos": puestos, "peor_caso": peor, "sin_17_08": sin}
 
 
 def dm_contra(res: pd.DataFrame, base: str = "sarimax") -> pd.DataFrame:
@@ -144,6 +219,7 @@ def correr_serie(uid: str = "Total", clave_fin: str = "fin_test", prefijo: str =
     print(met.round(3).to_string(index=False))
     print("Diebold-Mariano de SARIMAX contra cada modelo:\n" + dm_sarimax.round(3).to_string(index=False))
     if not completo:
+        res.to_csv(tablas / f"{prefijo}_predicciones.csv", index=False)
         met.round(4).assign(periodo=periodo).to_csv(tablas / f"{prefijo}_metricas.csv", index=False)
         dm_sarimax.round(4).assign(periodo=periodo).to_csv(tablas / f"{prefijo}_dm_sarimax.csv", index=False)
         return {"res": res, "metricas": met, "dm_sarimax": dm_sarimax}

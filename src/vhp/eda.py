@@ -228,6 +228,7 @@ def fig_acf(y: pd.Series) -> None:
 def fig_dia_semana(dow: pd.DataFrame, idx) -> None:
     fig, ax = plt.subplots(figsize=(7, 4))
     dow.plot.bar(ax=ax, rot=0)
+    ax.legend(title=None)  # sin "unique_id" (nombre del índice de columnas) en la leyenda
     ax.axhline(1, color="k", lw=0.7)
     ax.set(title=f"Índice por día de la semana (1 = media) — {periodo(idx)}")
     _guardar(fig, "04_dia_semana.png")

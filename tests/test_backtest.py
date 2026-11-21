@@ -158,3 +158,19 @@ def test_coeficientes_sarimax_una_fila_por_variable_que_varia():
         assert sorted(c.loc[c["serie"] == uid, "variable"]) == sorted(columnas_variables(hist, ev.EXOG_CAL))
     assert np.allclose(c["efecto_pct"], 100 * np.expm1(c["beta"]), atol=0.01)
     assert (c["efecto_ic_inf"] <= c["efecto_pct"]).all() and (c["efecto_pct"] <= c["efecto_ic_sup"]).all()
+
+
+def test_puestos_y_peor_caso():
+    """Puesto 1 = menor MASE en cada serie × ventana; peor caso = máximo % sobre el mejor."""
+    from vhp.pronostico import tabla_peor_caso, tabla_puestos
+    m = pd.DataFrame({
+        "modelo": ["a", "b", "a", "b"], "MASE": [1.0, 1.1, 0.9, 0.8],
+        "serie": ["Total", "Total", "Total", "Total"], "ventana": ["anterior", "anterior", "nueva", "nueva"],
+        "periodo": ["p1", "p1", "p2", "p2"]})
+    pu = tabla_puestos(m).set_index(["ventana", "modelo"])["puesto"]
+    assert pu[("anterior", "a")] == 1 and pu[("nueva", "b")] == 1
+    peor = tabla_peor_caso(m).set_index("modelo")
+    assert round(peor.loc["a", "peor_pct_sobre_mejor"], 2) == 12.5  # 0,9 / 0,8 − 1
+    assert peor.loc["a", "ventana_peor"] == "nueva"
+    assert round(peor.loc["b", "peor_pct_sobre_mejor"], 2) == 10.0
+    assert list(tabla_peor_caso(m)["modelo"]) == ["b", "a"]

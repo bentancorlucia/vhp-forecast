@@ -1,0 +1,9 @@
+modelo,MASE_peor,serie_peor,ventana_peor,periodo_peor,peor_pct_sobre_mejor,pct Total | anterior,pct Total | nueva,pct Total/empresas | anterior,pct Total/empresas | nueva,pct Total/particulares | anterior,pct Total/particulares | nueva
+lgbm_directo,0.92,Total/particulares,nueva,24/08/2026–14/11/2026,3.85,0.0,0.42,1.94,3.43,0.0,3.85
+ets,0.91,Total/empresas,anterior,08/06/2026–29/08/2026,11.54,9.46,8.62,11.54,4.57,1.19,0.0
+sarima,1.17,Total/empresas,nueva,24/08/2026–14/11/2026,14.29,13.81,8.22,2.78,14.29,13.36,9.51
+media_movil_4sem,1.03,Total/particulares,nueva,24/08/2026–14/11/2026,16.07,3.07,14.27,4.97,8.31,4.44,16.07
+sarimax,1.35,Total,anterior,08/06/2026–29/08/2026,20.65,20.65,0.0,0.0,0.0,15.98,5.67
+mlp,1.04,Total,nueva,24/08/2026–14/11/2026,22.97,22.14,22.97,19.3,4.14,14.38,11.23
+naive_estacional,1.83,Total/particulares,anterior,08/06/2026–29/08/2026,45.91,41.41,39.13,28.75,19.71,45.91,40.33
+naive,7.78,Total/empresas,anterior,08/06/2026–29/08/2026,850.1,265.4,307.29,850.1,615.04,89.76,146.21
