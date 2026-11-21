@@ -51,6 +51,8 @@ Detalle y tablas en `reports/resultados.md`; el porqué de cada decisión en `re
 
 Presentación web tipo diapositivas para la defensa (Vite + React + TypeScript). Todos los números salen de `presentacion/public/data/presentacion.json`, que se genera desde los archivos públicos del repo y se contrasta con `reports/resultados.md`.
 
+También está publicada en: https://presentacion-sigma-drab.vercel.app/
+
 ```bash
 cd presentacion
 npm install
