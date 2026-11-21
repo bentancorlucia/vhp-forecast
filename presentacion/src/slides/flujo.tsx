@@ -27,7 +27,7 @@ function Flujo() {
   return (
     <div className="flujo2">
       <Paso n={0}>
-        <p className="pregunta" style={{ margin: 0 }}>Un solo comando, <code className="flujo2-cmd">python main.py all</code>, corre <b>seis etapas en orden</b>. Cada parte de esta presentación es una de ellas.</p>
+        <p className="pregunta" style={{ margin: 0 }}>Un solo comando, <code className="flujo2-cmd">python main.py all</code>, corre <b>seis etapas en orden</b>.</p>
       </Paso>
 
       <div className="flujo2-linea" style={{ visibility: visto ? 'visible' : 'hidden' }}>
