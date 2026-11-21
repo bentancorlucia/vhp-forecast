@@ -361,7 +361,7 @@ function Candidatos() {
       </div>
       <Paso n={2}>
         <p style={{ margin: 0, fontSize: 17, color: 'var(--tinta-70)' }}>
-          <Periodo>MASE: menor es mejor</Periodo>
+          <Periodo>MASE: menor es mejor (se explica en Métricas)</Periodo>
         </p>
       </Paso>
     </div>
