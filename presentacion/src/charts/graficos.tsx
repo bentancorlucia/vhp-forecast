@@ -2,7 +2,7 @@
 import { useCallback, useMemo } from 'react';
 import * as d3 from 'd3';
 import { motion } from 'framer-motion';
-import { useAnimar, useDatos, usePaso } from '../components/marca';
+import { useAnimar, useDatos, usePaso, useVisto } from '../components/marca';
 import { diaSemana, fechaCorta, fechaLarga, mesAnio, num, pct, pctFrac, pval, signed, toDate } from '../lib/format';
 import { C, GridY, Svg, Tip, masCercano, useHover } from './base';
 import type { Evento, Pred } from '../lib/tipos';
@@ -666,6 +666,98 @@ export function FamiliasBarras({ w, h }: { w: number; h: number }) {
             <text className="etq" x={x(z.pct) + 10} y={y(z.familia)! + y.bandwidth() / 2} dy="0.32em">{num(z.pct, 1)} %</text>
           </g>
         ))}
+      </g>
+    </Svg>
+  );
+}
+
+// ---------------------------------------------------------------- robustez: matriz de puestos (modelo × serie × ventana)
+/** Puesto 1 = ámbar vivo; puesto 8 = apagado (tinta 11 % sobre crema). Valores hex de styles.css. */
+const colorPuesto = d3.scaleLinear<string>().domain([1, 8]).range(['#ea9a02', '#f0eadc']).interpolate(d3.interpolateRgb);
+
+/** Filas: los 8 modelos (de menor a mayor peor caso). Columnas: Total, Particulares y Empresas, cada una
+ *  con la ventana anterior y la nueva. `resaltar` (desde el paso indicado) marca la fila de ese modelo. */
+export function MatrizPuestos({ w, h, resaltar = 'lgbm_directo', pasoResalte = 1 }: { w: number; h: number; resaltar?: string; pasoResalte?: number }) {
+  const { total } = useDatos();
+  const rb = total.robustez;
+  const filas = rb.puestos;
+  const cols = rb.series.flatMap((s) => (['anterior', 'nueva'] as const).map((v) => ({ serie: s.id, ventana: v })));
+  const m = { t: 70, r: 8, b: 8, l: 214 };
+  const iw = w - m.l - m.r, ih = h - m.t - m.b;
+  const x = d3.scaleBand<number>().domain(cols.map((_, i) => i)).range([0, iw]).paddingInner(0.08);
+  const y = d3.scaleBand<string>().domain(filas.map((f) => f.id)).range([0, ih]).paddingInner(0.1);
+  const visto = useVisto(pasoResalte);
+  const animar = useAnimar();
+  const gx = (k: number) => x(2 * k)!; // inicio del grupo de la serie k
+  const gw = 2 * x.bandwidth() + x.step() - x.bandwidth();
+  return (
+    <Svg w={w} h={h} label="Puesto de cada modelo por serie y ventana (1 = menor MASE)">
+      <g transform={`translate(${m.l},${m.t})`}>
+        {rb.series.map((s, k) => (
+          <g key={s.id}>
+            <text className="etq-b" x={gx(k) + gw / 2} y={-40} textAnchor="middle">{s.nombre}</text>
+            <line x1={gx(k) + 4} x2={gx(k) + gw - 4} y1={-30} y2={-30} stroke={C.t25} />
+          </g>
+        ))}
+        {cols.map((c, i) => <text key={i} className="etq" x={x(i)! + x.bandwidth() / 2} y={-10} textAnchor="middle" fontSize={14} fill={C.t70}>{c.ventana}</text>)}
+        {filas.map((f, j) => {
+          const es = f.id === resaltar;
+          const apagar = visto && !es;
+          return (
+            <motion.g key={f.id} transform={`translate(0,${y(f.id)})`} animate={{ opacity: apagar ? 0.38 : 1 }} transition={{ duration: animar ? 0.5 : 0 }}>
+              <text className={es && visto ? 'etq-b' : 'etq'} x={-14} y={y.bandwidth() / 2} dy="0.32em" textAnchor="end">{f.nombre}</text>
+              {f.celdas.map((c, i) => (
+                <g key={i}>
+                  <motion.rect x={x(i)} width={x.bandwidth()} height={y.bandwidth()} rx={6} fill={colorPuesto(c.puesto)}
+                    initial={animar ? { opacity: 0 } : false} animate={{ opacity: 1 }} transition={{ duration: animar ? 0.4 : 0, delay: animar ? j * 0.05 + i * 0.03 : 0 }} />
+                  <text x={x(i)! + x.bandwidth() / 2} y={y.bandwidth() / 2} dy="0.34em" textAnchor="middle" fontSize={19} fontWeight={700}
+                    style={{ fill: c.puesto <= 2 ? 'var(--blanco)' : 'var(--tinta)' }}>
+                    {c.puesto}
+                    <title>{`${f.nombre}, ${c.serie} ${c.ventana}: puesto ${c.puesto}, MASE ${num(c.mase, 3)}`}</title>
+                  </text>
+                </g>
+              ))}
+            </motion.g>
+          );
+        })}
+        {visto && (() => {
+          const yy = y(resaltar)!;
+          return <motion.rect x={-m.l + 6} y={yy - 5} width={w - 14} height={y.bandwidth() + 10} rx={10} fill="none" stroke={C.ambar} strokeWidth={3}
+            initial={animar ? { opacity: 0 } : false} animate={{ opacity: 1 }} transition={{ duration: animar ? 0.5 : 0 }} />;
+        })()}
+      </g>
+    </Svg>
+  );
+}
+
+// ---------------------------------------------------------------- robustez: peor caso de cada modelo (% sobre el mejor)
+export function PeorCaso({ w, h, resaltar = 'lgbm_directo', tope = 50 }: { w: number; h: number; resaltar?: string; tope?: number }) {
+  const { total } = useDatos();
+  const filas = total.robustez.peor;
+  const m = { t: 6, r: 74, b: 4, l: 196 };
+  const iw = w - m.l - m.r, ih = h - m.t - m.b;
+  const y = d3.scaleBand<string>().domain(filas.map((f) => f.id)).range([0, ih]).paddingInner(0.42);
+  const x = d3.scaleLinear().domain([0, tope]).range([0, iw]);
+  const animar = useAnimar();
+  const bh = y.bandwidth() * 0.62;
+  return (
+    <Svg w={w} h={h} label="Peor caso de cada modelo: % de MASE por encima del mejor">
+      <g transform={`translate(${m.l},${m.t})`}>
+        {filas.map((f, i) => {
+          const es = f.id === resaltar;
+          const corta = f.pct > tope;
+          const largo = Math.max(x(Math.min(f.pct, tope)), 3);
+          return (
+            <g key={f.id} transform={`translate(0,${y(f.id)})`}>
+              <text className={es ? 'etq-b' : 'etq'} x={-12} y={bh / 2} dy="0.32em" textAnchor="end" fontSize={es ? 18 : 16}>{f.nombre}</text>
+              <motion.rect height={bh} rx={5} fill={es ? C.ambar : C.t25}
+                initial={animar ? { width: 0 } : false} animate={{ width: largo }} transition={{ duration: animar ? 0.6 : 0, delay: animar ? i * 0.06 : 0 }} />
+              <text className={es ? 'etq-b' : 'etq'} x={corta ? largo - 8 : largo + 8} y={bh / 2} dy="0.32em" textAnchor={corta ? 'end' : 'start'} fontSize={16}
+                style={corta ? { fill: 'var(--tinta)' } : undefined}>{signed(f.pct, 1)} %{corta ? ' →' : ''}</text>
+              <text x={0} y={bh + 14} fontSize={12.5} style={{ fill: 'var(--tinta-70)' }}>{f.serieNombre.toLowerCase()} · ventana {f.ventana}</text>
+            </g>
+          );
+        })}
       </g>
     </Svg>
   );

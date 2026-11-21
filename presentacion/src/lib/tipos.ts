@@ -45,7 +45,17 @@ export interface Datos {
     cobIC: { k: number; n: number; lo: number; hi: number };
     dmLgbm: { m2: string; n2: string; p: number; gana1: number; gana2: number; err1: number; err2: number }[];
     segmentos: Record<string, { metricas: { id: string; nombre: string; mase: number; wape: number }[]; pPrimero: number | null }>;
-    sarimaCal: { mase: number; wape: number; maseLgbm: number; p: number };
+    /** SARIMAX (SARIMA + calendario), Total: candidato probado y descartado. */
+    sarimax: { maseNueva: number; maseLgbmNueva: number; pNueva: number; puestoNueva: number; puestoAnterior: number; maseAnterior: number; maseLgbmAnterior: number; pAnterior: number };
+    /** Robustez: puesto (1–8, por MASE) de cada modelo en dos ventanas × tres series, y su peor caso. */
+    robustez: {
+      ventanas: Record<'anterior' | 'nueva', string>; ventanasCortas: Record<'anterior' | 'nueva', string>; superposicion: string;
+      series: { id: string; nombre: string }[];
+      puestos: { id: string; nombre: string; celdas: { serie: string; ventana: 'anterior' | 'nueva'; puesto: number; mase: number }[] }[];
+      peor: { id: string; nombre: string; pct: number; serie: string; serieNombre: string; ventana: 'anterior' | 'nueva'; periodo: string }[];
+      pMinLgbmMejor: number;
+      sin17: { cambia: boolean; dia: string; maseCon: number; maseSin: number };
+    };
     ejemplo: {
       fecha: string;
       modelos: Record<string, { y: number; yhat: number; lo: number; hi: number; escala: number }>;

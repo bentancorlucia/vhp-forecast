@@ -9,7 +9,7 @@ const S = 'Método';
 
 function ErrorPron() {
   const { total, meta } = useDatos();
-  const lg = total.metricas[0];
+  const lg = total.metricas.find((m) => m.id === 'lgbm_directo')!;
   const ne = total.metricas.find((m) => m.id === 'naive_estacional')!;
   const comp = ['lgbm_directo', 'sarima', 'ets', 'mlp', 'naive_estacional'].map((id) => total.metricas.find((m) => m.id === id)!);
   const items = [
@@ -61,7 +61,7 @@ function Intervalo() {
   const items = [
     { cifra: `−${pLo} / +${pHi} %`, s: <>Margen alrededor del pronóstico: lo que el modelo <b>se equivocó</b> en las {meta.semanasIntervalo} semanas previas.</> },
     { cifra: '80 %', s: <><b>Lo que promete:</b> el real tiene que quedar dentro de la franja 8 de cada 10 días.</> },
-    { cifra: pctFrac(total.metricas[0].cob, 0), s: <><b>Lo que pasó:</b> en {total.cobIC.k} de los {total.cobIC.n} días quedó adentro, algo por debajo del 80 %. Con {total.cobIC.n} días esa diferencia es compatible con el azar (IC 95 %: {pctFrac(total.cobIC.lo, 0)}–{pctFrac(total.cobIC.hi, 0)}).</> },
+    { cifra: pctFrac(total.cobIC.k / total.cobIC.n, 0), s: <><b>Lo que pasó:</b> en {total.cobIC.k} de los {total.cobIC.n} días quedó adentro, algo por debajo del 80 %. Con {total.cobIC.n} días esa diferencia es compatible con el azar (IC 95 %: {pctFrac(total.cobIC.lo, 0)}–{pctFrac(total.cobIC.hi, 0)}).</> },
   ];
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 56, height: '100%', alignItems: 'center' }}>
@@ -147,9 +147,8 @@ function TirasResiduos() {
 
 function DmLjung() {
   const { total, meta } = useDatos();
-  const dm = total.dm.find((d) => d.m1 === 'lgbm_directo' && d.m2 === 'media_movil_4sem')!;
   const mm = total.dmLgbm.find((x) => x.m2 === 'media_movil_4sem')!;
-  const pmin = Math.min(...total.ljungBox.map((x) => x.p));
+  const pmin = Math.min(...total.ljungBox.filter((x) => !x.modelo.startsWith('sarimax')).map((x) => x.p)); // ETS y SARIMA
   const ceja = { fontSize: 15, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase' as const, color: 'var(--ambar)', marginBottom: 6 };
   const sub = { margin: 0, fontSize: 21, lineHeight: 1.4, color: 'var(--tinta-70)' };
   const Resultado = ({ p, titulo, regla, periodo }: { p: string; titulo: string; regla: ReactNode; periodo: string }) => (
@@ -172,7 +171,7 @@ function DmLjung() {
         </Paso>
         <Paso n={0}><DiferenciaDiaria a={total.pred.lgbm_directo} b={total.pred.media_movil_4sem} /></Paso>
         <Paso n={1} style={{ marginTop: 'auto' }}>
-          <Resultado p={`p = ${pval(dm.p)}`} titulo="Empate: ninguno gana claro" periodo={`backtest ${meta.btPeriodo}`} regla={<>Con <b>p &lt; 0,05</b> la diferencia sería real. Acá se reparten casi mitad y mitad: la media móvil gana {mm.gana2} días y LightGBM {mm.gana1}, pero cuando pierde, pierde por más.<br /><span style={{ color: 'var(--tinta-45)' }}>Empate no es igualdad: 12 semanas no alcanzan para separarlos. Elegimos LightGBM por tener el menor error total.</span></>} />
+          <Resultado p={`p = ${pval(mm.p)}`} titulo="Empate: ninguno gana claro" periodo={`backtest ${meta.btPeriodo}`} regla={<>Con <b>p &lt; 0,05</b> la diferencia sería real. Acá se reparten casi mitad y mitad: la media móvil gana {mm.gana2} días y LightGBM {mm.gana1}, pero cuando pierde, pierde por más.<br /><span style={{ color: 'var(--tinta-45)' }}>Empate no es igualdad: 12 semanas no alcanzan para separarlos. Elegimos LightGBM por tener el menor error total.</span></>} />
         </Paso>
       </div>
       <div style={{ background: 'var(--tinta-12)' }} />
@@ -192,7 +191,7 @@ function DmLjung() {
 }
 
 export const ERROR: Diapo = { id: 'error', seccion: S, etapa: 4, titulo: 'Métricas', pasos: 3, Comp: ErrorPron,
-  notas: (d) => `El MAE es cuántas viandas le erramos por día; el WAPE, el mismo error como porcentaje de lo vendido, así no depende de K. El MASE divide por el error de copiar la semana pasada: es la métrica con la que elegimos. LightGBM queda en ${num(d.total.metricas[0].mase, 3)} contra ${num(d.total.metricas.find((m) => m.id === 'naive_estacional')!.mase, 3)} del naive estacional.` };
+  notas: (d) => `El MAE es cuántas viandas le erramos por día; el WAPE, el mismo error como porcentaje de lo vendido, así no depende de K. El MASE divide por el error de copiar la semana pasada: es la métrica con la que elegimos. LightGBM queda en ${num(d.total.metricas.find((m) => m.id === 'lgbm_directo')!.mase, 3)} contra ${num(d.total.metricas.find((m) => m.id === 'naive_estacional')!.mase, 3)} del naive estacional.` };
 export const INTERVALO: Diapo = { id: 'intervalo', seccion: S, etapa: 4, titulo: '¿Cuánto puede fallar? Intervalo 80 %', pasos: 3, Comp: Intervalo,
   notas: (d) => `Un pronóstico es un número, pero para comprar hace falta saber cuánto puede fallar. Miramos un día: el modelo dijo un número. En las últimas semanas, 8 de cada 10 días el real cayó dentro de cierto margen alrededor del pronóstico; técnicamente, los percentiles 10 y 90 del cociente real sobre pronóstico, sin suponer ninguna distribución. Aplicamos ese margen y sale el rango. Si es de 80 %, tiene que contener cerca del 80 % de los días reales: en el backtest cubrió el ${pctFrac(d.total.cobIC.k / d.total.cobIC.n, 0)}, ${d.total.cobIC.k} de ${d.total.cobIC.n} días, algo por debajo del 80 %. Con ${d.total.cobIC.n} días esa diferencia es compatible con el azar. Ese mismo margen es el que usa la compra.` };
 export const DM_LJUNG: Diapo = { id: 'dm-ljung', seccion: S, etapa: 4, titulo: 'Diebold-Mariano y Ljung-Box', pasos: 4, Comp: DmLjung,

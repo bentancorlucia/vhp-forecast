@@ -1,6 +1,6 @@
 // D. Hallazgos (8) y E. Cierre (3). Cada hallazgo recuerda la métrica que usa.
 import { Flecha, Nota, Paso, Periodo, Sello, useDatos } from '../components/marca';
-import { AdsSemanal, Backtest, LineaDemanda, CurvaCosto, EventosForest, MixTemperatura, PerfilSemanal, RankingEmpate } from '../charts/graficos';
+import { AdsSemanal, Backtest, LineaDemanda, CurvaCosto, EventosForest, MatrizPuestos, MixTemperatura, PeorCaso, PerfilSemanal } from '../charts/graficos';
 import { fechaLarga, num, pct, pctFrac, pctSigned, pval, signed } from '../lib/format';
 import type { Diapo } from './tipos';
 
@@ -41,49 +41,62 @@ function Patrones() {
 }
 
 function PorQueLgbm() {
-  const { total, meta } = useDatos();
-  const [g, m2, m3] = total.metricas;
-  const { particulares: sp, empresas: se } = total.segmentos;
-  const razones = [
-    { t: 'El menor error', d: <>Total: MASE <b>{num(g.mase, 3)}</b> y WAPE <b>{pctFrac(g.wape, 1)}</b>, primero de siete. Empresas: primero ({num(se.metricas[0].mase, 3)}). Particulares: {sp.metricas[0].nombre} queda apenas adelante ({num(sp.metricas[0].mase, 3)} contra {num(sp.metricas.find((m) => m.id === 'lgbm_directo')!.mase, 3)}; p&nbsp;=&nbsp;{num(sp.pPrimero ?? 1, 2)}).</> },
-    { t: 'Nadie lo supera, pero tampoco se separa', d: <>SARIMA con calendario lo iguala (MASE {num(total.sarimaCal.mase, 3)}; p&nbsp;=&nbsp;{num(total.sarimaCal.p, 2)}). Es un <b>SARIMAX</b>: una regresión sobre el calendario cuyo error sigue un SARIMA. La ventaja de LightGBM <b>no</b> viene de ver el calendario.</> },
-  ];
+  const { total } = useDatos();
+  const rb = total.robustez, sx = total.sarimax;
+  const lg = rb.puestos.find((x) => x.id === 'lgbm_directo')!;
+  const pLg = lg.celdas.map((c) => c.puesto);
+  const nModelos = rb.puestos.length, nSeries = rb.series.length, nVentanas = Object.keys(rb.ventanas).length;
+  const enTexto = ['cero', 'una', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho'];
+  const nTexto = (n: number) => enTexto[n] ?? String(n);
+  const ordinal = (n: number) => `${n}.º`;
   return (
-    <div className="col" style={{ height: '100%' }}>
-      <Paso n={0} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <p className="pregunta" style={{ margin: 0 }}>Siete modelos, el mismo walk-forward: LightGBM es el que menos se equivoca.</p>
+    <div className="col" style={{ height: '100%', gap: 14 }}>
+      <Paso n={0}>
+        <p className="pregunta" style={{ margin: 0 }}>{nTexto(nModelos)[0].toUpperCase() + nTexto(nModelos).slice(1)} modelos, {nTexto(nVentanas)} ventanas de 12 semanas, {nTexto(nSeries)} series: <b>¿cuál falla menos?</b></p>
       </Paso>
-      <div style={{ display: 'grid', gridTemplateColumns: '780px 1fr', gap: 64, flex: 1, alignItems: 'center' }}>
-        <Paso n={0}>
-          <RankingEmpate w={780} h={560} />
-          <Periodo>Total de viandas, {g.n} días, backtest {meta.btPeriodo} · DM: {g.nombre} contra cada modelo</Periodo>
-        </Paso>
-        <div className="col" style={{ gap: 30 }}>
-          <Paso n={1}><h2 style={{ margin: 0, paddingBottom: 12, borderBottom: '2px solid var(--ambar)' }}>Por qué lo elegimos</h2></Paso>
-          {razones.map((r, i) => (
-            <Paso key={r.t} n={i + 1} style={{ display: 'flex', gap: 20 }}>
-              <span style={{ fontFamily: 'var(--f-titulo)', fontWeight: 700, color: 'var(--ambar)', fontSize: 44, lineHeight: 1, width: 34, flex: 'none' }}>{i + 1}</span>
-              <div>
-                <h3 style={{ margin: '2px 0 6px' }}>{r.t}</h3>
-                <p style={{ fontSize: 20, margin: 0, color: 'var(--tinta-70)' }}>{r.d}</p>
-              </div>
-            </Paso>
-          ))}
+      <div style={{ display: 'grid', gridTemplateColumns: '740px 1fr', gap: 48, flex: 1, minHeight: 0 }}>
+        <div className="col" style={{ gap: 6 }}>
+          <Paso n={0}>
+            <h3 style={{ margin: '0 0 2px', fontSize: 22 }}>Puesto de cada modelo (1 = menor error)</h3>
+            <MatrizPuestos w={740} h={460} />
+          </Paso>
+          <Paso n={1}>
+            <p style={{ margin: 0, fontFamily: 'var(--f-mano)', color: 'var(--ambar)', fontSize: 28, lineHeight: 1.1 }}>
+              LightGBM: {ordinal(Math.min(...pLg))} o {ordinal(Math.max(...pLg))} en las {nTexto(pLg.length)}
+            </p>
+          </Paso>
+        </div>
+        <div className="col" style={{ gap: 16, minHeight: 0 }}>
           <Paso n={2}>
-            <div className="tarjeta crema" style={{ padding: '16px 22px' }}>
-              <h3 style={{ fontSize: 22, margin: '0 0 6px' }}>Elegimos {g.nombre.split(' ')[0]} por el menor error, pero…</h3>
-              <p style={{ fontSize: 18, margin: 0, lineHeight: 1.4 }}>…{m2.nombre} y {m3.nombre} andan parejo y el test no los separa.</p>
+            <h3 style={{ margin: '0 0 2px', fontSize: 22 }}>Peor caso: % por encima del mejor</h3>
+            <PeorCaso w={600} h={330} />
+          </Paso>
+          <Paso n={3}>
+            <div className="tarjeta crema" style={{ padding: '12px 20px' }}>
+              <p style={{ fontSize: 18, margin: 0, lineHeight: 1.4 }}>
+                <b>SARIMAX</b> (SARIMA + calendario): empató en la ventana nueva (MASE {num(sx.maseNueva, 3)} contra {num(sx.maseLgbmNueva, 3)}; p&nbsp;=&nbsp;{num(sx.pNueva, 2)}) y quedó {ordinal(sx.puestoAnterior)} en la anterior (p&nbsp;=&nbsp;{num(sx.pAnterior, 3)}). <b>Descartado.</b>
+              </p>
+            </div>
+          </Paso>
+          <Paso n={4}>
+            <div style={{ border: '2px solid var(--ambar)', borderRadius: 14, padding: '12px 20px' }}>
+              <p style={{ fontSize: 21, margin: 0, lineHeight: 1.35 }}>
+                <b>No es el que más gana: es el que nunca falla.</b> En cada ventana, no se separa estadísticamente de los mejores.
+              </p>
             </div>
           </Paso>
         </div>
       </div>
+      <Paso n={0}>
+        <Periodo>MASE por serie y ventana: {rb.ventanasCortas.anterior} y {rb.ventanasCortas.nueva} (se superponen una semana)</Periodo>
+      </Paso>
     </div>
   );
 }
 
 function BacktestTiempo() {
   const { total, meta } = useDatos();
-  const g = total.metricas[0];
+  const g = total.metricas.find((m) => m.id === 'lgbm_directo')!;
   return (
     <div className="col" style={{ height: '100%' }}>
       <Paso n={0} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -303,7 +316,7 @@ const DEC_CORTA: Record<string, [string, string]> = {
   dias_habiles: ['Los días cerrados no existen', 'Un día cerrado no es demanda cero: se excluye.'],
   segmentos: ['Dos segmentos, dos modelos', 'Particulares y empresas tienen semanas opuestas.'],
   walk_forward: ['Backtest walk-forward', '12 semanas, reentrenando cada una, sin mirar el futuro.'],
-  modelo_total: ['LightGBM', 'El menor error; SARIMA y ETS quedan cerca.'],
+  modelo_total: ['LightGBM, por robustez', 'Siempre 1.º o 2.º en dos ventanas y tres series; SARIMAX, probado y descartado.'],
   costo_faltante: ['El faltante tiene costo', 'Sobrar duele más: comprar cerca del pronóstico.'],
   platos_a_ingredientes: ['Del plan a los ingredientes', 'El recetario convierte viandas en kilos.'],
 };
@@ -344,10 +357,10 @@ function Limitaciones() {
 
 function Conclusion() {
   const { total, plan, meta } = useDatos();
-  const g = total.metricas[0];
+  const g = total.metricas.find((m) => m.id === 'lgbm_directo')!;
   const p90 = plan.simulacion.find((x) => x.metodo === plan.elegido.metodo && x.p === 90)!;
   const frases = [
-    <>La demanda de la semana se puede anticipar con un error del <b>{pctFrac(g.wape, 1)}</b>. LightGBM es el más preciso, pero SARIMA y ETS andan casi igual: <b>lo simple también sirve</b>.</>,
+    <>La demanda de la semana se puede anticipar con un error del <b>{pctFrac(g.wape, 1)}</b>. LightGBM es el más robusto (nunca sale de los dos primeros), pero SARIMA y ETS andan cerca: <b>lo simple también sirve</b>.</>,
     <>El clima cambia <b>qué</b> se pide, no <b>cuánto</b>. De las acciones, solo postres y panes en la web tuvieron un efecto claro; Meta no se puede evaluar hasta <b>variar el gasto a propósito</b>.</>,
     <>Conviene comprar <b>cerca de lo esperado</b>: asegurarse el 90&nbsp;% cuesta <b>${num(p90.costo, 1)}</b> contra ${num(plan.elegido.costo, 1)} por vianda. El plan sale cada sábado, en kilos por ingrediente.</>,
   ];
@@ -371,10 +384,18 @@ function Conclusion() {
 export const HALLAZGOS: Diapo[] = [
   { id: 'patrones', seccion: S, titulo: 'Patrones: dos semanas opuestas', pasos: 5, Comp: Patrones,
     notas: (d) => `Los particulares piden sobre todo el lunes: ${num(d.eda.diaSemana[0].particulares, 2)} veces su media. Las empresas casi no piden el sábado. En los feriados en que se abre, las empresas caen mucho más porque las oficinas cierran. Y enero cae por el verano. Por eso pronosticamos cada segmento por separado.` },
-  { id: 'por-que-lgbm', seccion: 'Método', titulo: 'Por qué LightGBM', pasos: 3, Comp: PorQueLgbm,
-    notas: (d) => `Comparamos siete modelos en las mismas ${d.meta.nOrigenes} semanas. Elegimos LightGBM porque tiene el menor error en el Total, MASE ${num(d.total.metricas[0].mase, 3)} y WAPE ${pctFrac(d.total.metricas[0].wape, 1)}, también en la ventana anterior y en empresas; en particulares ETS queda apenas adelante, sin diferencia significativa. Siendo honestas: con Diebold-Mariano no se separa de ${d.total.metricas[1].nombre} ni de ${d.total.metricas[2].nombre}. Probamos además darle el calendario a SARIMA. Eso se llama SARIMAX: una regresión sobre las variables de calendario cuyo error sigue un SARIMA; como el calendario se conoce de antemano, se puede usar para pronosticar. Y lo iguala: MASE ${num(d.total.sarimaCal.mase, 3)}. O sea que la ventaja no viene del calendario. La media móvil gana más días, ${d.total.dmLgbm.find((x) => x.m2 === 'media_movil_4sem')!.gana2} contra ${d.total.dmLgbm.find((x) => x.m2 === 'media_movil_4sem')!.gana1}, pero cuando pierde, pierde por más. Nadie lo supera, pero tampoco se separa.` },
+  { id: 'por-que-lgbm', seccion: 'Método', titulo: 'Por qué LightGBM', pasos: 5, Comp: PorQueLgbm,
+    notas: (d) => {
+      const rb = d.total.robustez, sx = d.total.sarimax;
+      const lg = rb.peor.find((x) => x.id === 'lgbm_directo')!;
+      return `Una ventana son ${d.meta.nOrigenes} semanas seguidas que el modelo pronostica sin haberlas visto; usamos dos, ${rb.ventanasCortas.anterior} y ${rb.ventanasCortas.nueva}, para no elegir por la suerte de un solo período. `
+        + `En la matriz, cada fila es un modelo y cada columna una serie en una ventana; el número es su puesto, y LightGBM nunca sale del primero o el segundo. `
+        + `A la derecha, el peor caso de cada modelo, cuánto quedó por encima del mejor en su peor serie y ventana: LightGBM, ${num(lg.pct, 1)} %; los demás, bastante más. `
+        + `SARIMAX, que es SARIMA con el calendario, empató en la ventana nueva pero quedó ${sx.puestoAnterior}.º en la anterior, y no se puede elegir un modelo solo por la ventana donde ganó. `
+        + `Siendo honestas: las dos ventanas comparten una semana, y en cada una las diferencias con los mejores no son significativas, así que lo elegimos por ser el que nunca falla, no por ganar.`;
+    } },
   { id: 'backtest', seccion: 'Método', titulo: 'El backtest en el tiempo', pasos: 3, Comp: BacktestTiempo,
-    notas: (d) => `Así se ve semana a semana: la línea oscura es lo real, la ámbar el pronóstico y la banda el intervalo del 80 %. Los círculos vacíos son los días que quedaron afuera. El peor día es el lunes ${fechaLarga(d.meta.diaIncompleto)}, que tiene un export incompleto; sacarlo no cambia el ranking.` },
+    notas: (d) => `Así se ve semana a semana: la línea oscura es lo real, la ámbar el pronóstico y la banda el intervalo del 80 %. Los círculos vacíos son los días que quedaron afuera. En la ventana anterior, el peor día fue el lunes ${fechaLarga(d.meta.diaIncompleto)}, que tiene un export incompleto; sacarlo ${d.total.robustez.sin17.cambia ? 'cambia el puesto de LightGBM o el de SARIMAX' : 'no cambia el puesto de LightGBM ni el de SARIMAX'}.` },
   { id: 'clima', seccion: S, titulo: 'El clima cambia qué se pide', pasos: 5, Comp: ClimaMix,
     notas: () => 'Con calor se pide menos carne vacuna, sobre todo en empresas, y el intervalo no toca el cero. Pero para pronosticar a una semana el clima no ayuda: la log loss del modelo con clima es igual o peor que usar el mix de las últimas cuatro semanas, que ya trae la estación.' },
   { id: 'eventos', seccion: S, titulo: 'Efecto de los eventos', pasos: 4, Comp: Eventos,

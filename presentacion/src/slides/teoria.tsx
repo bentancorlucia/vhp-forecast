@@ -353,7 +353,7 @@ function Candidatos() {
         </Paso>
         <Paso n={2} style={{ height: '100%' }}>
           <Col n="03" paso={2} titulo="SARIMA" archivo="models/sarimax.py"
-            que={<>Una regresión sobre su propio pasado: <b>valores</b> (AR) y <b>errores</b> (MA) de los días previos (<i>p, q</i>) y de la semana previa (<i>P, Q</i>). El <b>1</b> resta la semana anterior para que el nivel sea estable.</>}
+            que={<>Una regresión sobre su propio pasado: <b>valores</b> (AR) y <b>errores</b> (MA) de los días previos (<i>p, q</i>) y de la semana previa (<i>P, Q</i>). El <b>1</b> resta la semana anterior para que el nivel sea estable.<br /><b>+ calendario = SARIMAX</b> (lo probamos y lo descartamos).</>}
             tex={`(p,0,q)(P,1,Q)_{${s}}`}
             pie={<>36 combinaciones de p, q, P, Q: gana la de menor AIC<br />último sábado: <span className="mono">{total.sarimaUltimo}</span></>}
             cifra={num(mase('sarima'), 3)} etiqueta="MASE" />

@@ -40,6 +40,7 @@ NOMBRES_MODELO = {
     "media_movil_4sem": "Media móvil 4 sem.",
     "ets": "ETS",
     "sarima": "SARIMA",
+    "sarimax": "SARIMAX",
     "lgbm_directo": "LightGBM directo",
     "mlp": "MLP",
 }
@@ -192,6 +193,69 @@ def extraer_codigo(F: "Fuentes") -> dict:
     return out
 
 
+# ------------------------------------------------------------------ robustez (dos ventanas × tres series)
+SERIES_ROB = ["Total", "Total/particulares", "Total/empresas"]
+PREF_SERIE = {"Total": "total", "Total/particulares": "particulares", "Total/empresas": "empresas"}
+
+
+def periodo_corto(periodo: str) -> str:
+    """'08/06/2026–29/08/2026' → '08/06–29/08/2026'."""
+    a, b = periodo.split("–")
+    return f"{a[:5]}–{b}"
+
+
+def exportar_robustez(F: Fuentes) -> tuple[dict, dict]:
+    """Puestos, peor caso y chequeo sin el 17/08 (robustez_*.csv), con nombres de
+    src/vhp/nombres.py, y el resumen de SARIMAX (Total, las dos ventanas)."""
+    T = "reports/tables/"
+    sys.path.insert(0, str(F.ruta("src")))
+    from vhp.nombres import nombre
+    pu, pc, sin = F.csv(T + "robustez_puestos.csv"), F.csv(T + "robustez_peor_caso.csv"), F.csv(T + "robustez_sin_17_08.csv")
+    per = pu.drop_duplicates("ventana").set_index("ventana")["periodo"]
+    ini_nueva = per["nueva"].split("–")[0]
+    fin_ant = per["anterior"].split("–")[1]
+    orden = pc["modelo"].tolist()  # de menor a mayor peor caso
+    celda = pu.set_index(["modelo", "serie", "ventana"])
+    puestos = [{"id": m, "nombre": nombre(m), "celdas": [
+        {"serie": s, "ventana": v, "puesto": int(celda.loc[(m, s, v), "puesto"]), "mase": r(celda.loc[(m, s, v), "MASE"])}
+        for s in SERIES_ROB for v in ["anterior", "nueva"]]} for m in orden]
+    peor = [{"id": x.modelo, "nombre": nombre(x.modelo), "pct": r(x.peor_pct_sobre_mejor, 4), "serie": x.serie_peor,
+             "serieNombre": nombre(x.serie_peor), "ventana": x.ventana_peor, "periodo": x.periodo_peor}
+            for x in pc.itertuples()]
+    # p de Diebold-Mariano de LightGBM contra el mejor de cada serie × ventana (mismo criterio que report.py)
+    ps = []
+    for (s, v), m in pu[pu.puesto == 1].set_index(["serie", "ventana"])["modelo"].items():
+        if m == "lgbm_directo":
+            continue
+        if v == "nueva":
+            dm = F.csv(T + f"backtest_{PREF_SERIE[s]}_dm_lgbm.csv").set_index("modelo_2")
+            ps.append(float(dm.loc[m, "p_valor"]))
+        elif m == "sarimax":
+            dm = F.csv(T + f"backtest_{PREF_SERIE[s]}_ventana_anterior_dm_sarimax.csv").set_index("modelo_2")
+            ps.append(float(dm.loc["lgbm_directo", "p_valor"]))
+    s17 = sin[sin.modelo.isin(["lgbm_directo", "sarimax"])]
+    lgt = sin[(sin.serie == "Total") & (sin.modelo == "lgbm_directo")].iloc[0]
+    robustez = {
+        "ventanas": {"anterior": per["anterior"], "nueva": per["nueva"]},
+        "ventanasCortas": {"anterior": periodo_corto(per["anterior"]), "nueva": periodo_corto(per["nueva"])},
+        "superposicion": f"{ini_nueva[:5]}–{fin_ant}",
+        "series": [{"id": s, "nombre": nombre(s)} for s in SERIES_ROB],
+        "puestos": puestos, "peor": peor,
+        "pMinLgbmMejor": r(min(ps), 3),
+        "sin17": {"cambia": bool((s17.puesto_con != s17.puesto_sin).any()), "dia": lgt.dia_excluido,
+                  "maseCon": r(lgt.MASE_con, 4), "maseSin": r(lgt.MASE_sin, 4)},
+    }
+    sx = pu[(pu.modelo == "sarimax") & (pu.serie == "Total")].set_index("ventana")
+    lg = pu[(pu.modelo == "lgbm_directo") & (pu.serie == "Total")].set_index("ventana")
+    p_nue = F.csv(T + "backtest_total_dm_lgbm.csv").set_index("modelo_2").loc["sarimax", "p_valor"]
+    p_ant = F.csv(T + "backtest_total_ventana_anterior_dm_sarimax.csv").set_index("modelo_2").loc["lgbm_directo", "p_valor"]
+    sarimax = {"maseNueva": r(sx.loc["nueva", "MASE"]), "maseLgbmNueva": r(lg.loc["nueva", "MASE"]), "pNueva": r(p_nue, 3),
+               "puestoNueva": int(sx.loc["nueva", "puesto"]), "puestoAnterior": int(sx.loc["anterior", "puesto"]),
+               "maseAnterior": r(sx.loc["anterior", "MASE"]), "maseLgbmAnterior": r(lg.loc["anterior", "MASE"]),
+               "pAnterior": r(p_ant, 3)}
+    return robustez, sarimax
+
+
 # ------------------------------------------------------------------ exportación
 def construir(F: Fuentes) -> dict:
     T, P = "reports/tables/", "data/processed/"
@@ -297,9 +361,10 @@ def construir(F: Fuentes) -> dict:
         g = bp[bp.modelo == mod].sort_values("fecha")
         pred[mod] = [{"f": x.fecha, "o": x.origen, "h": int(x.h), "y": r(x.y, 1), "lo": r(x._6, 1), "m": r(x._7, 1), "hi": r(x._8, 1)} for x in g.itertuples()]
     fechas_bt = sorted(bp.fecha.unique())
-    # cobertura del intervalo 80 % del mejor modelo, con IC 95 % de Wilson (mismo cálculo que report.py)
+    # cobertura del intervalo 80 % de LightGBM directo (el modelo del proyecto), con IC 95 % de Wilson
+    # (mismo cálculo que report.py)
     from statsmodels.stats.proportion import proportion_confint
-    g0 = bp[bp.modelo == met.modelo.iloc[0]]
+    g0 = bp[bp.modelo == "lgbm_directo"]
     k_cob = int(((g0.y >= g0["q0.1"]) & (g0.y <= g0["q0.9"])).sum())
     lo_cob, hi_cob = proportion_confint(k_cob, len(g0), alpha=0.05, method="wilson")
     cob_ic = {"k": k_cob, "n": int(len(g0)), "lo": r(lo_cob, 3), "hi": r(hi_cob, 3)}
@@ -315,9 +380,7 @@ def construir(F: Fuentes) -> dict:
         segmentos[s] = {"metricas": [{"id": x.modelo, "nombre": NOMBRES_MODELO[x.modelo], "mase": r(x.MASE), "wape": r(x.WAPE)}
                                      for x in ms.itertuples()],
                         "pPrimero": None if ms.modelo.iloc[0] == "lgbm_directo" else r(ds.loc[ms.modelo.iloc[0], "p_valor"], 3)}
-    sc = F.csv(T + "backtest_total_sarima_cal.csv").set_index("modelo")
-    sarima_cal = {"mase": r(sc.loc["sarima_cal", "MASE"]), "wape": r(sc.loc["sarima_cal", "WAPE"]),
-                  "maseLgbm": r(sc.loc["lgbm_directo", "MASE"]), "p": r(sc.loc["sarima_cal", "p_valor_vs_lgbm"], 3)}
+    robustez, sarimax = exportar_robustez(F)
     origenes = sorted(bp.origen.unique())
     horizonte = int(bp.h.max())
     bt_periodo = f"{corta(fechas_bt[0])}–{larga(fechas_bt[-1])}"
@@ -462,7 +525,7 @@ def construir(F: Fuentes) -> dict:
         "dataset": dataset,
         "serie": serie_out,
         "eda": {"stl": stl_out, "autocorr": autocorr, "diaSemana": dia_semana, "efectos": efectos, "estacionariedad": estacionariedad, "rho": rho},
-        "total": {"metricas": metricas, "dm": dm_out, "ljungBox": lb_out, "pred": pred, "sarimaUltimo": sarima_ultimo, "cobIC": cob_ic, "dmLgbm": dm_lgbm, "segmentos": segmentos, "sarimaCal": sarima_cal,
+        "total": {"metricas": metricas, "dm": dm_out, "ljungBox": lb_out, "pred": pred, "sarimaUltimo": sarima_ultimo, "cobIC": cob_ic, "dmLgbm": dm_lgbm, "segmentos": segmentos, "sarimax": sarimax, "robustez": robustez,
                   "ejemplo": {"fecha": dia0, "modelos": ej, "semana": ej_semana}},
         "mix": {"temperatura": mix_temp, "temps": temps, "participacion": mix_part, "unidades": mix_unid},
         "eventos": eventos,
@@ -501,6 +564,20 @@ def chequear(out: dict, md: str) -> list[str]:
     for d in out["total"]["dm"]:
         n1, n2 = (n.replace("4 sem.", "4 semanas") for n in (d["n1"], d["n2"]))
         esta(f"| {n1} | {n2} | {es(d['dm'], 2)} | {es(d['p'], 3)} |", f"DM {d['m1']}–{d['m2']}")
+
+    rb, sx = out["total"]["robustez"], out["total"]["sarimax"]
+    for x in rb["puestos"]:
+        esta(f"| {x['nombre']} | " + " | ".join(str(c["puesto"]) for c in x["celdas"]) + " |", f"puestos de {x['id']}")
+    for x in rb["peor"]:
+        sg = "+" if x["pct"] >= 0 else "−"
+        esta(f"| {x['nombre']} | {sg}{es(abs(x['pct']), 1)} % | {x['serieNombre']} | {x['ventana']} ({x['periodo']}) |",
+             f"peor caso de {x['id']}")
+    esta(f"(MASE {es(sx['maseNueva'], 3)} contra {es(sx['maseLgbmNueva'], 3)}; Diebold-Mariano p = {es(sx['pNueva'], 2)})",
+         "SARIMAX ventana nueva")
+    esta(f"queda {sx['puestoAnterior']}.º ({es(sx['maseAnterior'], 3)} contra {es(sx['maseLgbmAnterior'], 3)}; "
+         f"p = {es(sx['pAnterior'], 3)} a favor de LightGBM)", "SARIMAX ventana anterior")
+    esta(f"no lo separa del mejor (p ≥ {es(rb['pMinLgbmMejor'], 2)})", "DM LightGBM contra el mejor")
+    esta(f"Ventana anterior: {rb['ventanas']['anterior']}; ventana nueva: {rb['ventanas']['nueva']}", "ventanas")
 
     adf = out["eda"]["estacionariedad"][0]
     esta(f"ADF p = {es(adf['p'], 2)}", "ADF en nivel")
