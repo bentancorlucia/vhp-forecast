@@ -1,0 +1,8 @@
+modelo_1,modelo_2,DM,p_valor,mejor,dias_gana_1,dias_gana_2,error_abs_1,error_abs_2
+sarimax,ets,-0.4033,0.6879,sarimax,30,41,2949.3188,3087.6272
+sarimax,lgbm_directo,-0.259,0.7964,sarimax,32,39,2949.3188,3055.7134
+sarimax,media_movil_4sem,-0.4955,0.6218,sarimax,32,39,2949.3188,3201.0
+sarimax,mlp,-0.3724,0.7107,sarimax,36,35,2949.3188,3077.3024
+sarimax,naive,-16.8671,0.0,sarimax,63,8,2949.3188,21104.0
+sarimax,naive_estacional,-2.1035,0.039,sarimax,33,38,2949.3188,3534.0
+sarimax,sarima,-1.5653,0.122,sarimax,36,35,2949.3188,3372.5806

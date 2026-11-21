@@ -5,3 +5,4 @@ lgbm_directo,mlp,-2.6064,0.0112,lgbm_directo,46,25,6298.1356,7705.7268
 lgbm_directo,naive,-15.5146,0.0,lgbm_directo,60,11,6298.1356,25557.0
 lgbm_directo,naive_estacional,-2.4449,0.017,lgbm_directo,38,33,6298.1356,8712.0
 lgbm_directo,sarima,-0.7379,0.4631,lgbm_directo,35,36,6298.1356,6780.4191
+lgbm_directo,sarimax,0.0586,0.9534,sarimax,34,37,6298.1356,6269.101

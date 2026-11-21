@@ -33,6 +33,7 @@ serie:
 pronostico:
   semanas_test: 12                     # walk-forward: un origen por semana (cada sábado)
   fin_test: 2026-11-14                 # Total y segmentos: última semana completa con datos (09/11–14/11/2026)
+  fin_test_ventana_anterior: 2026-08-29   # validación de SARIMAX: semanas 08/06–29/08/2026 (no se usaron para elegirlo)
   semanas_intervalo: 12                # intervalo 80 % = percentiles 10 y 90 de y/ŷ en los 12 orígenes previos
 
 clima:

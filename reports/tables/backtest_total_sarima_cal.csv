@@ -1,3 +1,0 @@
-modelo,n,MAE,MASE,WAPE,cobertura_80,DM_vs_lgbm,p_valor_vs_lgbm,periodo
-sarima_cal,71,88.2972,0.8421,0.0884,0.8169,0.0586,0.9534,24/08/2026–14/11/2026
-lgbm_directo,71,88.7061,0.8456,0.0888,0.7606,,,24/08/2026–14/11/2026

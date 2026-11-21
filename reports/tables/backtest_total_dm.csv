@@ -1,11 +1,11 @@
 modelo_1,modelo_2,DM,p_valor,mejor
+sarimax,lgbm_directo,-0.0586,0.9534,sarimax
+sarimax,sarima,-0.9846,0.3282,sarimax
+sarimax,ets,-0.8666,0.3891,sarimax
+sarimax,naive_estacional,-2.7439,0.0077,sarimax
 lgbm_directo,sarima,-0.7379,0.4631,lgbm_directo
 lgbm_directo,ets,-0.764,0.4474,lgbm_directo
-lgbm_directo,media_movil_4sem,-1.6068,0.1126,lgbm_directo
 lgbm_directo,naive_estacional,-2.4449,0.017,lgbm_directo
 sarima,ets,-0.107,0.9151,sarima
-sarima,media_movil_4sem,-0.6108,0.5433,sarima
 sarima,naive_estacional,-2.4335,0.0175,sarima
-ets,media_movil_4sem,-0.6911,0.4918,ets
 ets,naive_estacional,-2.6657,0.0095,ets
-media_movil_4sem,naive_estacional,-2.4133,0.0184,media_movil_4sem

@@ -20,7 +20,7 @@ NOMBRES = {
     "media_movil_4sem": "Media móvil 4 semanas",
     "ets": "ETS",
     "sarima": "SARIMA",
-    "sarima_cal": "SARIMA con calendario",
+    "sarimax": "SARIMAX",
     "lgbm_directo": "LightGBM directo",
     "mlp": "MLP",
     # mix

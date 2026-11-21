@@ -26,7 +26,7 @@ MODELOS = {
     "sarima": sarimax.modelo(),
     "lgbm_directo": lgbm.directo(ev.EXOG_CAL),
     "mlp": mlp.modelo(ev.EXOG_CAL, epocas_max=5, paciencia=2),
-    "sarima_cal": sarimax.modelo_calendario(ev.EXOG_CAL),  # control de robustez, fuera del ranking
+    "sarimax": sarimax.modelo_calendario(ev.EXOG_CAL),  # el modelo del proyecto
 }
 
 
@@ -121,10 +121,11 @@ def test_diebold_mariano_detecta_al_mejor():
     assert dm < 0 and p < 0.01
 
 
+@pytest.mark.parametrize("modelo", ["lgbm_directo", "sarimax"])
 @pytest.mark.parametrize("uid", ["Total", "Total/particulares", "Total/empresas"])
-def test_series_del_backtest_no_miran_el_futuro(uid):
+def test_series_del_backtest_no_miran_el_futuro(uid, modelo):
     """Con las series reales del backtest (Total y segmentos, datos públicos × K):
-    alterar lo posterior al origen no cambia el pronóstico de LightGBM directo."""
+    alterar lo posterior al origen no cambia el pronóstico de LightGBM directo ni de SARIMAX."""
     from vhp import pronostico
     try:
         g = pronostico.grilla_total(None, uid)
@@ -135,5 +136,25 @@ def test_series_del_backtest_no_miran_el_futuro(uid):
     origen = [d for d in g.index if d.dayofweek == 5][-3]
     g2 = g.copy()
     g2.loc[g2.index > origen, ["y", "y_modelo"]] *= 10
-    f = lgbm.directo(ev.EXOG_CAL)
+    f = lgbm.directo(ev.EXOG_CAL) if modelo == "lgbm_directo" else sarimax.modelo_calendario(ev.EXOG_CAL)
     pd.testing.assert_frame_equal(f(*ev.partir(g, origen)), f(*ev.partir(g2, origen)))
+
+
+def test_coeficientes_sarimax_una_fila_por_variable_que_varia():
+    """`sarimax_coeficientes.csv`: una fila por serie × variable de calendario que varía
+    en el entrenamiento del último origen, y efecto % = (e^β − 1) × 100."""
+    from vhp import pronostico
+    from vhp.config import ruta
+    from vhp.models.comun import columnas_variables
+    f = ruta("tablas") / "sarimax_coeficientes.csv"
+    if not f.exists():
+        pytest.skip("falta correr python main.py backtest")
+    c = pd.read_csv(f)
+    cfg = pronostico.cargar_config()
+    for uid in pronostico.SERIES:
+        g = pronostico.grilla_total(cfg, uid)
+        o = ev.origenes(g, cfg["pronostico"]["semanas_test"], cfg["pronostico"]["fin_test"])[-1]
+        hist, _ = ev.partir(g, o)
+        assert sorted(c.loc[c["serie"] == uid, "variable"]) == sorted(columnas_variables(hist, ev.EXOG_CAL))
+    assert np.allclose(c["efecto_pct"], 100 * np.expm1(c["beta"]), atol=0.01)
+    assert (c["efecto_ic_inf"] <= c["efecto_pct"]).all() and (c["efecto_pct"] <= c["efecto_ic_sup"]).all()

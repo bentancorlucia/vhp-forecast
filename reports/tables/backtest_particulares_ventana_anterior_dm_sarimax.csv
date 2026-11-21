@@ -1,0 +1,8 @@
+modelo_1,modelo_2,DM,p_valor,mejor,dias_gana_1,dias_gana_2,error_abs_1,error_abs_2,periodo
+sarimax,ets,2.5871,0.0118,ets,26,44,7995.2201,6964.2187,08/06/2026–29/08/2026
+sarimax,lgbm_directo,2.334,0.0225,lgbm_directo,31,39,7995.2201,6888.6798,08/06/2026–29/08/2026
+sarimax,media_movil_4sem,1.8511,0.0684,media_movil_4sem,32,38,7995.2201,7184.5,08/06/2026–29/08/2026
+sarimax,mlp,0.3552,0.7235,mlp,33,37,7995.2201,7879.9674,08/06/2026–29/08/2026
+sarimax,naive,-6.0053,0.0,sarimax,48,22,7995.2201,13033.0,08/06/2026–29/08/2026
+sarimax,naive_estacional,-2.6848,0.0091,sarimax,43,27,7995.2201,10078.0,08/06/2026–29/08/2026
+sarimax,sarima,0.3832,0.7028,sarima,35,35,7995.2201,7823.1223,08/06/2026–29/08/2026

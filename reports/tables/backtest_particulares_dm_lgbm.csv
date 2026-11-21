@@ -2,6 +2,7 @@ modelo_1,modelo_2,DM,p_valor,mejor,dias_gana_1,dias_gana_2,error_abs_1,error_abs
 lgbm_directo,ets,0.6107,0.5434,ets,33,38,5666.4868,5457.9037
 lgbm_directo,media_movil_4sem,-1.4925,0.1401,lgbm_directo,37,34,5666.4868,6330.5
 lgbm_directo,mlp,-0.659,0.5121,lgbm_directo,38,33,5666.4868,6066.0143
-lgbm_directo,naive,,,naive,58,13,5666.4868,13451.0
+lgbm_directo,naive,,,,58,13,5666.4868,13451.0
 lgbm_directo,naive_estacional,-1.935,0.057,lgbm_directo,45,26,5666.4868,7638.0
 lgbm_directo,sarima,-0.6665,0.5073,lgbm_directo,35,36,5666.4868,5970.8397
+lgbm_directo,sarimax,-0.2339,0.8158,lgbm_directo,33,38,5666.4868,5762.5745

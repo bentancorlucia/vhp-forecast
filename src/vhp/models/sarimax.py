@@ -1,4 +1,9 @@
-"""SARIMA (statsmodels SARIMAX, sin exógenas, período 6) sobre log(y_modelo).
+"""SARIMA y SARIMAX (statsmodels, período 6) sobre log(y_modelo).
+
+- `modelo()`: SARIMA puro, sin exógenas (la comparación que muestra cuánto agrega el calendario).
+- `modelo_calendario(cols)`: SARIMAX = regresión sobre las variables de calendario
+  (se conocen de antemano) con errores SARIMA. Es el modelo del proyecto desde el
+  21/11/2026: cada β se lee como un efecto, (e^β − 1) × 100 %.
 
 Se modela el logaritmo porque la varianza crece con el nivel (los días con 0, que solo
 hay en empresas, entran como 1 para poder tomar log); el pronóstico
@@ -60,9 +65,9 @@ def modelo():
 
 
 def modelo_calendario(columnas: list[str]):
-    """Control de robustez (no entra al ranking): el mismo SARIMA sobre log(y), misma
-    grilla y AIC, más como exógenas las variables de calendario que varían en hist.
-    Así SARIMA ve el mismo calendario que LightGBM. `fut` ya trae el calendario."""
+    """SARIMAX: el mismo SARIMA sobre log(y), misma grilla y AIC, más como exógenas
+    las variables de calendario que varían en hist. `fut` ya trae el calendario
+    (se conoce el sábado), así que no mira el futuro."""
     def f(hist: pd.DataFrame, fut: pd.DataFrame) -> pd.DataFrame:
         cols = columnas_variables(hist, columnas)
         r = ajustar(hist, exog=cols or None)
@@ -72,9 +77,30 @@ def modelo_calendario(columnas: list[str]):
     return f
 
 
-def ajuste_final(hist: pd.DataFrame) -> tuple[pd.Series, str]:
-    """Residuos dentro de la muestra (escala log) y la especificación elegida."""
-    r = ajustar(hist)
+def ajuste_final(hist: pd.DataFrame, exog: list[str] | None = None) -> tuple[pd.Series, str]:
+    """Residuos dentro de la muestra (escala log) y la especificación elegida.
+    Con `exog`, el SARIMAX (solo las columnas que varían en hist)."""
+    cols = columnas_variables(hist, exog) if exog else None
+    r = ajustar(hist, exog=cols or None)
     resid = pd.Series(r.resid, index=hist.index)
     resid.iloc[: 2 * PERIODO] = np.nan  # arranque del filtro (diferencia estacional): residuos sin sentido
     return resid, especificacion(r)
+
+
+def coeficientes(hist: pd.DataFrame, exog: list[str]) -> pd.DataFrame:
+    """Coeficientes del SARIMAX ajustado en hist: una fila por variable de calendario
+    que varía en hist, con β, IC 95 %, efecto % = (e^β − 1) × 100 con su IC
+    (transformando los extremos del IC de β), p-valor y orden elegido por AIC."""
+    cols = columnas_variables(hist, exog)
+    r = ajustar(hist, exog=cols)
+    nombres = list(r.model.exog_names)  # statsmodels: x1, x2… si exog es un array
+    params, ic, pv = (pd.Series(np.asarray(r.params), index=r.model.param_names),
+                      pd.DataFrame(np.asarray(r.conf_int(alpha=0.05)), index=r.model.param_names),
+                      pd.Series(np.asarray(r.pvalues), index=r.model.param_names))
+    filas = []
+    for c, k in zip(cols, nombres):
+        b, lo, hi = params[k], ic.loc[k, 0], ic.loc[k, 1]
+        filas.append({"variable": c, "beta": b, "beta_ic_inf": lo, "beta_ic_sup": hi,
+                      "efecto_pct": 100 * np.expm1(b), "efecto_ic_inf": 100 * np.expm1(lo),
+                      "efecto_ic_sup": 100 * np.expm1(hi), "p_valor": pv[k]})
+    return pd.DataFrame(filas).assign(orden=especificacion(r), aic=r.aic)
