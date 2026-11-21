@@ -26,7 +26,7 @@ function ModeloFinal() {
   const lg = total.metricas.find((m) => m.id === 'lgbm_directo')!;
   const cat = mix.unidades.find((x) => x.nivel === 'categoria' && x.id === 'media_4sem')!;
   const factores = [
-    { v: num(ej.total), t: 'Pronóstico', s: `Viandas de ${ej.seg} en la semana, con LightGBM.`, m: `MASE ${num(lg.mase, 2)}` },
+    { v: num(ej.total), t: 'Pronóstico', s: `Viandas de ${ej.seg} en la semana, con LightGBM.`, m: `MASE ${num(total.segmentos[ej.seg]?.metricas.find((m) => m.id === 'lgbm_directo')?.mase ?? lg.mase, 2)} en ${ej.seg}` },
     { v: pct(ej.part * 100, 1), t: 'Participación', s: `Parte de ${ej.cat} en las últimas 4 semanas.`, m: `MASE por categoría ${num(cat.mase, 2)}` },
     { v: num(ej.factor, 2), t: 'Colchón', s: 'Factor que sale de los errores recientes.', m: `p = ${plan.pElegido}` },
   ];

@@ -249,7 +249,7 @@ function PlanCompras() {
       <div className="col" style={{ gap: 0, minHeight: 0 }}>
         <Paso n={0}>
           <p className="pregunta" style={{ margin: 0, fontSize: 28 }}>Conviene comprar <b>cerca de lo esperado</b>: asegurarse no paga.</p>
-          <p className="chica" style={{ margin: '6px 0 18px' }}><b>p</b> = en qué % de las semanas alcanza lo que se compra. Con p&nbsp;=&nbsp;50 alcanza 1 de cada 2 semanas; con p&nbsp;=&nbsp;90, 9 de cada 10. Para que alcance más seguido hay que comprar más.</p>
+          <p className="chica" style={{ margin: '6px 0 18px' }}><b>p</b> = en qué % de las semanas debería alcanzar lo que se compra: con p&nbsp;=&nbsp;50, 1 de cada 2; con p&nbsp;=&nbsp;90, 9 de cada 10 (en el backtest, con p&nbsp;=&nbsp;{plan.pElegido} alcanzó en el {pctFrac(plan.elegido.cob, 1)} de las semanas × categoría). Para que alcance más seguido hay que comprar más.</p>
         </Paso>
         <Paso n={0} className="plan-ej">
           <div className="plan-caja">
@@ -285,7 +285,7 @@ function PlanCompras() {
             <span className="mayor">&gt;</span>
             <div style={{ textAlign: 'right' }}><div className="v" style={{ color: 'var(--tinta-70)' }}>${cs.faltante}</div><div className="d">perder una venta</div></div>
           </div>
-          <p className="chica" style={{ margin: 0, fontSize: '16px' }}>Tirar duele más: comprar de más no paga. El factor de p&nbsp;=&nbsp;{plan.pElegido} (×{num(plan.factor.empresas, 2)} en empresas, ×{num(plan.factor.particulares, 2)} en particulares) solo corrige que el modelo se quedó corto más veces de las que se pasó; <b>no es un margen de seguridad</b>. Si perder una venta costara <b>${caro.faltante}</b>, convendría p&nbsp;=&nbsp;{caro.p}.</p>
+          <p className="chica" style={{ margin: 0, fontSize: '16px' }}>Tirar duele más: comprar de más no paga. El factor de p&nbsp;=&nbsp;{plan.pElegido} (×{num(plan.factor.empresas, 2)} en empresas, ×{num(plan.factor.particulares, 2)} en particulares) solo corrige el sesgo del modelo: <b>no es un margen de seguridad</b>. Si perder una venta costara <b>${caro.faltante}</b>, convendría p&nbsp;=&nbsp;{caro.p}.</p>
           <p className="plan-supuesto"><b>Supuesto:</b> no se consultó qué pasa en la práctica cuando falta un ingrediente (¿se cambia el plato?, ¿se compra en el día?). Los ${cs.faltante} son una estimación.</p>
         </Paso>
 

@@ -13,7 +13,7 @@ function ErrorPron() {
   const ne = total.metricas.find((m) => m.id === 'naive_estacional')!;
   const comp = ['lgbm_directo', 'sarima', 'ets', 'mlp', 'naive_estacional'].map((id) => total.metricas.find((m) => m.id === id)!);
   const items = [
-    { n: 0, nombre: 'MAE', sigla: 'Mean Absolute Error', a: lg.mae, b: ne.mae, k: 'mae' as const, f: (x: number) => num(x, 0), unidad: 'viandas', mide: <>Cuántas viandas le erramos <b>por día</b>.</> },
+    { n: 0, nombre: 'MAE', sigla: 'Mean Absolute Error', a: lg.mae, b: ne.mae, k: 'mae' as const, f: (x: number) => num(x, 0), unidad: 'viandas × K', mide: <>Cuántas viandas (× K) le erramos <b>por día</b>.</> },
     { n: 1, nombre: 'WAPE', sigla: 'Weighted Absolute Percentage Error', a: lg.wape, b: ne.wape, k: 'wape' as const, f: (x: number) => `${num(x * 100, 1)} %`, unidad: '', mide: <>Ese error como <b>% de lo vendido</b>.</> },
     { n: 2, nombre: 'MASE', sigla: 'Mean Absolute Scaled Error', a: lg.mase, b: ne.mase, k: 'mase' as const, f: (x: number) => num(x, 2), unidad: '', mide: <>El error frente a <b>copiar la semana pasada</b>. Con esta elegimos.</>, hero: true },
   ];

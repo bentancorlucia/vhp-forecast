@@ -292,7 +292,14 @@ def construir(F: Fuentes) -> dict:
     fer = fer[(fer.fecha >= serie.index.min()) & (fer.fecha <= serie.index.max())]
     meta_sem = F.csv(P + "meta_ads_semanal_indice.csv")
     tests = F.ruta("tests")
-    n_tests = sum(len(re.findall(r"^def test_", p.read_text(encoding="utf-8"), flags=re.M)) for p in tests.glob("test_*.py"))
+    # cantidad de tests que corre pytest (incluye los parametrizados), igual que el informe
+    import subprocess, sys
+    try:
+        sal = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q"], cwd=tests.parent,
+                             capture_output=True, text=True, timeout=300).stdout
+        n_tests = int(re.search(r"(\d+) tests? collected", sal).group(1))
+    except Exception:
+        n_tests = sum(len(re.findall(r"^def test_", p.read_text(encoding="utf-8"), flags=re.M)) for p in tests.glob("test_*.py"))
     muestra = vv.sort_values(["fecha", "segmento", "categoria"]).head(4)
     # ejemplo de la serie ya cruzada: tartas de empresas en la semana de carnaval 2026
     dias_cruce = pd.to_datetime(["2026-02-12", "2026-02-13", "2026-02-16", "2026-02-18"])
@@ -367,7 +374,7 @@ def construir(F: Fuentes) -> dict:
     g0 = bp[bp.modelo == "lgbm_directo"]
     k_cob = int(((g0.y >= g0["q0.1"]) & (g0.y <= g0["q0.9"])).sum())
     lo_cob, hi_cob = proportion_confint(k_cob, len(g0), alpha=0.05, method="wilson")
-    cob_ic = {"k": k_cob, "n": int(len(g0)), "lo": r(lo_cob, 3), "hi": r(hi_cob, 3)}
+    cob_ic = {"k": k_cob, "n": int(len(g0)), "lo": r(lo_cob, 4), "hi": r(hi_cob, 4)}
     # DM de LightGBM contra cada modelo (días que gana cada uno y error total), segmentos y control SARIMA con calendario
     dml = F.csv(T + "backtest_total_dm_lgbm.csv")
     dm_lgbm = [{"m2": x.modelo_2, "n2": NOMBRES_MODELO[x.modelo_2], "p": r(x.p_valor, 3), "gana1": int(x.dias_gana_1),
