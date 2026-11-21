@@ -90,21 +90,21 @@ decisiones:
   - id: walk_forward
     fase: modelos
     titulo: "Backtest walk-forward de 12 semanas"
-    decision: "El Total y cada segmento con los mismos 12 orígenes (sábados 22/08–07/11/2026), ventana expansiva; semanas pronosticadas 24/08–14/11/2026 (`pronostico.fin_test`). Mismos 7 modelos y mismo intervalo en las tres series; empresas usa su cierre propio del 24/05/2025. Métricas solo en días abiertos. Hasta el 18/11/2026 el Total terminaba en agosto (08/06–29/08/2026)."
+    decision: "El Total y cada segmento con los mismos 12 orígenes (sábados 22/08–07/11/2026), ventana expansiva; semanas pronosticadas 24/08–14/11/2026 (`pronostico.fin_test`). Mismos 8 modelos (los 7 de antes y SARIMAX) y mismo intervalo en las tres series, en dos ventanas: la nueva (24/08–14/11/2026) y la anterior (12 orígenes hasta el 22/08/2026, semanas 08/06–29/08/2026, `pronostico.fin_test_ventana_anterior`); empresas usa su cierre propio del 24/05/2025. Métricas solo en días abiertos. Hasta el 18/11/2026 el Total terminaba en agosto (08/06–29/08/2026)."
     porque: "Simula exactamente el uso real: cada semana se reentrena con todo lo disponible y nunca se mira el futuro (hay tests de leakage)."
     quien: método
 
   - id: metricas
     fase: modelos
     titulo: "MASE, WAPE y cobertura del intervalo 80 %; nada de MAPE"
-    decision: "Se comparan modelos con MAE, MASE (relativo al naive estacional), WAPE y la cobertura del intervalo 80 %. Diebold-Mariano entre los mejores y Ljung-Box sobre los residuos de ETS y SARIMA."
+    decision: "Se comparan modelos con MAE, MASE (relativo al naive estacional), WAPE y la cobertura del intervalo 80 %. Diebold-Mariano entre los mejores y Ljung-Box sobre los residuos de ETS, SARIMA y SARIMAX."
     porque: "MAPE explota con días chicos y castiga asimétricamente. MASE, WAPE y la cobertura además no cambian con el escalado K."
     quien: método
 
   - id: modelos_total
     fase: modelos
-    titulo: "Siete modelos, de lo más simple a lo más complejo"
-    decision: "naive, naive estacional, media móvil 4 semanas, ETS (Holt-Winters de statsmodels), SARIMA (statsmodels), LightGBM directo y un MLP en PyTorch. LightGBM y el MLP usan las mismas variables: 18 rezagos y 2 medias móviles divididos por el nivel de la última semana, día de la semana, feriados, Turismo, verano y h (estrategia directa)."
+    titulo: "Ocho modelos, de lo más simple a lo más complejo"
+    decision: "naive, naive estacional, media móvil 4 semanas, ETS (Holt-Winters de statsmodels), SARIMA (statsmodels), SARIMAX (el mismo SARIMA con las variables de calendario como exógenas), LightGBM directo y un MLP en PyTorch. LightGBM y el MLP usan las mismas variables: 18 rezagos y 2 medias móviles divididos por el nivel de la última semana, día de la semana, feriados, Turismo, verano y h (estrategia directa)."
     porque: "Son los modelos de series temporales clásicos y los de ML que se vieron en el curso (boosting y redes MLP), así que todo se puede explicar. ETS elige por AIC entre estacionalidad aditiva o multiplicativa y sin tendencia o con tendencia amortiguada. El MLP escala con media y desvío de su tramo de entrenamiento y frena con early stopping sobre las últimas 4 semanas de cada origen; semilla 42."
     quien: método
 
@@ -124,17 +124,17 @@ decisiones:
 
   - id: modelo_total
     fase: modelos
-    titulo: "LightGBM directo como modelo del total (y de los segmentos)"
-    decision: "lgbm_directo (MASE 0,846) queda primero en el Total, seguido de sarima (0,911) y ets (0,915) (backtest 24/08–14/11/2026). Antes (Total hasta agosto, backtest 08/06–29/08/2026): lgbm 1,116, media móvil 1,150, ETS 1,221. Por segmento, mismos orígenes: en empresas lgbm queda primero (1,056; mlp 1,063, ets 1,068); en particulares ETS queda primero (0,888) y lgbm segundo (0,922). Se mantiene LightGBM en el Total y en los dos segmentos del plan."
-    porque: "Menor error en el Total en dos ventanas (08/06–29/08 y 24/08–14/11/2026) y en empresas; en particulares ETS queda apenas primero, sin diferencia significativa (DM p = 0,54). Ni Diebold-Mariano ni el SARIMA con calendario lo superan, pero tampoco se separan de él: SARIMA (p = 0,46), ETS (p = 0,45), SARIMA con calendario (MASE 0,842, p = 0,95). En Diebold-Mariano la media móvil de 4 semanas gana más días que LightGBM (37 contra 34), pero tiene más error total (p = 0,11). El MLP (1,036) no le gana a LightGBM y se reporta así. Cambiar de modelo no mejora el error de forma significativa y movería todo el plan."
-    quien: método
+    titulo: "LightGBM directo como modelo del total (y de los segmentos), por robustez"
+    decision: "Se mantiene lgbm_directo en el Total y en los dos segmentos del plan. Puesto por MASE entre 8 modelos (robustez_puestos.csv), ventana anterior (08/06–29/08/2026) y nueva (24/08–14/11/2026): Total 1.º (1,116) y 2.º (0,846); particulares 1.º (1,253) y 2.º (0,922; ETS 0,888); empresas 2.º (0,835; SARIMAX 0,819) y 2.º (1,056; SARIMAX 1,021)."
+    porque: "Robustez: en dos ventanas de 12 semanas y tres series (Total, particulares, empresas) LightGBM es el único que siempre queda 1.º o 2.º, y en su peor caso está +3,9 % por encima del mejor (MASE, particulares, ventana nueva). Los otros modelos quedan, en su peor caso, entre +11,5 % (ETS, empresas, anterior) y +20,6 % (SARIMAX, Total, anterior), y el MLP en +23,0 % (robustez_peor_caso.csv). En cada ventana Diebold-Mariano no lo separa del mejor: Total nueva contra SARIMAX p = 0,95, particulares nueva contra ETS p = 0,54, empresas nueva contra SARIMAX p = 0,80, empresas anterior contra SARIMAX p = 0,89; en el Total y particulares de la ventana anterior es el primero. Matiz: las dos ventanas se superponen una semana (24/08–29/08/2026), así que no son pruebas independientes. El MLP no le gana a LightGBM y se reporta así."
+    quien: Lucía
 
-  - id: sarima_calendario
+  - id: sarimax_descartado
     fase: modelos
-    titulo: "Control: SARIMA con calendario"
-    decision: "Control de robustez, fuera del ranking de 7 modelos: el mismo SARIMA sobre log(y) (misma grilla de órdenes y AIC) con las variables de calendario que varían en cada entrenamiento como exógenas (regresión con errores SARIMA). Total, mismos 12 orígenes (backtest 24/08–14/11/2026): MASE 0,842, WAPE 8,8 %, cobertura 82 %, contra LightGBM directo 0,846, 8,9 % y 76 %; Diebold-Mariano p = 0,95 (backtest_total_sarima_cal.csv)."
-    porque: "LightGBM era el único modelo que veía el calendario, así que la comparación no era pareja. Con el calendario, SARIMA lo iguala: la ventaja de LightGBM no viene de ver el calendario, y ese argumento deja de usarse para elegirlo. Se mantiene LightGBM porque la diferencia es nula y cambiarlo movería todo el plan sin ganar precisión."
-    quien: método
+    titulo: "SARIMAX probado como candidato y descartado; se mantiene LightGBM por robustez"
+    decision: "SARIMAX = el mismo SARIMA sobre log(y) (misma grilla de órdenes y AIC) con las variables de calendario como exógenas (regresión con errores SARIMA). Entró como 8.º candidato del ranking. Total: en la ventana nueva (24/08–14/11/2026) empata con LightGBM (MASE 0,842 contra 0,846; Diebold-Mariano p = 0,95); en la anterior (08/06–29/08/2026) queda 5.º (1,346 contra 1,116; p = 0,038 a favor de LightGBM). Particulares: 3.º en la nueva (0,938) y 6.º en la anterior (1,453). Empresas: 1.º en las dos (1,021 en la nueva y 0,819 en la anterior). Peor caso +20,6 % sobre el mejor (Total, anterior). Fuera del Total y los segmentos del backtest no se usa: el plan de compras y las categorías siguen con LightGBM."
+    porque: "No se puede elegir un modelo solo por la ventana donde ganó. En la ventana nueva SARIMAX iguala a LightGBM (y muestra que la ventaja de LightGBM no viene de ver el calendario, argumento que ya no se usa), pero en la anterior queda significativamente peor en el Total. LightGBM nunca sale del 1.º o 2.º puesto. Matiz: las ventanas se superponen una semana (24/08–29/08/2026) y no son pruebas independientes; y en cada ventana LightGBM no se distingue estadísticamente de los mejores. Chequeo sin el lunes 17/08/2026 (export incompleto) en la ventana anterior: los puestos de LightGBM y SARIMAX no cambian en ninguna serie (robustez_sin_17_08.csv)."
+    quien: Lucía
 
   - id: clima_total
     fase: modelos

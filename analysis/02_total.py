@@ -1,7 +1,8 @@
 # %% [markdown]
 # # Fase 5 — Modelos del total y backtesting walk-forward
 # Lógica en `src/vhp/pronostico.py`, `src/vhp/evaluate.py` y `src/vhp/models/`.
-# Modelos: naive, naive estacional, media móvil 4 semanas, ETS, SARIMA, LightGBM directo y MLP.
+# 8 modelos: naive, naive estacional, media móvil 4 semanas, ETS, SARIMA, LightGBM directo, MLP
+# y SARIMAX (SARIMA con calendario; probado y descartado). Dos ventanas: 08/06–29/08 y 24/08–14/11/2026.
 # Backtest: 12 orígenes (sábados 22/08–07/11/2026), se pronostican los días hábiles
 # de la semana siguiente; semanas pronosticadas 24/08–14/11/2026. Ventana expansiva.
 # Intervalo 80 %: percentiles 10 y 90 de y/ŷ del propio modelo en los 12 orígenes previos
@@ -59,3 +60,20 @@ display(Image(FIG / "07_backtest_total.png"))
 
 # %%
 ev.metricas(res[res["fecha"] != "2026-08-17"]).round(3)
+
+# %% [markdown]
+# ## 6. Robustez: dos ventanas × tres series
+# Puesto de cada modelo por MASE (ventana anterior 08/06–29/08/2026, nueva 24/08–14/11/2026; se
+# superponen una semana) y peor caso: máximo de (MASE / MASE del mejor − 1) × 100 entre las seis.
+
+# %%
+pd.read_csv(T / "robustez_puestos.csv").pivot_table(index="modelo", columns=["serie", "ventana"], values="puesto")
+
+# %%
+pd.read_csv(T / "robustez_peor_caso.csv").round(2)
+
+# %% [markdown]
+# Chequeo: ventana anterior sin el lunes 17/08/2026 (mismo recorte para los 8 modelos).
+
+# %%
+pd.read_csv(T / "robustez_sin_17_08.csv").round(3)

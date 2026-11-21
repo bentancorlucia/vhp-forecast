@@ -2,10 +2,11 @@
 
 Corre los 8 modelos en los 12 orígenes semanales (y en los 12 sábados anteriores,
 solo para armar el intervalo 80 %), calcula MAE, MASE, WAPE y cobertura,
-Diebold-Mariano entre los mejores y de SARIMAX (el modelo del proyecto) contra
-cada uno, y Ljung-Box de los residuos de ETS, SARIMA y SARIMAX. Lo mismo en la
-ventana anterior (12 orígenes hasta `fin_test_ventana_anterior`), que no se usó
-para elegir SARIMAX, y los coeficientes del SARIMAX al último origen.
+Diebold-Mariano entre los mejores, de LightGBM directo (el modelo del proyecto) y de
+SARIMAX (candidato probado y descartado) contra cada uno, y Ljung-Box de los residuos
+de ETS, SARIMA y SARIMAX. Lo mismo en la ventana anterior (12 orígenes hasta
+`fin_test_ventana_anterior`), los coeficientes del SARIMAX al último origen y las
+tablas de robustez (puesto y peor caso de cada modelo en las dos ventanas × tres series).
 Usa datos públicos (unidades × K): MASE, WAPE y cobertura no dependen de K;
 MAE queda multiplicado por K.
 """
@@ -81,7 +82,7 @@ FIG_MODELOS = ["lgbm_directo", "sarima", "ets", "naive_estacional"]
 def correr() -> dict:
     cfg = cargar_config()
     out = {uid: correr_serie(uid, *v) for uid, v in SERIES.items()}
-    # Validación de la elección de SARIMAX en datos que no se usaron para elegirla
+    # Segunda ventana: la que descarta a SARIMAX y sostiene a LightGBM por robustez
     for uid, (_, prefijo, _) in SERIES.items():
         out[f"{uid} (ventana anterior)"] = correr_serie(uid, "fin_test_ventana_anterior",
                                                         f"{prefijo}_ventana_anterior", None, completo=False)
@@ -157,7 +158,7 @@ def robustez(cfg: dict | None = None) -> dict:
     m = _metricas_ventanas(cfg)
     puestos, peor, sin = tabla_puestos(m), tabla_peor_caso(m), tabla_sin_dia(cfg)
     puestos.round(4).to_csv(tablas / "robustez_puestos.csv", index=False)
-    peor.round(2).to_csv(tablas / "robustez_peor_caso.csv", index=False)
+    peor.round(4).to_csv(tablas / "robustez_peor_caso.csv", index=False)
     sin.round(4).to_csv(tablas / "robustez_sin_17_08.csv", index=False)
     print("Robustez, peor caso (% de MASE por encima del mejor de cada serie × ventana):")
     print(peor[["modelo", "peor_pct_sobre_mejor", "serie_peor", "ventana_peor", "periodo_peor"]].round(1).to_string(index=False))

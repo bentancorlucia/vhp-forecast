@@ -17,8 +17,8 @@ FASES = {"datos": "Datos y preparación", "eda": "Análisis exploratorio", "mode
          "mix": "Clima y mix de categorías", "eventos": "Efecto de eventos", "ads": "Gasto en Meta Ads",
          "plan": "Plan de compras", "compras": "De platos a ingredientes"}
 NOMBRES = {"naive": "Naive", "naive_estacional": "Naive estacional", "media_movil_4sem": "Media móvil 4 semanas",
-           "ets": "ETS", "sarima": "SARIMA", "lgbm_directo": "LightGBM directo", "mlp": "MLP",
-           "sarima_cal": "SARIMA con calendario"}
+           "ets": "ETS", "sarima": "SARIMA", "sarimax": "SARIMAX", "lgbm_directo": "LightGBM directo", "mlp": "MLP"}
+SERIES_ROB = {"Total": "Total", "Total/particulares": "Particulares", "Total/empresas": "Empresas"}
 NOTA_ESCALA = ("Unidades multiplicadas por una constante secreta K (anonimización). Las métricas relativas "
                "(MASE, WAPE, coberturas, %) no cambian con K.")
 
@@ -194,12 +194,16 @@ def texto_modelos(N: Num) -> str:
               f"le gana a LightGBM ({n(N.mase('lgbm_directo'), 3)}). ")
     t += ("El intervalo 80 % de todos los modelos son los percentiles 10 y 90 del error relativo (y / ŷ) del propio "
           "modelo en las 12 semanas previas al origen. ")
+    if g != "lgbm_directo" and "lgbm_directo" in N.met.index:
+        t += (f"{NOMBRES[g]} queda primero en esta ventana, pero el modelo del proyecto es LightGBM directo, "
+              "por robustez en dos ventanas y tres series (ver «Robustez» más abajo). ")
+    g = "lgbm_directo" if "lgbm_directo" in N.met.index else g
     k, dias, lo, hi = N.cobertura(g)
     t += (f"Con {NOMBRES[g]} cubrió el {pct(100 * k / dias, 0)} ({k} de {dias} días; IC 95 % de Wilson "
           f"{n(100 * lo, 0)}–{n(100 * hi, 0)} %), {'algo por debajo del' if k / dias < 0.8 else 'en o por encima del'} "
           f"80 %. Con {dias} días esa diferencia es compatible con el azar. ")
     lb = N.lb
-    t += (f"Ljung-Box sobre los residuos de ETS y SARIMA (rezagos 6 y 12): p entre {n(lb.lb_pvalue.min(), 2)} y "
+    t += (f"Ljung-Box sobre los residuos de ETS, SARIMA y SARIMAX (rezagos 6 y 12): p entre {n(lb.lb_pvalue.min(), 2)} y "
           f"{n(lb.lb_pvalue.max(), 2)}, sin autocorrelación que quede por modelar.")
     return t
 
@@ -359,26 +363,72 @@ def seccion_segmentos(N: Num, pb: str) -> list[str]:
                           f"LightGBM le gana al naive estacional ({n(ne, 3)}; p = "
                           f"{n(dm.loc['naive_estacional', 'p_valor'], 3)}).")
     L = [f"### Backtest por segmento ({pb})", "",
-         "Mismos 12 orígenes, los mismos 7 modelos y el mismo intervalo que el Total. Empresas usa su cierre propio "
+         "Mismos 12 orígenes, los mismos 8 modelos y el mismo intervalo que el Total. Empresas usa su cierre propio "
          "del 24/05/2025.", "", md(pd.DataFrame(filas)), "", " ".join(textos) + " El plan de compras sigue usando "
-         "LightGBM directo en los dos segmentos: es el primero en el Total y en empresas, y en particulares la "
-         "diferencia con ETS no es significativa.", ""]
-    if (ruta("tablas") / "backtest_total_sarima_cal.csv").exists():
-        c = _t("backtest_total_sarima_cal").set_index("modelo")
-        sc, lg = c.loc["sarima_cal"], c.loc["lgbm_directo"]
-        L += [f"### Control: SARIMA con calendario (Total, {pb})", "",
-              "El mismo SARIMA sobre log(y), con la misma grilla de órdenes y AIC, más las variables de calendario "
-              "(feriado laborable, víspera y día después de un cierre, Turismo, verano) como exógenas: una regresión "
-              "con errores SARIMA. No entra al ranking; sirve para ver si la ventaja de LightGBM es solo que ve el "
-              "calendario.", "",
-              md(pd.DataFrame([{"Modelo": NOMBRES.get(k, k), "MASE": n(r.MASE, 3), "WAPE": pct(100 * r.WAPE),
-                                "Cobertura 80 %": pct(100 * r.cobertura_80, 0)} for k, r in c.iterrows()])), "",
-              f"SARIMA con calendario {'no le gana' if sc.MASE >= lg.MASE else 'le gana'} a LightGBM directo "
-              f"(MASE {n(sc.MASE, 3)} contra {n(lg.MASE, 3)}); Diebold-Mariano p = {n(sc.p_valor_vs_lgbm, 2)}.", ""]
+         "LightGBM directo en los dos segmentos, por robustez (ver abajo).", ""]
+    L += seccion_robustez()
     return L
 
 
 # ============================================================ resultados.md
+def _p_lgbm_contra_mejor(serie: str, ventana: str, mejor: str) -> float | None:
+    """p de Diebold-Mariano de LightGBM contra el mejor de esa serie × ventana (None si
+    LightGBM es el mejor o si esa comparación no está en las tablas)."""
+    if mejor == "lgbm_directo":
+        return None
+    pref = {"Total": "total", "Total/particulares": "particulares", "Total/empresas": "empresas"}[serie]
+    if ventana == "nueva":
+        dm = _t(f"backtest_{pref}_dm_lgbm").set_index("modelo_2")
+        return float(dm.loc[mejor, "p_valor"]) if mejor in dm.index else None
+    dm = _t(f"backtest_{pref}_ventana_anterior_dm_sarimax").set_index("modelo_2")
+    return float(dm.loc["lgbm_directo", "p_valor"]) if mejor == "sarimax" else None
+
+
+def seccion_robustez() -> list[str]:
+    """Puestos y peor caso de los 8 modelos en dos ventanas × tres series (robustez_*.csv)."""
+    if not (ruta("tablas") / "robustez_puestos.csv").exists():
+        return []
+    pu, pc, sin = _t("robustez_puestos"), _t("robustez_peor_caso"), _t("robustez_sin_17_08")
+    per = pu.drop_duplicates("ventana").set_index("ventana")["periodo"]
+    cols = [(s, v) for s in SERIES_ROB for v in ["anterior", "nueva"]]
+    ancho = pu.pivot(index="modelo", columns=["serie", "ventana"], values="puesto")
+    orden = pc["modelo"].tolist()
+    filas = []
+    for m in orden:
+        f = {"Modelo": NOMBRES[m]}
+        for s, v in cols:
+            f[f"{SERIES_ROB[s]}, {v}"] = int(ancho.loc[m, (s, v)])
+        filas.append(f)
+    peor = pd.DataFrame([{"Modelo": NOMBRES[r.modelo], "Peor caso (% sobre el mejor)": pct(r.peor_pct_sobre_mejor, 1, True),
+                          "Serie": SERIES_ROB[r.serie_peor], "Ventana": f"{r.ventana_peor} ({r.periodo_peor})"}
+                         for r in pc.itertuples()])
+    lg = ancho.loc["lgbm_directo"]
+    mejores = pu[pu.puesto == 1].set_index(["serie", "ventana"])["modelo"]
+    ps = [p for (s, v), m in mejores.items() if (p := _p_lgbm_contra_mejor(s, v, m)) is not None]
+    sx = pu[(pu.modelo == "sarimax") & (pu.serie == "Total")].set_index("ventana")
+    lt = pu[(pu.modelo == "lgbm_directo") & (pu.serie == "Total")].set_index("ventana")
+    p_ant = float(_t("backtest_total_ventana_anterior_dm_sarimax").set_index("modelo_2").loc["lgbm_directo", "p_valor"])
+    p_nue = float(_t("backtest_total_dm_lgbm").set_index("modelo_2").loc["sarimax", "p_valor"])
+    s17 = sin[sin.modelo.isin(["lgbm_directo", "sarimax"])]
+    cambia = (s17.puesto_con != s17.puesto_sin).any()
+    lgt = sin[(sin.serie == "Total") & (sin.modelo == "lgbm_directo")].iloc[0]
+    return [f"### Robustez: dos ventanas de 12 semanas, tres series", "",
+            f"Puesto de cada modelo por MASE (1 = menor error). Ventana anterior: {per['anterior']}; ventana nueva: "
+            f"{per['nueva']}. Las dos ventanas se superponen una semana (24/08–29/08/2026), así que no son pruebas "
+            "independientes.", "", md(pd.DataFrame(filas)), "",
+            f"LightGBM directo queda {int(lg.min())}.º o {int(lg.max())}.º en las seis. Peor caso de cada modelo: el "
+            "máximo, entre las seis, de (MASE / MASE del mejor − 1) × 100:", "", md(peor), "",
+            f"SARIMAX (SARIMA + calendario) empata con LightGBM en el Total de la ventana nueva (MASE "
+            f"{n(sx.loc['nueva', 'MASE'], 3)} contra {n(lt.loc['nueva', 'MASE'], 3)}; Diebold-Mariano p = {n(p_nue, 2)}), "
+            f"pero en la anterior queda {int(sx.loc['anterior', 'puesto'])}.º ({n(sx.loc['anterior', 'MASE'], 3)} contra "
+            f"{n(lt.loc['anterior', 'MASE'], 3)}; p = {n(p_ant, 3)} a favor de LightGBM). Se descarta y se mantiene "
+            "LightGBM directo por robustez: no es el que más gana, es el que nunca falla. En cada ventana, Diebold-"
+            "Mariano no lo separa del mejor (p ≥ " + n(min(ps), 2) + ").", "",
+            f"Chequeo sin el lunes 17/08/2026 (export incompleto), ventana anterior ({lgt.periodo}), mismo recorte "
+            f"para los 8 modelos: los puestos de LightGBM y SARIMAX {'cambian en alguna serie' if cambia else 'no cambian en ninguna serie'} "
+            f"(LightGBM en el Total: MASE {n(lgt.MASE_con, 3)} → {n(lgt.MASE_sin, 3)}; robustez_sin_17_08.csv).", ""]
+
+
 def resultados_md() -> str:
     N = Num()
     ancho = eda.cargar_datos()["ancho"]

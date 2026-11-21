@@ -2,8 +2,9 @@
 
 - `modelo()`: SARIMA puro, sin exógenas (la comparación que muestra cuánto agrega el calendario).
 - `modelo_calendario(cols)`: SARIMAX = regresión sobre las variables de calendario
-  (se conocen de antemano) con errores SARIMA. Es el modelo del proyecto desde el
-  21/11/2026: cada β se lee como un efecto, (e^β − 1) × 100 %.
+  (se conocen de antemano) con errores SARIMA. Candidato probado y descartado el
+  21/11/2026 (queda 5.º en la ventana anterior del Total; ver `decisiones.yaml`,
+  `sarimax_descartado`). Cada β se lee como un efecto, (e^β − 1) × 100 %.
 
 Se modela el logaritmo porque la varianza crece con el nivel (los días con 0, que solo
 hay en empresas, entran como 1 para poder tomar log); el pronóstico

@@ -26,7 +26,7 @@ MODELOS = {
     "sarima": sarimax.modelo(),
     "lgbm_directo": lgbm.directo(ev.EXOG_CAL),
     "mlp": mlp.modelo(ev.EXOG_CAL, epocas_max=5, paciencia=2),
-    "sarimax": sarimax.modelo_calendario(ev.EXOG_CAL),  # el modelo del proyecto
+    "sarimax": sarimax.modelo_calendario(ev.EXOG_CAL),  # candidato descartado (SARIMA + calendario)
 }
 
 

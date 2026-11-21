@@ -40,6 +40,7 @@ Efectos de calendario: regresión lineal de log(y) en días hábiles (06/05/2025
 
 | Modelo | MASE | WAPE | Cobertura 80 % |
 |---|---|---|---|
+| SARIMAX | 0,842 | 8,8 % | 82 % |
 | LightGBM directo | 0,846 | 8,9 % | 76 % |
 | SARIMA | 0,911 | 9,6 % | 82 % |
 | ETS | 0,915 | 9,6 % | 85 % |
@@ -48,38 +49,40 @@ Efectos de calendario: regresión lineal de log(y) en días hábiles (06/05/2025
 | Naive estacional | 1,172 | 12,3 % | 80 % |
 | Naive | 3,430 | 36,0 % | 85 % |
 
-LightGBM directo es el de menor MASE (0,846); Diebold-Mariano no lo separa de SARIMA (p = 0,46) ni de ETS (p = 0,45). Los mejores le ganan al naive estacional (p ≤ 0,018). El MLP (MASE 1,036) no le gana a LightGBM (0,846). El intervalo 80 % de todos los modelos son los percentiles 10 y 90 del error relativo (y / ŷ) del propio modelo en las 12 semanas previas al origen. Con LightGBM directo cubrió el 76 % (54 de 71 días; IC 95 % de Wilson 65–84 %), algo por debajo del 80 %. Con 71 días esa diferencia es compatible con el azar. Ljung-Box sobre los residuos de ETS y SARIMA (rezagos 6 y 12): p entre 0,07 y 0,79, sin autocorrelación que quede por modelar.
+SARIMAX es el de menor MASE (0,842); Diebold-Mariano no lo separa de LightGBM directo (p = 0,95) ni de SARIMA (p = 0,33). Los mejores le ganan al naive estacional (p ≤ 0,018). El MLP (MASE 1,036) no le gana a LightGBM (0,846). El intervalo 80 % de todos los modelos son los percentiles 10 y 90 del error relativo (y / ŷ) del propio modelo en las 12 semanas previas al origen. SARIMAX queda primero en esta ventana, pero el modelo del proyecto es LightGBM directo, por robustez en dos ventanas y tres series (ver «Robustez» más abajo). Con LightGBM directo cubrió el 76 % (54 de 71 días; IC 95 % de Wilson 65–84 %), algo por debajo del 80 %. Con 71 días esa diferencia es compatible con el azar. Ljung-Box sobre los residuos de ETS, SARIMA y SARIMAX (rezagos 6 y 12): p entre 0,07 y 0,96, sin autocorrelación que quede por modelar.
 
 Diebold-Mariano (error absoluto, h = 1 a 6, backtest 24/08/2026–14/11/2026):
 
 | Modelo 1 | Modelo 2 | DM | p | Mejor |
 |---|---|---|---|---|
+| SARIMAX | LightGBM directo | −0,06 | 0,953 | SARIMAX |
+| SARIMAX | SARIMA | −0,98 | 0,328 | SARIMAX |
+| SARIMAX | ETS | −0,87 | 0,389 | SARIMAX |
+| SARIMAX | Naive estacional | −2,74 | 0,008 | SARIMAX |
 | LightGBM directo | SARIMA | −0,74 | 0,463 | LightGBM directo |
 | LightGBM directo | ETS | −0,76 | 0,447 | LightGBM directo |
-| LightGBM directo | Media móvil 4 semanas | −1,61 | 0,113 | LightGBM directo |
 | LightGBM directo | Naive estacional | −2,44 | 0,017 | LightGBM directo |
 | SARIMA | ETS | −0,11 | 0,915 | SARIMA |
-| SARIMA | Media móvil 4 semanas | −0,61 | 0,543 | SARIMA |
 | SARIMA | Naive estacional | −2,43 | 0,018 | SARIMA |
-| ETS | Media móvil 4 semanas | −0,69 | 0,492 | ETS |
 | ETS | Naive estacional | −2,67 | 0,009 | ETS |
-| Media móvil 4 semanas | Naive estacional | −2,41 | 0,018 | Media móvil 4 semanas |
 
 ![Backtest del total](figures/07_backtest_total.png)
 
 ### Backtest por segmento (24/08/2026–14/11/2026)
 
-Mismos 12 orígenes, los mismos 7 modelos y el mismo intervalo que el Total. Empresas usa su cierre propio del 24/05/2025.
+Mismos 12 orígenes, los mismos 8 modelos y el mismo intervalo que el Total. Empresas usa su cierre propio del 24/05/2025.
 
 | Segmento | Modelo | MASE | WAPE | Cobertura 80 % |
 |---|---|---|---|---|
 | Particulares | ETS | 0,888 | 12,4 % | 76 % |
 | Particulares | LightGBM directo | 0,922 | 12,9 % | 80 % |
+| Particulares | SARIMAX | 0,938 | 13,1 % | 77 % |
 | Particulares | SARIMA | 0,972 | 13,6 % | 80 % |
 | Particulares | MLP | 0,987 | 13,8 % | 80 % |
 | Particulares | Media móvil 4 semanas | 1,030 | 14,4 % | 76 % |
 | Particulares | Naive estacional | 1,246 | 17,4 % | 80 % |
 | Particulares | Naive | 2,185 | 30,7 % | 75 % |
+| Empresas | SARIMAX | 1,021 | 10,9 % | 79 % |
 | Empresas | LightGBM directo | 1,056 | 11,3 % | 80 % |
 | Empresas | MLP | 1,063 | 11,4 % | 75 % |
 | Empresas | ETS | 1,068 | 11,4 % | 77 % |
@@ -88,18 +91,39 @@ Mismos 12 orígenes, los mismos 7 modelos y el mismo intervalo que el Total. Emp
 | Empresas | Naive estacional | 1,222 | 13,1 % | 79 % |
 | Empresas | Naive | 7,300 | 78,0 % | 87 % |
 
-En particulares, ETS queda primero (0,888) y LightGBM directo segundo (0,922), pero Diebold-Mariano no los separa (p = 0,54). LightGBM le gana al naive estacional (1,246; p = 0,057). En empresas, LightGBM directo es el de menor MASE (1,056); Diebold-Mariano no lo separa de MLP (p = 0,91) y contra el naive estacional (1,222) da p = 0,060. El plan de compras sigue usando LightGBM directo en los dos segmentos: es el primero en el Total y en empresas, y en particulares la diferencia con ETS no es significativa.
+En particulares, ETS queda primero (0,888) y LightGBM directo segundo (0,922), pero Diebold-Mariano no los separa (p = 0,54). LightGBM le gana al naive estacional (1,246; p = 0,057). En empresas, SARIMAX queda primero (1,021) y LightGBM directo segundo (1,056), pero Diebold-Mariano no los separa (p = 0,80). LightGBM le gana al naive estacional (1,222; p = 0,060). El plan de compras sigue usando LightGBM directo en los dos segmentos, por robustez (ver abajo).
 
-### Control: SARIMA con calendario (Total, 24/08/2026–14/11/2026)
+### Robustez: dos ventanas de 12 semanas, tres series
 
-El mismo SARIMA sobre log(y), con la misma grilla de órdenes y AIC, más las variables de calendario (feriado laborable, víspera y día después de un cierre, Turismo, verano) como exógenas: una regresión con errores SARIMA. No entra al ranking; sirve para ver si la ventaja de LightGBM es solo que ve el calendario.
+Puesto de cada modelo por MASE (1 = menor error). Ventana anterior: 08/06/2026–29/08/2026; ventana nueva: 24/08/2026–14/11/2026. Las dos ventanas se superponen una semana (24/08–29/08/2026), así que no son pruebas independientes.
 
-| Modelo | MASE | WAPE | Cobertura 80 % |
+| Modelo | Total, anterior | Total, nueva | Particulares, anterior | Particulares, nueva | Empresas, anterior | Empresas, nueva |
+|---|---|---|---|---|---|---|
+| LightGBM directo | 1 | 2 | 1 | 2 | 2 | 2 |
+| ETS | 3 | 4 | 2 | 1 | 5 | 4 |
+| SARIMA | 4 | 3 | 4 | 4 | 3 | 6 |
+| Media móvil 4 semanas | 2 | 5 | 3 | 6 | 4 | 5 |
+| SARIMAX | 5 | 1 | 6 | 3 | 1 | 1 |
+| MLP | 6 | 6 | 5 | 5 | 6 | 3 |
+| Naive estacional | 7 | 7 | 7 | 7 | 7 | 7 |
+| Naive | 8 | 8 | 8 | 8 | 8 | 8 |
+
+LightGBM directo queda 1.º o 2.º en las seis. Peor caso de cada modelo: el máximo, entre las seis, de (MASE / MASE del mejor − 1) × 100:
+
+| Modelo | Peor caso (% sobre el mejor) | Serie | Ventana |
 |---|---|---|---|
-| SARIMA con calendario | 0,842 | 8,8 % | 82 % |
-| LightGBM directo | 0,846 | 8,9 % | 76 % |
+| LightGBM directo | +3,9 % | Particulares | nueva (24/08/2026–14/11/2026) |
+| ETS | +11,5 % | Empresas | anterior (08/06/2026–29/08/2026) |
+| SARIMA | +14,3 % | Empresas | nueva (24/08/2026–14/11/2026) |
+| Media móvil 4 semanas | +16,1 % | Particulares | nueva (24/08/2026–14/11/2026) |
+| SARIMAX | +20,6 % | Total | anterior (08/06/2026–29/08/2026) |
+| MLP | +23,0 % | Total | nueva (24/08/2026–14/11/2026) |
+| Naive estacional | +45,9 % | Particulares | anterior (08/06/2026–29/08/2026) |
+| Naive | +850,1 % | Empresas | anterior (08/06/2026–29/08/2026) |
 
-SARIMA con calendario le gana a LightGBM directo (MASE 0,842 contra 0,846); Diebold-Mariano p = 0,95.
+SARIMAX (SARIMA + calendario) empata con LightGBM en el Total de la ventana nueva (MASE 0,842 contra 0,846; Diebold-Mariano p = 0,95), pero en la anterior queda 5.º (1,346 contra 1,116; p = 0,038 a favor de LightGBM). Se descarta y se mantiene LightGBM directo por robustez: no es el que más gana, es el que nunca falla. En cada ventana, Diebold-Mariano no lo separa del mejor (p ≥ 0,54).
+
+Chequeo sin el lunes 17/08/2026 (export incompleto), ventana anterior (08/06/2026–29/08/2026), mismo recorte para los 8 modelos: los puestos de LightGBM y SARIMAX no cambian en ninguna serie (LightGBM en el Total: MASE 1,116 → 1,008; robustez_sin_17_08.csv).
 
 ## 3. Clima → mix de categorías
 
@@ -258,11 +282,11 @@ Cadena de multiplicaciones: plan por segmento × categoría → reparto entre lo
 | Pronóstico del total | Horizonte: la semana siguiente, con datos hasta el sábado | Es como se planifica en el negocio: el fin de semana se decide qué comprar y cocinar para la semana. | negocio |
 | Pronóstico del total | Backtest walk-forward de 12 semanas | Simula exactamente el uso real: cada semana se reentrena con todo lo disponible y nunca se mira el futuro (hay tests de leakage). | técnica |
 | Pronóstico del total | MASE, WAPE y cobertura del intervalo 80 %; nada de MAPE | MAPE explota con días chicos y castiga asimétricamente. MASE, WAPE y la cobertura además no cambian con el escalado K. | técnica |
-| Pronóstico del total | Siete modelos, de lo más simple a lo más complejo | Son los modelos de series temporales clásicos y los de ML que se vieron en el curso (boosting y redes MLP), así que todo se puede explicar. ETS elige por AIC entre estacionalidad aditiva o multiplicativa y sin tendencia o con tendencia amortiguada. El MLP escala con media y desvío de su tramo de entrenamiento y frena con early stopping sobre las últimas 4 semanas de cada origen; semilla 42. | técnica |
+| Pronóstico del total | Ocho modelos, de lo más simple a lo más complejo | Son los modelos de series temporales clásicos y los de ML que se vieron en el curso (boosting y redes MLP), así que todo se puede explicar. ETS elige por AIC entre estacionalidad aditiva o multiplicativa y sin tendencia o con tendencia amortiguada. El MLP escala con media y desvío de su tramo de entrenamiento y frena con early stopping sobre las últimas 4 semanas de cada origen; semilla 42. | técnica |
 | Pronóstico del total | Órdenes del SARIMA elegidos por AIC en cada origen | El log estabiliza la varianza, que crece con el nivel. D = 1 porque con una diferencia estacional de 6 días la serie es estacionaria (ADF del EDA) y d = 0 para no diferenciar de más; la constante es el crecimiento medio semana a semana. El AIC premia el ajuste y castiga los parámetros de más, y elegir en cada origen con su propio entrenamiento evita mirar el test. | técnica |
 | Pronóstico del total | Intervalo 80 % con los errores recientes de cada modelo | Es el mismo método para todos los modelos, no supone ninguna distribución y solo usa semanas que ya terminaron al momento del origen (la semana pronosticada desde o − 1 termina justo en o), así que no mira el test. Se usa el cociente y no la diferencia porque la serie crece y el error escala con el nivel. 12 semanas: suficientes errores (~70 días) y lo bastante recientes. Con LightGBM en el Total cubrió el 76 % (54 de 71 días; IC 95 % de Wilson 65–84 %, backtest 24/08–14/11/2026), algo por debajo del 80 %. Con 71 días esa diferencia es compatible con el azar. | técnica |
-| Pronóstico del total | LightGBM directo como modelo del total (y de los segmentos) | Menor error en el Total en dos ventanas (08/06–29/08 y 24/08–14/11/2026) y en empresas; en particulares ETS queda apenas primero, sin diferencia significativa (DM p = 0,54). Ni Diebold-Mariano ni el SARIMA con calendario lo superan, pero tampoco se separan de él: SARIMA (p = 0,46), ETS (p = 0,45), SARIMA con calendario (MASE 0,842, p = 0,95). En Diebold-Mariano la media móvil de 4 semanas gana más días que LightGBM (37 contra 34), pero tiene más error total (p = 0,11). El MLP (1,036) no le gana a LightGBM y se reporta así. Cambiar de modelo no mejora el error de forma significativa y movería todo el plan. | técnica |
-| Pronóstico del total | Control: SARIMA con calendario | LightGBM era el único modelo que veía el calendario, así que la comparación no era pareja. Con el calendario, SARIMA lo iguala: la ventaja de LightGBM no viene de ver el calendario, y ese argumento deja de usarse para elegirlo. Se mantiene LightGBM porque la diferencia es nula y cambiarlo movería todo el plan sin ganar precisión. | técnica |
+| Pronóstico del total | LightGBM directo como modelo del total (y de los segmentos), por robustez | Robustez: en dos ventanas de 12 semanas y tres series (Total, particulares, empresas) LightGBM es el único que siempre queda 1.º o 2.º, y en su peor caso está +3,9 % por encima del mejor (MASE, particulares, ventana nueva). Los otros modelos quedan, en su peor caso, entre +11,5 % (ETS, empresas, anterior) y +20,6 % (SARIMAX, Total, anterior), y el MLP en +23,0 % (robustez_peor_caso.csv). En cada ventana Diebold-Mariano no lo separa del mejor: Total nueva contra SARIMAX p = 0,95, particulares nueva contra ETS p = 0,54, empresas nueva contra SARIMAX p = 0,80, empresas anterior contra SARIMAX p = 0,89; en el Total y particulares de la ventana anterior es el primero. Matiz: las dos ventanas se superponen una semana (24/08–29/08/2026), así que no son pruebas independientes. El MLP no le gana a LightGBM y se reporta así. | negocio |
+| Pronóstico del total | SARIMAX probado como candidato y descartado; se mantiene LightGBM por robustez | No se puede elegir un modelo solo por la ventana donde ganó. En la ventana nueva SARIMAX iguala a LightGBM (y muestra que la ventaja de LightGBM no viene de ver el calendario, argumento que ya no se usa), pero en la anterior queda significativamente peor en el Total. LightGBM nunca sale del 1.º o 2.º puesto. Matiz: las ventanas se superponen una semana (24/08–29/08/2026) y no son pruebas independientes; y en cada ventana LightGBM no se distingue estadísticamente de los mejores. Chequeo sin el lunes 17/08/2026 (export incompleto) en la ventana anterior: los puestos de LightGBM y SARIMAX no cambian en ninguna serie (robustez_sin_17_08.csv). | negocio |
 | Pronóstico del total | El clima no entra al pronóstico del total | El clima no mueve cuántas viandas se piden, sino cuáles. Además es dato observado: en producción habría que usar el pronóstico del tiempo, que agrega error. | técnica |
 | Clima y mix de categorías | El clima va como hallazgo descriptivo, no como mejora del pronóstico | Con calor (24,6 °C) contra frío (11,3 °C) la carne vacuna cae 7,2 pp en empresas y 2,5 pp en particulares (IC 95 % sin cero; mix_efecto_temperatura.csv, 06/05/2025–14/11/2026). Para pronosticar, el clima no agrega: en empresas media_4sem tiene la menor log loss (1,6792 contra 1,6817 del multinomial con clima); en particulares el multinomial con clima queda apenas primero (1,7485 contra 1,7502 de media_4sem, −0,1 %), pero sin clima da lo mismo (1,7486): la mejora es del multinomial, no de la temperatura (backtest 24/08–14/11/2026). El mix reciente ya trae la estación. | negocio |
 | Clima y mix de categorías | Categorías = segmento (LightGBM) × participación media de 4 semanas | MASE 0,901 en categorías contra 0,907 del multinomial y 0,905 del multinomial con clima (backtest 24/08–14/11/2026), y el intervalo 80 % cubre 78,5 %. Es coherente por construcción (las categorías suman el segmento) y aprovecha el mejor modelo del total. | negocio |

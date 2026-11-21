@@ -22,7 +22,7 @@ Pasos sueltos: `python main.py <paso>`.
 | `calendar` | Feriados de Uruguay, días hábiles, variables de calendario | `data/processed/calendario.csv` |
 | `clima` | Clima diario de Montevideo (Open-Meteo) | `data/external/` |
 | `eda` | STL, ACF/PACF, ADF, perfiles, efectos de calendario, mix vs. temperatura | figuras 01–04 y 06 |
-| `backtest` | 7 modelos (naive, naive estacional, media móvil, ETS, SARIMA, LightGBM directo, MLP), walk-forward de 12 semanas, sobre el Total y cada segmento (semanas 24/08–14/11/2026), más el control SARIMA con calendario (solo Total) | `backtest_total_*`, `backtest_particulares_*`, `backtest_empresas_*`, `backtest_total_sarima_cal.csv`, figura 07 |
+| `backtest` | 8 modelos (naive, naive estacional, media móvil, ETS, SARIMA, LightGBM directo, MLP y SARIMAX = SARIMA con calendario), walk-forward de 12 semanas, sobre el Total y cada segmento, en dos ventanas (semanas 08/06–29/08/2026 y 24/08–14/11/2026); robustez: puesto y peor caso de cada modelo | `backtest_total_*`, `backtest_particulares_*`, `backtest_empresas_*` (`*_ventana_anterior_*`), `robustez_*.csv`, `sarimax_coeficientes.csv`, figura 07 |
 | `mix` | Clima → mix de categorías: efecto de la temperatura, participación media de 4 semanas vs. multinomial | `mix_*`, figuras 08–09 |
 | `eventos` | Contrafactuales SARIMA, placebos y efecto mínimo detectable (incluye el cambio de reparto de Meta del 05/09 y la baja de pauta de noviembre 2026) | `eventos_*`, figura 10 |
 | `ads` | Meta Ads: variación del gasto y de los clics, regresiones log-log (gasto total, gasto de campaña, clics) y Granger con 1 rezago | `ads_*`, figura 11 |
