@@ -361,7 +361,7 @@ function Conclusion() {
   const p90 = plan.simulacion.find((x) => x.metodo === plan.elegido.metodo && x.p === 90)!;
   const frases = [
     <>La demanda de la semana se puede anticipar con un error del <b>{pctFrac(g.wape, 1)}</b>. LightGBM es el más robusto (nunca sale de los dos primeros), pero SARIMA y ETS andan cerca: <b>lo simple también sirve</b>.</>,
-    <>El clima cambia <b>qué</b> se pide, no <b>cuánto</b>. De las acciones, solo postres y panes en la web tuvieron un efecto claro; Meta no se puede evaluar hasta <b>variar el gasto a propósito</b>.</>,
+    <>El clima cambia <b>qué</b> se pide, no <b>cuánto</b>. De las acciones, solo los postres en la web tuvieron un efecto claro (panes: chico, a confirmar); Meta no se puede evaluar hasta <b>variar el gasto a propósito</b>.</>,
     <>Conviene comprar <b>cerca de lo esperado</b>: asegurarse el 90&nbsp;% cuesta <b>${num(p90.costo, 1)}</b> contra ${num(plan.elegido.costo, 1)} por vianda. El plan sale cada sábado, en kilos por ingrediente.</>,
   ];
   return (

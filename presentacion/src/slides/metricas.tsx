@@ -171,7 +171,7 @@ function DmLjung() {
         </Paso>
         <Paso n={0}><DiferenciaDiaria a={total.pred.lgbm_directo} b={total.pred.media_movil_4sem} /></Paso>
         <Paso n={1} style={{ marginTop: 'auto' }}>
-          <Resultado p={`p = ${pval(mm.p)}`} titulo="Empate: ninguno gana claro" periodo={`backtest ${meta.btPeriodo}`} regla={<>Con <b>p &lt; 0,05</b> la diferencia sería real. Acá se reparten casi mitad y mitad: la media móvil gana {mm.gana2} días y LightGBM {mm.gana1}, pero cuando pierde, pierde por más.<br /><span style={{ color: 'var(--tinta-45)' }}>Empate no es igualdad: 12 semanas no alcanzan para separarlos. Elegimos LightGBM por tener el menor error total.</span></>} />
+          <Resultado p={`p = ${pval(mm.p)}`} titulo="Empate: ninguno gana claro" periodo={`backtest ${meta.btPeriodo}`} regla={<>Con <b>p &lt; 0,05</b> la diferencia sería real. Acá se reparten casi mitad y mitad: la media móvil gana {mm.gana2} días y LightGBM {mm.gana1}, pero cuando pierde, pierde por más.<br /><span style={{ color: 'var(--tinta-45)' }}>Empate no es igualdad: 12 semanas no alcanzan para separarlos. Por eso lo elegimos por robustez, no por ganar (próxima diapositiva).</span></>} />
         </Paso>
       </div>
       <div style={{ background: 'var(--tinta-12)' }} />
