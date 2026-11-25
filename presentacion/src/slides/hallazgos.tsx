@@ -299,35 +299,6 @@ function PlanCompras() {
 const d3sum = (v: number[]) => v.reduce((a, b) => a + b, 0);
 
 // ---------------------------------------------------------------- E. Cierre
-// Versión corta para la diapositiva; el detalle va en las notas y en decisiones.yaml.
-const DEC_CORTA: Record<string, [string, string]> = {
-  dias_habiles: ['Los días cerrados no existen', 'Un día cerrado no es demanda cero: se excluye.'],
-  segmentos: ['Dos segmentos, dos modelos', 'Particulares y empresas tienen semanas opuestas.'],
-  walk_forward: ['Backtest walk-forward', '12 semanas, reentrenando cada una, sin mirar el futuro.'],
-  modelo_total: ['LightGBM, por robustez', 'Siempre 1.º o 2.º en dos ventanas y tres series (total, particulares y empresas); SARIMAX, probado y descartado.'],
-  costo_faltante: ['El faltante tiene costo', 'Sobrar duele más: comprar cerca del pronóstico.'],
-  platos_a_ingredientes: ['Del plan a los ingredientes', 'El recetario permite pasar viandas a kilos; todavía está incompleto.'],
-};
-
-function Decisiones() {
-  const { decisiones } = useDatos();
-  return (
-    <div className="decisiones">
-      {decisiones.map((d, i) => {
-        const [titulo, frase] = DEC_CORTA[d.id] ?? [d.titulo, d.decision];
-        return (
-          <Paso key={d.id} n={i} className="decision">
-            <span className="decision-n">{String(i + 1).padStart(2, '0')}</span>
-            <span className="decision-tipo">{d.quien === 'Lucía' ? 'negocio' : 'técnica'}</span>
-            <h3>{titulo}</h3>
-            <p>{frase}</p>
-          </Paso>
-        );
-      })}
-    </div>
-  );
-}
-
 function Limitaciones() {
   const { limitaciones } = useDatos();
   return (
@@ -393,10 +364,8 @@ export const HALLAZGOS: Diapo[] = [
 ];
 
 export const CIERRE: Diapo[] = [
-  { id: 'decisiones', seccion: 'Cierre', titulo: 'Decisiones clave y por qué', pasos: 6, Comp: Decisiones,
-    notas: () => 'Estas son las decisiones que más pesan. Algunas son del negocio, como que los días cerrados no existen o cómo se valora el faltante; otras son técnicas, como validar con walk-forward. Todas están documentadas con su porqué en el repo.' },
-  { id: 'limitaciones', seccion: 'Cierre', titulo: 'Lo que estos datos no permiten decir', pasos: 6, Comp: Limitaciones,
-    notas: () => 'Lo más importante: sin la hora de creación del pedido no podemos usar lo ya confirmado; faltan los pedidos que entran por fuera del sistema; Meta no se puede medir sin variar el gasto ni saber de qué anuncio viene cada pedido; y la suba de precio y la baja de pauta tienen pocas semanas. Sobre p: no es data leakage, porque cada plan usa solo semanas ya terminadas; pero p se elige con el mismo backtest en el que se informa el costo, así que ese costo es algo optimista. Las acciones para resolverlas están en la hoja de ruta que vimos.' },
+  { id: 'limitaciones', seccion: 'Cierre', titulo: 'Lo que estos datos no permiten decir', pasos: 4, Comp: Limitaciones,
+    notas: () => 'Lo más importante: sin la hora de creación del pedido no podemos usar lo ya confirmado; y faltan los pedidos que entran por fuera del sistema. Sobre p: no es data leakage, porque cada plan usa solo semanas ya terminadas; pero p se elige con el mismo backtest en el que se informa el costo, así que ese costo es algo optimista. Las acciones para resolverlas están en la hoja de ruta que vimos.' },
   { id: 'conclusion', seccion: 'Cierre', titulo: 'Conclusión', pasos: 4, propia: true, Comp: Conclusion,
     notas: () => 'Cerrá con las tres frases, despacio. Uno: se puede pronosticar bien, y un modelo simple compite con el mejor. Dos: qué mueve la demanda, qué acción funcionó y qué hay que hacer para medir Meta. Tres: comprar cerca del pronóstico es lo más barato, y el plan ya sale listo cada sábado. Después, abrí a preguntas.' },
 ];

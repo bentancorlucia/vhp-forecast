@@ -13,6 +13,6 @@ export const SEP_HALLAZGOS = sep(1, 'Hallazgos', 'Hallazgos', 'Qué nos dijeron 
 export const SEP_USO = sep(2, 'Cómo se usa', '¿Cómo se usa?', 'Del modelo a la compra del sábado.',
   ['La compra, en una cuenta', 'Su código', 'El colchón', 'El ritual del sábado', 'Qué mejoraría'],
   'Esta parte es la más práctica: qué haría el negocio con esto, cada semana.');
-export const SEP_CIERRE = sep(3, 'Cierre', 'Cierre', 'Las decisiones que más pesaron, lo que no sabemos y la conclusión.',
-  ['Decisiones clave', 'Limitaciones', 'Conclusión'],
-  'Cerramos con las decisiones, las limitaciones y tres frases.');
+export const SEP_CIERRE = sep(3, 'Cierre', 'Cierre', 'Lo que no sabemos y la conclusión.',
+  ['Limitaciones', 'Conclusión'],
+  'Cerramos con las limitaciones y tres frases.');

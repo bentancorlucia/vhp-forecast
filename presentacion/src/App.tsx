@@ -142,6 +142,12 @@ export function Presentacion() {
   const datos = useDatos();
   const s = useEscalaVentana();
   const reduce = useReducedMotion() ?? false;
+  const [completa, setCompleta] = useState(false);
+  useEffect(() => {
+    const on = () => setCompleta(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', on);
+    return () => document.removeEventListener('fullscreenchange', on);
+  }, []);
 
   useEffect(() => {
     const antes = () => flushSync(() => setImprimiendo(true));
@@ -180,6 +186,14 @@ export function Presentacion() {
       </div>
       <div className="progreso" style={{ width: `${((pos.i + (pos.paso + 1) / d.pasos) / TOTAL) * 100}%` }} />
       <div className="numero">{pos.i + 1} / {TOTAL}</div>
+      <button className="btn-pantalla" onClick={(e) => { e.stopPropagation(); pantallaCompleta(); }}
+        title={completa ? 'Salir de pantalla completa (F)' : 'Pantalla completa (F)'} aria-label="Pantalla completa">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {completa
+            ? <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />
+            : <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />}
+        </svg>
+      </button>
       {notas && (
         <div className="panel-notas" onClick={(e) => e.stopPropagation()}>
           <b>Notas · {d.titulo}</b><br />{d.notas(datos)}

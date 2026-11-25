@@ -214,6 +214,8 @@ table.tabla { border-collapse: collapse; width: 100%; font-size: 20px; font-feat
 .mini-tit{font-size:15px;margin-top:8px;display:block}
 .progreso{position:fixed;left:0;bottom:0;height:4px;background:var(--ambar);transition:width .5s var(--curva);z-index:20}
 .numero{position:fixed;right:18px;bottom:12px;font-size:13px;color:var(--tinta-70);z-index:20;font-variant-numeric:tabular-nums}
+.btn-pantalla{position:fixed;right:72px;bottom:6px;z-index:20;display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--tinta-70);cursor:pointer;opacity:.55;transition:opacity .2s,background .2s}
+.btn-pantalla:hover{opacity:1;background:var(--crema-osc)}
 .panel-notas{position:fixed;left:50%;transform:translate(-50%);bottom:24px;width:min(1000px,92vw);z-index:25;background:var(--blanco);border-left:6px solid var(--ambar);border-radius:6px 16px 16px 6px;padding:18px 24px;font-size:19px;line-height:1.5;box-shadow:0 20px 50px -10px #7a540259}
 .panel-notas b{color:var(--ambar)}
 .vista-notas{position:fixed;top:0;right:0;bottom:0;left:0;display:grid;grid-template-columns:1.4fr 1fr;grid-template-rows:auto 1fr;gap:20px;padding:22px;background:var(--crema-osc);overflow:hidden}
@@ -225,7 +227,7 @@ table.tabla { border-collapse: collapse; width: 100%; font-size: 20px; font-feat
 .mazo-impresion{display:none}
 @page{size:1600px 900px;margin:0}
 @media print{html,body,#root{height:auto;overflow:visible;background:var(--crema)}
-.escenario,.progreso,.numero,.panel-notas,.indice{display:none!important}
+.escenario,.progreso,.numero,.btn-pantalla,.panel-notas,.indice{display:none!important}
 .mazo-impresion{display:block}
 .hoja{width:1600px;height:900px;position:relative;page-break-after:always;break-after:page;overflow:hidden}
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact}

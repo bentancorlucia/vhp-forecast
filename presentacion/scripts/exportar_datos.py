@@ -68,8 +68,6 @@ METODOS_MIX = {"media_4sem": "Media 4 semanas", "multinomial": "Multinomial", "m
 LIMITACIONES = [
     {"titulo": "Sin hora de creación del pedido", "texto": "Solo sabemos el día de entrega, no cuándo se pidió.", "implica": "El pronóstico no usa los pedidos ya confirmados.", "fuente": "decisiones.yaml (fecha_entrega)"},
     {"titulo": "Faltan pedidos fuera del sistema", "texto": "WhatsApp, teléfono y carga manual no figuran.", "implica": "La demanda real es algo mayor.", "fuente": "decisiones.yaml (periodo)"},
-    {"titulo": "Meta: sin variación ni origen del pedido", "texto": "El gasto casi no varía (CV 2,8 %) y no hay UTM.", "implica": "No sabemos cuánto rinde Meta ni qué anuncio funciona.", "fuente": "decisiones.yaml (meta_no_identificado, eventos_meta_nuevos)"},
-    {"titulo": "Suba de precio, preliminar", "texto": "Solo 8 semanas después y 4 placebos.", "implica": "El p-placebo no baja de 0,2: aún no se distingue de cero.", "fuente": "decisiones.yaml (suba_precio_preliminar)"},
     {"titulo": "Recetario incompleto", "texto": "26 platos (13,7 %) sin receta; XL estimadas como normal × 1,30.", "implica": "La lista de compras queda corta en esos platos.", "fuente": "decisiones.yaml (platos_a_ingredientes, xl_sin_receta)"},
     {"titulo": "Clima observado y p optimista", "texto": "Se usa el clima real, y p se elige en las mismas semanas que se evalúa.", "implica": "Sin leakage, pero el costo es algo optimista.", "fuente": "decisiones.yaml (clima_total, plan_colchon)"},
 ]
